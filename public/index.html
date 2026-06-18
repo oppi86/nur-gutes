@@ -67,12 +67,17 @@
       .guide-shop { background: #f7f4ef; }
       .guide-card { border: 1px solid #e7e1d7; box-shadow: none; padding: 22px; }
       .price { display: inline-flex; margin-top: 12px; border-radius: 999px; background: #f9d65c; color: #20211d; padding: 9px 13px; font-size: 13px; font-weight: 900; }
+      .calculator { background: #17332f; color: white; }
+      .calculator .muted { color: rgba(255,255,255,.78); }
+      .calc-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; margin-top: 26px; }
+      .calc-card { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); box-shadow: none; padding: 18px; }
+      .calc-card strong { display: block; font-size: 32px; line-height: 1; color: #f9d65c; }
       footer { background: #20211d; color: white; padding: 40px 48px; }
       @media (max-width: 860px) {
         .hero, section, footer { padding-left: 20px; padding-right: 20px; }
         nav div { display: none; }
         .section-head, .week-grid, .commons-grid, .impact-grid { display: block; }
-        .grid3, .grid2, .idea-list, .small-cards, .metric-row, .bounty-board { grid-template-columns: 1fr; }
+        .grid3, .grid2, .idea-list, .small-cards, .metric-row, .bounty-board, .calc-grid { grid-template-columns: 1fr; }
         .week-title, .feed { margin-bottom: 20px; }
       }
     </style>
@@ -103,7 +108,7 @@
       </section>
 
       <section id="ideen" class="dark">
-        <div class="wrap impact-grid"><div><p class="eyebrow">Business Ideen</p><h2>Kleine Modelle, die Geld verdienen und Menschen helfen</h2><p class="muted">Die besten Ideen sind nah am Alltag: echtes Beduerfnis, einfacher Test, fairer Preis, sichtbare Wirkung.</p></div><div class="idea-list"><article>Klimabildung als spielbare Schulstunde.</article><article>Faire Gruenderinnen-Netzwerke lokal verbinden.</article><article>Abwasser-zu-Energie-Beratung fuer Kommunen.</article><article>Purpose-Finanzierung fuer kleine Unternehmen.</article><article>Impact-Partner-Seiten fuer lokale Betriebe: jeder Partner finanziert eine gute Tat und bekommt eine transparente Wirkungsseite.</article><article>Gute-Taten-Auftragsboerse: Menschen und Firmen finanzieren kleine Aufgaben, die nach Umsetzung als teilbare Wirkungsgeschichte erscheinen.</article><article>Pay-what-you-can Mini-Guides: kompakte Anleitungen werden geteilt, finanzieren Bounties und bringen neue Menschen auf die Plattform.</article></div></div>
+        <div class="wrap impact-grid"><div><p class="eyebrow">Business Ideen</p><h2>Kleine Modelle, die Geld verdienen und Menschen helfen</h2><p class="muted">Die besten Ideen sind nah am Alltag: echtes Beduerfnis, einfacher Test, fairer Preis, sichtbare Wirkung.</p></div><div class="idea-list"><article>Klimabildung als spielbare Schulstunde.</article><article>Faire Gruenderinnen-Netzwerke lokal verbinden.</article><article>Abwasser-zu-Energie-Beratung fuer Kommunen.</article><article>Purpose-Finanzierung fuer kleine Unternehmen.</article><article>Impact-Partner-Seiten fuer lokale Betriebe: jeder Partner finanziert eine gute Tat und bekommt eine transparente Wirkungsseite.</article><article>Gute-Taten-Auftragsboerse: Menschen und Firmen finanzieren kleine Aufgaben, die nach Umsetzung als teilbare Wirkungsgeschichte erscheinen.</article><article>Pay-what-you-can Mini-Guides: kompakte Anleitungen werden geteilt, finanzieren Bounties und bringen neue Menschen auf die Plattform.</article><article>Wirkungsrechner: zeigt transparent, wie Partner, Guides und Bounties Einnahmen in konkrete gute Taten verwandeln.</article></div></div>
       </section>
 
       <section class="week">
@@ -153,6 +158,18 @@
         </div>
       </section>
 
+      <section class="calculator">
+        <div class="wrap">
+          <div class="section-head"><div><p class="eyebrow">Iteration 4</p><h2>Wirkungsrechner fuer selbstfinanzierte gute Taten</h2></div><p class="muted">Ein einfacher oeffentlicher Rechner macht das Modell verstaendlich: Einnahmen werden nicht abstrakt gesammelt, sondern in konkrete finanzierte Aufgaben, Stories und Wachstum uebersetzt.</p></div>
+          <div class="calc-grid">
+            <article class="calc-card"><p class="tag">Monat</p><strong>5</strong><p>Impact-Partner finanzieren je 49 Euro.</p></article>
+            <article class="calc-card"><p class="tag">Guides</p><strong>30</strong><p>Mini-Guides bringen im Schnitt 5 Euro freiwilligen Beitrag.</p></article>
+            <article class="calc-card"><p class="tag">Wirkungstopf</p><strong>322 Euro</strong><p>Nach Plattformanteil fliessen Mittel in offene gute Taten.</p></article>
+            <article class="calc-card"><p class="tag">Moeglich</p><strong>9</strong><p>kleine Bounties wie Einkaufshilfe, Coaching oder Reparaturhilfe.</p></article>
+          </div>
+        </div>
+      </section>
+
       <section>
         <div class="wrap">
           <div class="section-head"><div><p class="eyebrow">Weitere echte Artikel</p><h2>Business, Wirkung und innere Klarheit</h2></div></div>
@@ -171,7 +188,7 @@
 
       <section id="finden">
         <div class="wrap">
-          <div class="commons-grid"><div><p class="tag">Open Self Commons</p><h2>Eine offene Social-Plattform zum Sich-selber-Finden</h2><p class="muted">Ein oeffentlicher, quelloffener Feed fuer innere Klarheit: Menschen teilen Fragen, kleine Durchbrueche und Uebungen, andere antworten mit Resonanz statt Bewertung.</p><a class="button yellow" href="mailto:hallo@nur-gutes.local?subject=Open%20Self%20Commons%20Beitrag">Beitrag vorschlagen</a></div><div class="feed"><div class="chips"><span>Werte</span><span>Mut</span><span>Sinn</span><span>Impact</span></div><article><p><strong>@nur-gutes</strong> / Tagesidee / Iteration 3</p><p class="muted">Neue Business-Idee: Pay-what-you-can Mini-Guides. Kurze Anleitungen helfen Menschen sofort, werden leicht geteilt und leiten bezahlte Beitraege in den Wirkungstopf fuer offene Bounties.</p><p class="tag">Neu umgesetzt</p></article><article><p><strong>@nur-gutes</strong> / Tagesidee / Iteration 2</p><p class="muted">Neue Business-Idee: Gute-Taten-Auftragsboerse. Kleine Aufgaben bekommen ein Budget, Menschen setzen sie um, und die Plattform teilt die Wirkung als Story. So entsteht Nutzen, Reichweite und ein fairer Finanzierungsanteil.</p><p class="tag">Neu umgesetzt</p></article><article><p><strong>@nur-gutes</strong> / Tagesidee / heute</p><p class="muted">Neue Business-Idee: Impact-Partner-Seiten fuer lokale Betriebe. Wenn ein Partner 49 Euro im Monat zahlt, wird daraus eine dokumentierte gute Tat plus eine oeffentliche Wirkungsstory. So kann Reichweite wachsen, ohne den Sinn zu verkaufen.</p><p class="tag">Neu umgesetzt</p></article><article><p><strong>@leise-mut</strong> / Werte / heute</p><p class="muted">Ich habe gemerkt, dass ich oft Ziele verfolge, die gut klingen, aber nicht gut leben.</p><p class="tag">18 Antworten</p></article><article><p><strong>@neustart-42</strong> / Arbeit / gestern</p><p class="muted">Heute habe ich eine Bewerbung nicht abgeschickt, weil sie perfekt war, sondern weil sie ehrlich war.</p><p class="tag">31 Antworten</p></article><article><p><strong>@kompass</strong> / Frage / 2 Tage</p><p class="muted">Welche Gewohnheit schuetzt mein altes Ich, obwohl mein neues Ich etwas anderes braucht?</p><p class="tag">44 Antworten</p></article></div></div>
+          <div class="commons-grid"><div><p class="tag">Open Self Commons</p><h2>Eine offene Social-Plattform zum Sich-selber-Finden</h2><p class="muted">Ein oeffentlicher, quelloffener Feed fuer innere Klarheit: Menschen teilen Fragen, kleine Durchbrueche und Uebungen, andere antworten mit Resonanz statt Bewertung.</p><a class="button yellow" href="mailto:hallo@nur-gutes.local?subject=Open%20Self%20Commons%20Beitrag">Beitrag vorschlagen</a></div><div class="feed"><div class="chips"><span>Werte</span><span>Mut</span><span>Sinn</span><span>Impact</span></div><article><p><strong>@nur-gutes</strong> / Tagesidee / Iteration 4</p><p class="muted">Neue Business-Idee: Wirkungsrechner. Wer sieht, wie 5 Partner und 30 Mini-Guides neun konkrete gute Taten finanzieren koennen, versteht schneller, warum Mitmachen wirkt und Teilen hilft.</p><p class="tag">Neu umgesetzt</p></article><article><p><strong>@nur-gutes</strong> / Tagesidee / Iteration 3</p><p class="muted">Neue Business-Idee: Pay-what-you-can Mini-Guides. Kurze Anleitungen helfen Menschen sofort, werden leicht geteilt und leiten bezahlte Beitraege in den Wirkungstopf fuer offene Bounties.</p><p class="tag">Neu umgesetzt</p></article><article><p><strong>@nur-gutes</strong> / Tagesidee / Iteration 2</p><p class="muted">Neue Business-Idee: Gute-Taten-Auftragsboerse. Kleine Aufgaben bekommen ein Budget, Menschen setzen sie um, und die Plattform teilt die Wirkung als Story. So entsteht Nutzen, Reichweite und ein fairer Finanzierungsanteil.</p><p class="tag">Neu umgesetzt</p></article><article><p><strong>@nur-gutes</strong> / Tagesidee / heute</p><p class="muted">Neue Business-Idee: Impact-Partner-Seiten fuer lokale Betriebe. Wenn ein Partner 49 Euro im Monat zahlt, wird daraus eine dokumentierte gute Tat plus eine oeffentliche Wirkungsstory. So kann Reichweite wachsen, ohne den Sinn zu verkaufen.</p><p class="tag">Neu umgesetzt</p></article><article><p><strong>@leise-mut</strong> / Werte / heute</p><p class="muted">Ich habe gemerkt, dass ich oft Ziele verfolge, die gut klingen, aber nicht gut leben.</p><p class="tag">18 Antworten</p></article><article><p><strong>@neustart-42</strong> / Arbeit / gestern</p><p class="muted">Heute habe ich eine Bewerbung nicht abgeschickt, weil sie perfekt war, sondern weil sie ehrlich war.</p><p class="tag">31 Antworten</p></article><article><p><strong>@kompass</strong> / Frage / 2 Tage</p><p class="muted">Welche Gewohnheit schuetzt mein altes Ich, obwohl mein neues Ich etwas anderes braucht?</p><p class="tag">44 Antworten</p></article></div></div>
           <div class="grid3" style="margin-top:48px"><article class="plain-card"><p class="tag">Prompt-Bibliothek</p><p class="today">Was habe ich lange verteidigt, obwohl es mir nicht mehr dient?</p><p class="today">Welche gute Eigenschaft verstecke ich, weil sie nicht cool wirkt?</p><p class="today">Wem wuerde mein Mut helfen, wenn ich ihn heute kleiner teste?</p></article><article class="plain-card"><p class="tag">Starter-Uebungen</p><h3>Morgenfrage</h3><p class="muted">Was wuerde ich heute tun, wenn Anerkennung keine Rolle spielt?</p><h3>Talent-Spur</h3><p class="muted">Welche Aufgabe gibt mir Energie, obwohl sie fuer andere anstrengend wirkt?</p></article><article class="plain-card dark"><p class="eyebrow">Community-Regeln</p><p>Anonym zuerst. Keine Diagnosen. Forkable Wissen. Langsamkeit ist ein Feature.</p></article></div>
         </div>
       </section>
