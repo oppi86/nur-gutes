@@ -1,0 +1,8 @@
+{
+  "name": "nur-gutes",
+  "version": "1.0.0",
+  "private": false,
+  "scripts": {
+    "build": "echo \"Static site ready\""
+  }
+}

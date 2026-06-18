@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nur Gutes</title>
+    <meta name="description" content="Positive News, sinnvolle Business Ideen, gute Taten und Selbstfindung." />
+    <style>
+      * { box-sizing: border-box; }
+      body { margin: 0; background: #f7f4ef; color: #20211d; font-family: Arial, Helvetica, sans-serif; }
+      a { color: inherit; text-decoration: none; }
+      .hero { min-height: 88vh; position: relative; overflow: hidden; padding: 20px 48px; color: white; }
+      .hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+      .shade { position: absolute; inset: 0; background: rgba(18,24,18,.48); }
+      nav, .hero-content { position: relative; z-index: 1; }
+      nav { display: flex; align-items: center; justify-content: space-between; font-weight: 700; }
+      nav div { display: flex; gap: 28px; font-size: 14px; }
+      .brand { font-size: 20px; }
+      .hero-content { min-height: 72vh; max-width: 900px; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 48px; }
+      .pill { width: fit-content; border-radius: 999px; background: rgba(255,255,255,.18); padding: 10px 16px; font-size: 14px; font-weight: 800; }
+      h1 { margin: 28px 0 0; font-size: clamp(52px, 8vw, 88px); line-height: 1; letter-spacing: 0; }
+      h2 { margin: 8px 0 0; font-size: clamp(34px, 5vw, 56px); line-height: 1.08; letter-spacing: 0; }
+      h3 { margin: 12px 0 0; font-size: 25px; line-height: 1.15; }
+      p { line-height: 1.75; }
+      .hero-copy { max-width: 680px; font-size: 19px; color: rgba(255,255,255,.9); }
+      .buttons { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+      .button { display: inline-flex; border-radius: 8px; padding: 14px 20px; font-size: 14px; font-weight: 800; }
+      .yellow { background: #f9d65c; color: #20211d; }
+      .outline { border: 1px solid rgba(255,255,255,.55); color: white; }
+      section { padding: 64px 48px; }
+      .wrap { max-width: 1280px; margin: 0 auto; }
+      .section-head { display: flex; gap: 24px; justify-content: space-between; align-items: flex-end; margin-bottom: 32px; }
+      .eyebrow { margin: 0; color: #577246; font-size: 13px; font-weight: 900; text-transform: uppercase; letter-spacing: .04em; }
+      .muted { color: #575952; }
+      .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+      .grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+      article, .panel { border-radius: 8px; background: white; box-shadow: 0 1px 12px rgba(20,20,20,.06); }
+      article img { width: 100%; height: 220px; object-fit: cover; border-radius: 8px 8px 0 0; }
+      .body { padding: 24px; }
+      .tag { color: #b35632; font-size: 12px; font-weight: 900; text-transform: uppercase; }
+      .meta { color: #777a70; font-size: 12px; font-weight: 900; text-transform: uppercase; }
+      .learn { color: #263f35; font-size: 14px; font-weight: 800; }
+      .today { border-radius: 8px; background: #f6edcf; color: #584719; padding: 14px; font-size: 14px; font-weight: 800; }
+      .dark { background: #17332f; color: white; }
+      .dark .muted { color: rgba(255,255,255,.78); }
+      .idea-list { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+      .idea-list article { background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.16); box-shadow: none; padding: 20px; }
+      .week { background: #f6edcf; }
+      .week-grid, .commons-grid, .impact-grid { display: grid; grid-template-columns: .85fr 1.15fr; gap: 32px; align-items: start; }
+      .week-title { background: #f9d65c; padding: 36px; }
+      .small-cards { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; }
+      .small-cards article { border: 1px solid #e7e1d7; box-shadow: none; padding: 20px; }
+      .feed { background: #f7f4ef; padding: 22px; }
+      .feed article { padding: 20px; margin-top: 16px; }
+      .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+      .chips span { border-radius: 999px; background: white; padding: 8px 12px; font-size: 12px; font-weight: 900; color: #777a70; text-transform: uppercase; }
+      .plain-card { border: 1px solid #e7e1d7; box-shadow: none; padding: 24px; }
+      footer { background: #20211d; color: white; padding: 40px 48px; }
+      @media (max-width: 860px) {
+        .hero, section, footer { padding-left: 20px; padding-right: 20px; }
+        nav div { display: none; }
+        .section-head, .week-grid, .commons-grid, .impact-grid { display: block; }
+        .grid3, .grid2, .idea-list, .small-cards { grid-template-columns: 1fr; }
+        .week-title, .feed { margin-bottom: 20px; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="hero" id="start">
+        <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1800&q=85" alt="Eine offene Strasse fuehrt durch eine weite Felslandschaft" />
+        <div class="shade"></div>
+        <nav><a class="brand" href="#start">Nur Gutes</a><div><a href="#news">News</a><a href="#ideen">Ideen</a><a href="#taten">Taten</a><a href="#finden">Selbstfindung</a></div></nav>
+        <div class="hero-content">
+          <p class="pill">Positive Impulse fuer Menschen, die etwas aufbauen wollen</p>
+          <h1>Nur Gutes</h1>
+          <p class="hero-copy">Ein digitales Magazin fuer gute Nachrichten, sinnvolle Business Ideen, wirksame Taten und klare Wege, sich selbst wieder naeher zu kommen.</p>
+          <div class="buttons"><a class="button yellow" href="#news">Ausgabe lesen</a><a class="button outline" href="#taten">Gutes starten</a></div>
+        </div>
+      </section>
+
+      <section id="news">
+        <div class="wrap">
+          <div class="section-head"><div><p class="eyebrow">Ausgabe</p><h2>Echte Artikel mit Nutzwert</h2></div><p class="muted">Kuratierte Artikel aus serioesen Quellen, jeweils mit Einordnung, Original-Link und einem kleinen Schritt fuer heute.</p></div>
+          <div class="grid3">
+            <article><img src="https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?auto=format&fit=crop&w=900&q=80" alt="" /><div class="body"><p class="tag">Positive News</p><h3>Wie eine Community-Bank Klimaprojekte finanziert</h3><p class="meta">Reasons to be Cheerful / 8. Juni 2026</p><p class="muted">Climate First Bank zeigt, wie lokales Vertrauen und klassische Kreditvergabe saubere Energieprojekte voranbringen koennen.</p><p class="learn">Was man lernen kann: Nachhaltigkeit wird staerker, wenn sie in bestehende Finanzbeziehungen eingebaut wird.</p><p class="today">Heute machbar: Frag eine lokale Bank nach nachhaltigen Krediten in deiner Region.</p><a class="button yellow" href="https://reasonstobecheerful.world/climate-first-bank/">Original lesen</a></div></article>
+            <article><img src="https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=900&q=80" alt="" /><div class="body"><p class="tag">Innovation</p><h3>Aus Klaerschlamm wird erneuerbares Erdgas</h3><p class="meta">Good News Network / 25. April 2026</p><p class="muted">Ein Verfahren der Washington State University erzeugte im Pilotversuch deutlich mehr erneuerbares Gas aus Abwasserschlamm.</p><p class="learn">Was man lernen kann: Abfallstroeme koennen lokale Energiequellen werden.</p><p class="today">Heute machbar: Notiere drei Abfallstroeme in deiner Stadt und wer daraus Nutzen ziehen koennte.</p><a class="button yellow" href="https://www.goodnewsnetwork.org/researchers-method-to-get-renewable-natural-gas-directly-from-sewage/">Original lesen</a></div></article>
+            <article><img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=900&q=80" alt="" /><div class="body"><p class="tag">Gemeinschaft</p><h3>Eine Kleinstadt baut ein Toolkit gegen Mega-Rechenzentren</h3><p class="meta">Reasons to be Cheerful / 30. April 2026</p><p class="muted">Menomonie stoppte ein grosses Data-Center-Vorhaben und teilte das Wissen als Werkzeugkasten fuer andere Gemeinden.</p><p class="learn">Was man lernen kann: Gute Taten koennen auch kommunale Kompetenz sein.</p><p class="today">Heute machbar: Such die naechste oeffentliche Sitzung deiner Kommune heraus.</p><a class="button yellow" href="https://reasonstobecheerful.world/menomonie-wisconsin-data-center-toolkit/">Original lesen</a></div></article>
+          </div>
+        </div>
+      </section>
+
+      <section id="ideen" class="dark">
+        <div class="wrap impact-grid"><div><p class="eyebrow">Business Ideen</p><h2>Kleine Modelle, die Geld verdienen und Menschen helfen</h2><p class="muted">Die besten Ideen sind nah am Alltag: echtes Beduerfnis, einfacher Test, fairer Preis, sichtbare Wirkung.</p></div><div class="idea-list"><article>Klimabildung als spielbare Schulstunde.</article><article>Faire Gruenderinnen-Netzwerke lokal verbinden.</article><article>Abwasser-zu-Energie-Beratung fuer Kommunen.</article><article>Purpose-Finanzierung fuer kleine Unternehmen.</article></div></div>
+      </section>
+
+      <section class="week">
+        <div class="wrap week-grid"><div class="week-title"><p class="eyebrow">Idee der Woche</p><h2>Wirkungs-Sprint fuer lokale Betriebe</h2><p>Ein 7-Tage-Angebot, das kleinen Unternehmen hilft, eine gute Tat in eine sichtbare Aktion zu verwandeln.</p></div><div class="small-cards"><article><p class="tag">Problem</p><p class="muted">Viele lokale Betriebe wollen etwas Sinnvolles tun, wissen aber nicht, wie sie Wirkung und Aufwand verbinden.</p></article><article><p class="tag">Zielgruppe</p><p class="muted">Lokale Unternehmen mit 2 bis 25 Mitarbeitenden.</p></article><article><p class="tag">Erster Test</p><p class="muted">Drei Betriebe ansprechen und einen kostenlosen Mini-Workshop anbieten.</p></article><article><p class="tag">Preis & Wirkung</p><p class="muted">Start: 290 Euro. Wirkung messbar ueber Stunden, erreichte Menschen oder gesammelte Mittel.</p></article></div></div>
+      </section>
+
+      <section>
+        <div class="wrap">
+          <div class="section-head"><div><p class="eyebrow">Weitere echte Artikel</p><h2>Business, Wirkung und innere Klarheit</h2></div></div>
+          <div class="grid2">
+            <article class="plain-card"><p class="tag">Good Business</p><h3>Klima-Lernen als Spiel bekommt Investoren</h3><p class="meta">Positive News / 13. Januar 2026</p><p class="muted">Brainspark Games verbindet Unterricht, Forschung und reale Nachhaltigkeitsaufgaben.</p><a class="button yellow" href="https://www.positive.news/economics/good-business/climate-learning-gets-a-boost-from-dragons/">Original lesen</a></article>
+            <article class="plain-card"><p class="tag">Gruenden</p><h3>Forschung staerkt Unternehmerinnen in Yorkshire</h3><p class="meta">Positive News / 21. Januar 2026</p><p class="muted">Forschende und Unternehmerinnen arbeiten an besseren Daten, Netzwerken und Kapitalzugang.</p><a class="button yellow" href="https://www.positive.news/society/the-new-research-that-will-help-female-entrepreneurs-in-yorkshire-to-fly/">Original lesen</a></article>
+            <article class="plain-card"><p class="tag">Impact</p><h3>Profit und Purpose als Geschaeftsmodell</h3><p class="meta">World Economic Forum / 2. April 2026</p><p class="muted">Sozialunternehmen planen Liquiditaet, Wirkung und Verantwortung zusammen.</p><a class="button yellow" href="https://www.weforum.org/stories/2026/04/how-markets-and-missions-are-becoming-allies-for-impact/">Original lesen</a></article>
+            <article class="plain-card"><p class="tag">Selbstfindung</p><h3>Selbstmitgefuehl hilft, in Stress ruhig zu bleiben</h3><p class="meta">Greater Good / 27. Januar 2026</p><p class="muted">Innere Freundlichkeit hilft, Stress zu regulieren und praesent zu bleiben.</p><a class="button yellow" href="https://greatergood.berkeley.edu/article/item/how_self_compassion_can_help_school_leaders_stay_grounded">Original lesen</a></article>
+          </div>
+        </div>
+      </section>
+
+      <section id="taten">
+        <div class="wrap impact-grid"><div><p class="eyebrow">Wege mit guten Taten</p><h2>Vom guten Gefuehl zur echten Wirkung</h2><div class="small-cards"><article>1. Ein Problem in der eigenen Strasse beobachten</article><article>2. Drei Menschen fragen, was wirklich fehlen wuerde</article><article>3. Eine Loesung bauen, die in sieben Tagen testbar ist</article><article>4. Wirkung messen: Zeit, Geld, Freude oder Entlastung</article></div></div><article class="plain-card"><p class="tag">Mini-Challenge</p><h3>24 Stunden, eine gute Tat</h3><p class="muted">Suche eine Person, deren Woche durch zehn Minuten deiner Aufmerksamkeit leichter wird. Schreib danach auf, was sich veraendert hat.</p></article></div>
+      </section>
+
+      <section id="finden">
+        <div class="wrap">
+          <div class="commons-grid"><div><p class="tag">Open Self Commons</p><h2>Eine offene Social-Plattform zum Sich-selber-Finden</h2><p class="muted">Ein oeffentlicher, quelloffener Feed fuer innere Klarheit: Menschen teilen Fragen, kleine Durchbrueche und Uebungen, andere antworten mit Resonanz statt Bewertung.</p><a class="button yellow" href="mailto:hallo@nur-gutes.local?subject=Open%20Self%20Commons%20Beitrag">Beitrag vorschlagen</a></div><div class="feed"><div class="chips"><span>Werte</span><span>Mut</span><span>Sinn</span></div><article><p><strong>@leise-mut</strong> / Werte / heute</p><p class="muted">Ich habe gemerkt, dass ich oft Ziele verfolge, die gut klingen, aber nicht gut leben.</p><p class="tag">18 Antworten</p></article><article><p><strong>@neustart-42</strong> / Arbeit / gestern</p><p class="muted">Heute habe ich eine Bewerbung nicht abgeschickt, weil sie perfekt war, sondern weil sie ehrlich war.</p><p class="tag">31 Antworten</p></article><article><p><strong>@kompass</strong> / Frage / 2 Tage</p><p class="muted">Welche Gewohnheit schuetzt mein altes Ich, obwohl mein neues Ich etwas anderes braucht?</p><p class="tag">44 Antworten</p></article></div></div>
+          <div class="grid3" style="margin-top:48px"><article class="plain-card"><p class="tag">Prompt-Bibliothek</p><p class="today">Was habe ich lange verteidigt, obwohl es mir nicht mehr dient?</p><p class="today">Welche gute Eigenschaft verstecke ich, weil sie nicht cool wirkt?</p><p class="today">Wem wuerde mein Mut helfen, wenn ich ihn heute kleiner teste?</p></article><article class="plain-card"><p class="tag">Starter-Uebungen</p><h3>Morgenfrage</h3><p class="muted">Was wuerde ich heute tun, wenn Anerkennung keine Rolle spielt?</p><h3>Talent-Spur</h3><p class="muted">Welche Aufgabe gibt mir Energie, obwohl sie fuer andere anstrengend wirkt?</p></article><article class="plain-card dark"><p class="eyebrow">Community-Regeln</p><p>Anonym zuerst. Keine Diagnosen. Forkable Wissen. Langsamkeit ist ein Feature.</p></article></div>
+        </div>
+      </section>
+    </main>
+    <footer><div class="wrap"><strong>Nur Gutes</strong><p>Kuratierte Impulse fuer Fortschritt, Zuversicht, Unternehmergeist und ein wacheres Leben.</p></div></footer>
+  </body>
+</html>
