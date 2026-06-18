@@ -55,12 +55,17 @@
       .chips { display: flex; flex-wrap: wrap; gap: 8px; }
       .chips span { border-radius: 999px; background: white; padding: 8px 12px; font-size: 12px; font-weight: 900; color: #777a70; text-transform: uppercase; }
       .plain-card { border: 1px solid #e7e1d7; box-shadow: none; padding: 24px; }
+      .funding { background: #e6efe1; }
+      .funding-card { background: #17332f; color: white; padding: 28px; border-radius: 8px; }
+      .metric-row { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; margin-top: 18px; }
+      .metric { border-radius: 8px; background: rgba(255,255,255,.12); padding: 16px; }
+      .metric strong { display: block; font-size: 28px; line-height: 1; }
       footer { background: #20211d; color: white; padding: 40px 48px; }
       @media (max-width: 860px) {
         .hero, section, footer { padding-left: 20px; padding-right: 20px; }
         nav div { display: none; }
         .section-head, .week-grid, .commons-grid, .impact-grid { display: block; }
-        .grid3, .grid2, .idea-list, .small-cards { grid-template-columns: 1fr; }
+        .grid3, .grid2, .idea-list, .small-cards, .metric-row { grid-template-columns: 1fr; }
         .week-title, .feed { margin-bottom: 20px; }
       }
     </style>
@@ -91,11 +96,32 @@
       </section>
 
       <section id="ideen" class="dark">
-        <div class="wrap impact-grid"><div><p class="eyebrow">Business Ideen</p><h2>Kleine Modelle, die Geld verdienen und Menschen helfen</h2><p class="muted">Die besten Ideen sind nah am Alltag: echtes Beduerfnis, einfacher Test, fairer Preis, sichtbare Wirkung.</p></div><div class="idea-list"><article>Klimabildung als spielbare Schulstunde.</article><article>Faire Gruenderinnen-Netzwerke lokal verbinden.</article><article>Abwasser-zu-Energie-Beratung fuer Kommunen.</article><article>Purpose-Finanzierung fuer kleine Unternehmen.</article></div></div>
+        <div class="wrap impact-grid"><div><p class="eyebrow">Business Ideen</p><h2>Kleine Modelle, die Geld verdienen und Menschen helfen</h2><p class="muted">Die besten Ideen sind nah am Alltag: echtes Beduerfnis, einfacher Test, fairer Preis, sichtbare Wirkung.</p></div><div class="idea-list"><article>Klimabildung als spielbare Schulstunde.</article><article>Faire Gruenderinnen-Netzwerke lokal verbinden.</article><article>Abwasser-zu-Energie-Beratung fuer Kommunen.</article><article>Purpose-Finanzierung fuer kleine Unternehmen.</article><article>Impact-Partner-Seiten fuer lokale Betriebe: jeder Partner finanziert eine gute Tat und bekommt eine transparente Wirkungsseite.</article></div></div>
       </section>
 
       <section class="week">
         <div class="wrap week-grid"><div class="week-title"><p class="eyebrow">Idee der Woche</p><h2>Wirkungs-Sprint fuer lokale Betriebe</h2><p>Ein 7-Tage-Angebot, das kleinen Unternehmen hilft, eine gute Tat in eine sichtbare Aktion zu verwandeln.</p></div><div class="small-cards"><article><p class="tag">Problem</p><p class="muted">Viele lokale Betriebe wollen etwas Sinnvolles tun, wissen aber nicht, wie sie Wirkung und Aufwand verbinden.</p></article><article><p class="tag">Zielgruppe</p><p class="muted">Lokale Unternehmen mit 2 bis 25 Mitarbeitenden.</p></article><article><p class="tag">Erster Test</p><p class="muted">Drei Betriebe ansprechen und einen kostenlosen Mini-Workshop anbieten.</p></article><article><p class="tag">Preis & Wirkung</p><p class="muted">Start: 290 Euro. Wirkung messbar ueber Stunden, erreichte Menschen oder gesammelte Mittel.</p></article></div></div>
+      </section>
+
+      <section class="funding">
+        <div class="wrap week-grid">
+          <div>
+            <p class="eyebrow">Gutes finanziert Gutes</p>
+            <h2>Impact-Partner als erstes selbsttragendes Einnahmemodell</h2>
+            <p class="muted">Lokale Betriebe koennen eine kleine Monats-Partnerschaft buchen. Dafuer entsteht eine oeffentliche Mini-Seite mit ihrer guten Tat, messbarer Wirkung und einem Link zur eigenen Website.</p>
+            <p class="learn">Prinzip: 70 Prozent der Einnahmen finanzieren konkrete gute Taten, 20 Prozent halten die Plattform am Leben, 10 Prozent gehen in Wachstum und Reichweite.</p>
+          </div>
+          <div class="funding-card">
+            <p class="eyebrow">Tagesidee / 18. Juni 2026</p>
+            <h3>Gruende den ersten "Gute Tat Partner"-Slot</h3>
+            <p>Ein Cafe, Studio oder lokaler Laden zahlt 49 Euro pro Monat. Die Website dokumentiert, welche gute Tat dadurch moeglich wurde: eine Lernstunde, ein Nachbarschaftsessen, eine Reparaturhilfe oder ein Mini-Stipendium.</p>
+            <div class="metric-row">
+              <div class="metric"><strong>49</strong><span>Euro Startpreis</span></div>
+              <div class="metric"><strong>70%</strong><span>direkt fuer Wirkung</span></div>
+              <div class="metric"><strong>1</strong><span>Story pro Partner</span></div>
+            </div>
+          </div>
+        </div>
       </section>
 
       <section>
@@ -116,7 +142,7 @@
 
       <section id="finden">
         <div class="wrap">
-          <div class="commons-grid"><div><p class="tag">Open Self Commons</p><h2>Eine offene Social-Plattform zum Sich-selber-Finden</h2><p class="muted">Ein oeffentlicher, quelloffener Feed fuer innere Klarheit: Menschen teilen Fragen, kleine Durchbrueche und Uebungen, andere antworten mit Resonanz statt Bewertung.</p><a class="button yellow" href="mailto:hallo@nur-gutes.local?subject=Open%20Self%20Commons%20Beitrag">Beitrag vorschlagen</a></div><div class="feed"><div class="chips"><span>Werte</span><span>Mut</span><span>Sinn</span></div><article><p><strong>@leise-mut</strong> / Werte / heute</p><p class="muted">Ich habe gemerkt, dass ich oft Ziele verfolge, die gut klingen, aber nicht gut leben.</p><p class="tag">18 Antworten</p></article><article><p><strong>@neustart-42</strong> / Arbeit / gestern</p><p class="muted">Heute habe ich eine Bewerbung nicht abgeschickt, weil sie perfekt war, sondern weil sie ehrlich war.</p><p class="tag">31 Antworten</p></article><article><p><strong>@kompass</strong> / Frage / 2 Tage</p><p class="muted">Welche Gewohnheit schuetzt mein altes Ich, obwohl mein neues Ich etwas anderes braucht?</p><p class="tag">44 Antworten</p></article></div></div>
+          <div class="commons-grid"><div><p class="tag">Open Self Commons</p><h2>Eine offene Social-Plattform zum Sich-selber-Finden</h2><p class="muted">Ein oeffentlicher, quelloffener Feed fuer innere Klarheit: Menschen teilen Fragen, kleine Durchbrueche und Uebungen, andere antworten mit Resonanz statt Bewertung.</p><a class="button yellow" href="mailto:hallo@nur-gutes.local?subject=Open%20Self%20Commons%20Beitrag">Beitrag vorschlagen</a></div><div class="feed"><div class="chips"><span>Werte</span><span>Mut</span><span>Sinn</span><span>Impact</span></div><article><p><strong>@nur-gutes</strong> / Tagesidee / heute</p><p class="muted">Neue Business-Idee: Impact-Partner-Seiten fuer lokale Betriebe. Wenn ein Partner 49 Euro im Monat zahlt, wird daraus eine dokumentierte gute Tat plus eine oeffentliche Wirkungsstory. So kann Reichweite wachsen, ohne den Sinn zu verkaufen.</p><p class="tag">Neu umgesetzt</p></article><article><p><strong>@leise-mut</strong> / Werte / heute</p><p class="muted">Ich habe gemerkt, dass ich oft Ziele verfolge, die gut klingen, aber nicht gut leben.</p><p class="tag">18 Antworten</p></article><article><p><strong>@neustart-42</strong> / Arbeit / gestern</p><p class="muted">Heute habe ich eine Bewerbung nicht abgeschickt, weil sie perfekt war, sondern weil sie ehrlich war.</p><p class="tag">31 Antworten</p></article><article><p><strong>@kompass</strong> / Frage / 2 Tage</p><p class="muted">Welche Gewohnheit schuetzt mein altes Ich, obwohl mein neues Ich etwas anderes braucht?</p><p class="tag">44 Antworten</p></article></div></div>
           <div class="grid3" style="margin-top:48px"><article class="plain-card"><p class="tag">Prompt-Bibliothek</p><p class="today">Was habe ich lange verteidigt, obwohl es mir nicht mehr dient?</p><p class="today">Welche gute Eigenschaft verstecke ich, weil sie nicht cool wirkt?</p><p class="today">Wem wuerde mein Mut helfen, wenn ich ihn heute kleiner teste?</p></article><article class="plain-card"><p class="tag">Starter-Uebungen</p><h3>Morgenfrage</h3><p class="muted">Was wuerde ich heute tun, wenn Anerkennung keine Rolle spielt?</p><h3>Talent-Spur</h3><p class="muted">Welche Aufgabe gibt mir Energie, obwohl sie fuer andere anstrengend wirkt?</p></article><article class="plain-card dark"><p class="eyebrow">Community-Regeln</p><p>Anonym zuerst. Keine Diagnosen. Forkable Wissen. Langsamkeit ist ein Feature.</p></article></div>
         </div>
       </section>
