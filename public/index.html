@@ -1073,7 +1073,49 @@
       .service-ladder-actions strong { display: block; color: #17332f; font-size: 24px; line-height: 1.05; }
       .service-ladder-metrics { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; margin-top: 18px; }
       .service-ladder-metrics article { border: 1px solid #c9dad2; box-shadow: none; padding: 16px; }
+      .impact-app { background: #fdfbf5; padding-top: 56px; }
+      .app-shell { display: grid; grid-template-columns: .82fr 1.18fr; gap: 24px; align-items: start; }
+      .app-intro { background: #17332f; color: white; border: 1px solid rgba(255,255,255,.18); box-shadow: none; padding: 28px; }
+      .app-intro .muted { color: rgba(255,255,255,.78); }
+      .app-status { display: inline-flex; border-radius: 999px; background: #f9d65c; color: #20211d; padding: 8px 12px; font-size: 12px; font-weight: 900; text-transform: uppercase; }
+      .app-stats { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; margin-top: 20px; }
+      .app-stats article { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); box-shadow: none; padding: 16px; }
+      .app-stats strong { display: block; color: #f9d65c; font-size: 28px; line-height: 1; margin-bottom: 6px; }
+      .app-note { border: 1px solid rgba(255,255,255,.18); border-radius: 8px; padding: 14px; margin-top: 18px; font-size: 14px; color: rgba(255,255,255,.86); }
+      .app-workbench { border: 1px solid #e7e1d7; box-shadow: none; padding: 20px; }
+      .app-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+      .app-tab, .app-action, .app-filter, .app-pay, .app-copy, .app-card button { border: 0; border-radius: 8px; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 11px 13px; }
+      .app-tab { background: #e6efe1; color: #17332f; }
+      .app-tab[aria-selected="true"], .app-action, .app-pay { background: #f9d65c; color: #20211d; }
+      .app-panel { display: none; }
+      .app-panel.active { display: block; }
+      .app-form { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+      .app-form label, .stripe-grid label { display: grid; gap: 6px; color: #575952; font-size: 12px; font-weight: 900; text-transform: uppercase; }
+      .app-form input, .app-form select, .app-form textarea, .stripe-grid input, .app-share textarea { width: 100%; border: 1px solid #d9d1c4; border-radius: 8px; background: #fff; color: #20211d; font: inherit; padding: 12px; min-width: 0; }
+      .app-form textarea, .app-wide { grid-column: 1 / -1; }
+      .app-actions-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 16px 0; }
+      .app-filter { background: #f7f4ef; color: #575952; border: 1px solid #e7e1d7; }
+      .app-filter.active { background: #17332f; color: white; border-color: #17332f; }
+      .app-list { display: grid; gap: 12px; }
+      .app-card { border: 1px solid #e7e1d7; box-shadow: none; padding: 16px; }
+      .app-card-head { display: flex; gap: 12px; align-items: flex-start; justify-content: space-between; }
+      .app-card h3 { margin-top: 4px; font-size: 20px; }
+      .app-card p { margin: 8px 0 0; }
+      .app-card-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+      .app-card-meta span { border-radius: 999px; background: #e6efe1; color: #17332f; padding: 7px 10px; font-size: 12px; font-weight: 900; }
+      .app-card button { background: #f7f4ef; border: 1px solid #e7e1d7; color: #20211d; margin-top: 12px; margin-right: 6px; }
+      .stripe-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+      .pay-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; margin-top: 16px; }
+      .app-pay { text-align: center; }
+      .app-pay.missing { background: #f7f4ef; border: 1px solid #e7e1d7; color: #777a70; }
+      .app-share textarea { min-height: 230px; resize: vertical; }
+      .app-copy { background: #17332f; color: white; margin-top: 12px; }
       footer { background: #20211d; color: white; padding: 40px 48px; }
+      @media (max-width: 860px) {
+        .app-shell, .app-form, .stripe-grid, .pay-grid { grid-template-columns: 1fr; }
+        .app-intro { margin-bottom: 20px; }
+        .app-card-head { display: block; }
+      }
       @media (max-width: 860px) {
         .hero, section, footer { padding-left: 20px; padding-right: 20px; }
         nav div { display: none; }
@@ -1088,12 +1130,72 @@
       <section class="hero" id="start">
         <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1800&q=85" alt="Eine offene Strasse fuehrt durch eine weite Felslandschaft" />
         <div class="shade"></div>
-        <nav><a class="brand" href="#start">Nur Gutes</a><div><a href="#news">News</a><a href="#ideen">Ideen</a><a href="#taten">Taten</a><a href="#finden">Selbstfindung</a></div></nav>
+        <nav><a class="brand" href="#start">Nur Gutes</a><div><a href="#app">App</a><a href="#news">News</a><a href="#ideen">Ideen</a><a href="#taten">Taten</a><a href="#finden">Selbstfindung</a></div></nav>
         <div class="hero-content">
           <p class="pill">Positive Impulse fuer Menschen, die etwas aufbauen wollen</p>
           <h1>Nur Gutes</h1>
           <p class="hero-copy">Ein digitales Magazin fuer gute Nachrichten, sinnvolle Business Ideen, wirksame Taten und klare Wege, sich selbst wieder naeher zu kommen.</p>
-          <div class="buttons"><a class="button yellow" href="#news">Ausgabe lesen</a><a class="button outline" href="#taten">Gutes starten</a></div>
+          <div class="buttons"><a class="button yellow" href="#app">Workspace oeffnen</a><a class="button outline" href="#news">Ausgabe lesen</a></div>
+        </div>
+      </section>
+
+      <section class="impact-app" id="app">
+        <div class="wrap app-shell">
+          <article class="app-intro">
+            <p class="app-status" id="stripeStatus">Stripe Payment Links nicht verbunden</p>
+            <h2>Impact Workspace</h2>
+            <p class="muted">Plane gute Taten, mache daraus bezahlbare Angebote, speichere den Fortschritt im Browser und teile sofort klare naechste Schritte.</p>
+            <div class="app-stats">
+              <article><strong id="metricActions">0</strong><span>aktive Eintraege</span></article>
+              <article><strong id="metricRevenue">0 EUR</strong><span>Revenue-Ziel</span></article>
+              <article><strong id="metricImpact">0 EUR</strong><span>Impact-Anteil 40%</span></article>
+              <article><strong id="metricDone">0</strong><span>abgeschlossen</span></article>
+            </div>
+            <p class="app-note">Revenue-Reinvestition: 40% gute Taten, 25% bessere Algorithmen und Automatisierung, 20% Growth/Marketing, 15% Betrieb und Qualitaet.</p>
+          </article>
+          <article class="app-workbench">
+            <div class="app-tabs" role="tablist" aria-label="Impact Workspace">
+              <button class="app-tab" type="button" aria-selected="true" data-app-tab="board">Board</button>
+              <button class="app-tab" type="button" aria-selected="false" data-app-tab="payments">Stripe</button>
+              <button class="app-tab" type="button" aria-selected="false" data-app-tab="share">Social</button>
+            </div>
+
+            <div class="app-panel active" data-app-panel="board">
+              <form class="app-form" id="impactForm">
+                <label>Titel<input id="impactTitle" name="title" required maxlength="80" placeholder="z.B. Nachbarschafts-Einkaufshilfe starten" /></label>
+                <label>Kategorie<select id="impactCategory" name="category"><option>Gute Tat</option><option>Business Idee</option><option>Selbstfindung</option><option>Community</option></select></label>
+                <label>Revenue-Ziel EUR<input id="impactAmount" name="amount" type="number" min="0" step="1" value="29" /></label>
+                <label>Naechster Schritt<input id="impactNext" name="next" maxlength="120" placeholder="Wen schreibe ich heute an?" /></label>
+                <label class="app-wide">Kurzbeschreibung<textarea id="impactText" name="text" rows="3" maxlength="240" placeholder="Was wird besser, fuer wen, und wie sieht der erste Beweis aus?"></textarea></label>
+                <button class="app-action app-wide" type="submit">Eintrag speichern</button>
+              </form>
+              <div class="app-actions-row" aria-label="Board Filter">
+                <button class="app-filter active" type="button" data-filter="all">Alle</button>
+                <button class="app-filter" type="button" data-filter="planned">Geplant</button>
+                <button class="app-filter" type="button" data-filter="active">Aktiv</button>
+                <button class="app-filter" type="button" data-filter="done">Fertig</button>
+              </div>
+              <div class="app-list" id="impactList"></div>
+            </div>
+
+            <div class="app-panel" data-app-panel="payments">
+              <p class="muted">Trage deine echten Stripe Payment Links ein. Die Website speichert nur URLs im Browser; keine Secret Keys, keine Kartendaten.</p>
+              <form class="stripe-grid" id="stripeForm">
+                <label>Quick Sponsor 29 EUR<input name="quick" type="url" placeholder="https://buy.stripe.com/..." /></label>
+                <label>Impact Audit 99 EUR<input name="audit" type="url" placeholder="https://buy.stripe.com/..." /></label>
+                <label>Growth Sprint 390 EUR<input name="sprint" type="url" placeholder="https://buy.stripe.com/..." /></label>
+                <label>Monthly Circle<input name="monthly" type="url" placeholder="https://buy.stripe.com/..." /></label>
+                <button class="app-action app-wide" type="submit">Payment Links speichern</button>
+              </form>
+              <div class="pay-grid" id="payGrid"></div>
+            </div>
+
+            <div class="app-panel app-share" data-app-panel="share">
+              <p class="muted">Aus dem Board entsteht ein sofort postbarer Social- und Outreach-Text fuer Instagram, TikTok, LinkedIn, Twitter und direkte Nachrichten.</p>
+              <textarea id="shareText" readonly></textarea>
+              <button class="app-copy" type="button" id="copyShare">Text kopieren</button>
+            </div>
+          </article>
         </div>
       </section>
 
@@ -4121,5 +4223,220 @@
       </section>
     </main>
     <footer><div class="wrap"><strong>Nur Gutes</strong><p>Kuratierte Impulse fuer Fortschritt, Zuversicht, Unternehmergeist und ein wacheres Leben.</p></div></footer>
+    <script>
+      (() => {
+        const itemKey = "nurGutesImpactItems";
+        const stripeKey = "nurGutesStripeLinks";
+        const seedItems = [
+          {
+            id: "seed-proof-1",
+            title: "Proof-Snapshot fuer erste gute Tat",
+            category: "Gute Tat",
+            amount: 29,
+            next: "Eine kleine Wirkung belegen und als Update teilen",
+            text: "Aus einer sichtbaren guten Tat entsteht ein kurzer Beleg mit Betrag, Ergebnis und naechstem Schritt.",
+            status: "active",
+            createdAt: "2026-06-20"
+          },
+          {
+            id: "seed-growth-1",
+            title: "Impact Workspace als zahlbaren Sprint anbieten",
+            category: "Business Idee",
+            amount: 390,
+            next: "Ersten Partner fuer einen Growth Sprint ansprechen",
+            text: "Ein Team bekommt Board, Payment Link, Social Copy und Reinvestitionsplan als umsetzbares Mini-System.",
+            status: "planned",
+            createdAt: "2026-06-20"
+          }
+        ];
+        const paymentLabels = {
+          quick: "Quick Sponsor",
+          audit: "Impact Audit",
+          sprint: "Growth Sprint",
+          monthly: "Monthly Circle"
+        };
+        const money = (value) => `${Math.round(Number(value) || 0)} EUR`;
+        const escapeHtml = (value) => String(value || "").replace(/[&<>"']/g, (char) => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;"
+        }[char]));
+        const loadJson = (key, fallback) => {
+          try {
+            const saved = localStorage.getItem(key);
+            return saved ? JSON.parse(saved) : fallback;
+          } catch (error) {
+            return fallback;
+          }
+        };
+        let items = loadJson(itemKey, seedItems);
+        let stripeLinks = loadJson(stripeKey, {});
+        let currentFilter = "all";
+
+        const qs = (selector) => document.querySelector(selector);
+        const qsa = (selector) => Array.from(document.querySelectorAll(selector));
+        const saveItems = () => localStorage.setItem(itemKey, JSON.stringify(items));
+        const saveStripe = () => localStorage.setItem(stripeKey, JSON.stringify(stripeLinks));
+
+        function renderStats() {
+          const activeItems = items.filter((item) => item.status !== "done");
+          const revenue = items.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+          qs("#metricActions").textContent = activeItems.length;
+          qs("#metricRevenue").textContent = money(revenue);
+          qs("#metricImpact").textContent = money(revenue * 0.4);
+          qs("#metricDone").textContent = items.filter((item) => item.status === "done").length;
+          const connected = Object.values(stripeLinks).some(Boolean);
+          qs("#stripeStatus").textContent = connected ? "Stripe Payment Links verbunden" : "Stripe Payment Links nicht verbunden";
+        }
+
+        function renderBoard() {
+          const list = qs("#impactList");
+          const visibleItems = currentFilter === "all" ? items : items.filter((item) => item.status === currentFilter);
+          if (!visibleItems.length) {
+            list.innerHTML = '<article class="app-card"><p class="muted">Keine Eintraege in diesem Filter. Leg den ersten naechsten Schritt an.</p></article>';
+            return;
+          }
+          list.innerHTML = visibleItems.map((item) => `
+            <article class="app-card" data-id="${escapeHtml(item.id)}">
+              <div class="app-card-head">
+                <div>
+                  <p class="tag">${escapeHtml(item.category)} / ${escapeHtml(item.status)}</p>
+                  <h3>${escapeHtml(item.title)}</h3>
+                </div>
+                <strong>${money(item.amount)}</strong>
+              </div>
+              <p class="muted">${escapeHtml(item.text)}</p>
+              <div class="app-card-meta"><span>${escapeHtml(item.next || "Naechsten Schritt klaeren")}</span><span>Impact 40%: ${money((Number(item.amount) || 0) * 0.4)}</span></div>
+              <button type="button" data-status="planned">Plan</button>
+              <button type="button" data-status="active">Aktiv</button>
+              <button type="button" data-status="done">Fertig</button>
+              <button type="button" data-delete="true">Loeschen</button>
+            </article>
+          `).join("");
+        }
+
+        function renderPayments() {
+          const form = qs("#stripeForm");
+          Object.keys(paymentLabels).forEach((key) => {
+            if (form.elements[key]) form.elements[key].value = stripeLinks[key] || "";
+          });
+          qs("#payGrid").innerHTML = Object.entries(paymentLabels).map(([key, label]) => {
+            const href = stripeLinks[key];
+            const className = href ? "app-pay" : "app-pay missing";
+            const target = href || "#payments";
+            const text = href ? label : `${label} fehlt`;
+            return `<a class="${className}" href="${escapeHtml(target)}" ${href ? 'target="_blank" rel="noopener"' : ""} data-pay-link="${key}">${escapeHtml(text)}</a>`;
+          }).join("");
+        }
+
+        function renderShare() {
+          const topItems = items.slice(0, 3);
+          const revenue = items.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+          const lines = [
+            "Instagram/TikTok:",
+            `Heute in Nur Gutes: ${topItems[0]?.title || "eine kleine gute Tat"} wird konkret. Ziel: ${money(revenue)} Revenue, davon ${money(revenue * 0.4)} direkt fuer Wirkung. Wer will mitmachen?`,
+            "",
+            "LinkedIn:",
+            `Wir testen eine produktive Impact-App: Gute Taten planen, Revenue-Ziel setzen, Stripe-Link verbinden, Fortschritt teilen. Aktuelle naechste Schritte: ${topItems.map((item) => item.next).filter(Boolean).join(" / ") || "ersten Partner ansprechen"}.`,
+            "",
+            "Twitter/X:",
+            `Nur Gutes wird vom Magazin zur App: Board + Payment Links + Proof + Reinvestition. Heute offen: ${items.length} Eintraege, ${money(revenue)} Ziel, ${money(revenue * 0.4)} Impact-Anteil.`,
+            "",
+            "Direktnachricht:",
+            `Ich baue gerade ein kleines System, das gute Taten in klare Aufgaben, Finanzierung und sichtbare Belege uebersetzt. Hast du ein Projekt, das wir als ersten Proof-Sprint testen sollen?`
+          ];
+          qs("#shareText").value = lines.join("\n");
+        }
+
+        function renderAll() {
+          renderStats();
+          renderBoard();
+          renderPayments();
+          renderShare();
+        }
+
+        qsa("[data-app-tab]").forEach((tab) => {
+          tab.addEventListener("click", () => {
+            const name = tab.dataset.appTab;
+            qsa("[data-app-tab]").forEach((button) => button.setAttribute("aria-selected", button === tab ? "true" : "false"));
+            qsa("[data-app-panel]").forEach((panel) => panel.classList.toggle("active", panel.dataset.appPanel === name));
+          });
+        });
+
+        qs("#impactForm").addEventListener("submit", (event) => {
+          event.preventDefault();
+          const form = event.currentTarget;
+          items.unshift({
+            id: `impact-${Date.now()}`,
+            title: form.title.value.trim(),
+            category: form.category.value,
+            amount: Number(form.amount.value) || 0,
+            next: form.next.value.trim(),
+            text: form.text.value.trim() || "Ein kleiner konkreter Schritt mit sichtbarem Nutzen.",
+            status: "planned",
+            createdAt: new Date().toISOString().slice(0, 10)
+          });
+          form.reset();
+          qs("#impactAmount").value = 29;
+          saveItems();
+          renderAll();
+        });
+
+        qs("#impactList").addEventListener("click", (event) => {
+          const button = event.target.closest("button");
+          const card = event.target.closest("[data-id]");
+          if (!button || !card) return;
+          if (button.dataset.delete) {
+            items = items.filter((item) => item.id !== card.dataset.id);
+          } else if (button.dataset.status) {
+            items = items.map((item) => item.id === card.dataset.id ? { ...item, status: button.dataset.status } : item);
+          }
+          saveItems();
+          renderAll();
+        });
+
+        qsa("[data-filter]").forEach((button) => {
+          button.addEventListener("click", () => {
+            currentFilter = button.dataset.filter;
+            qsa("[data-filter]").forEach((filterButton) => filterButton.classList.toggle("active", filterButton === button));
+            renderBoard();
+          });
+        });
+
+        qs("#stripeForm").addEventListener("submit", (event) => {
+          event.preventDefault();
+          const form = event.currentTarget;
+          stripeLinks = Object.fromEntries(Object.keys(paymentLabels).map((key) => [key, form.elements[key].value.trim()]));
+          saveStripe();
+          renderAll();
+        });
+
+        qs("#payGrid").addEventListener("click", (event) => {
+          const link = event.target.closest("[data-pay-link]");
+          if (!link || !link.classList.contains("missing")) return;
+          event.preventDefault();
+          qsa("[data-app-tab]").find((tab) => tab.dataset.appTab === "payments")?.click();
+          qs("#stripeForm input")?.focus();
+        });
+
+        qs("#copyShare").addEventListener("click", async () => {
+          const text = qs("#shareText").value;
+          try {
+            await navigator.clipboard.writeText(text);
+            qs("#copyShare").textContent = "Kopiert";
+          } catch (error) {
+            qs("#shareText").select();
+            qs("#copyShare").textContent = "Text markiert";
+          }
+          setTimeout(() => {
+            qs("#copyShare").textContent = "Text kopieren";
+          }, 1800);
+        });
+
+        renderAll();
+      })();
+    </script>
   </body>
 </html>
