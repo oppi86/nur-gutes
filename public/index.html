@@ -1090,8 +1090,8 @@
       .app-panel { display: none; }
       .app-panel.active { display: block; }
       .app-form { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
-      .app-form label, .stripe-grid label { display: grid; gap: 6px; color: #575952; font-size: 12px; font-weight: 900; text-transform: uppercase; }
-      .app-form input, .app-form select, .app-form textarea, .stripe-grid input, .app-share textarea { width: 100%; border: 1px solid #d9d1c4; border-radius: 8px; background: #fff; color: #20211d; font: inherit; padding: 12px; min-width: 0; }
+      .app-form label, .stripe-grid label, .pitch-grid label { display: grid; gap: 6px; color: #575952; font-size: 12px; font-weight: 900; text-transform: uppercase; }
+      .app-form input, .app-form select, .app-form textarea, .stripe-grid input, .app-share textarea, .pitch-grid input, .pitch-grid select, .pitch-grid textarea { width: 100%; border: 1px solid #d9d1c4; border-radius: 8px; background: #fff; color: #20211d; font: inherit; padding: 12px; min-width: 0; }
       .app-form textarea, .app-wide { grid-column: 1 / -1; }
       .app-actions-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 16px 0; }
       .app-filter { background: #f7f4ef; color: #575952; border: 1px solid #e7e1d7; }
@@ -1110,9 +1110,14 @@
       .app-pay.missing { background: #f7f4ef; border: 1px solid #e7e1d7; color: #777a70; }
       .app-share textarea { min-height: 230px; resize: vertical; }
       .app-copy { background: #17332f; color: white; margin-top: 12px; }
+      .pitch-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
+      .pitch-grid textarea { grid-column: 1 / -1; min-height: 220px; resize: vertical; }
+      .pitch-preview { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; margin: 16px 0; }
+      .pitch-preview article { border: 1px solid #e7e1d7; box-shadow: none; padding: 16px; }
+      .pitch-preview strong { display: block; color: #17332f; font-size: 24px; line-height: 1.05; margin-top: 4px; }
       footer { background: #20211d; color: white; padding: 40px 48px; }
       @media (max-width: 860px) {
-        .app-shell, .app-form, .stripe-grid, .pay-grid { grid-template-columns: 1fr; }
+        .app-shell, .app-form, .stripe-grid, .pay-grid, .pitch-grid, .pitch-preview { grid-template-columns: 1fr; }
         .app-intro { margin-bottom: 20px; }
         .app-card-head { display: block; }
       }
@@ -1157,6 +1162,7 @@
             <div class="app-tabs" role="tablist" aria-label="Impact Workspace">
               <button class="app-tab" type="button" aria-selected="true" data-app-tab="board">Board</button>
               <button class="app-tab" type="button" aria-selected="false" data-app-tab="payments">Stripe</button>
+              <button class="app-tab" type="button" aria-selected="false" data-app-tab="pitch">Pitch</button>
               <button class="app-tab" type="button" aria-selected="false" data-app-tab="share">Social</button>
             </div>
 
@@ -1188,6 +1194,22 @@
                 <button class="app-action app-wide" type="submit">Payment Links speichern</button>
               </form>
               <div class="pay-grid" id="payGrid"></div>
+            </div>
+
+            <div class="app-panel" data-app-panel="pitch">
+              <p class="muted">Der Partner Pitch Builder macht aus einem Board-Eintrag einen konkreten Sponsor-Ask mit Preis, Wirkung, Share-Link und Reinvestitionslogik.</p>
+              <div class="pitch-grid">
+                <label>Board-Eintrag<select id="pitchItem"></select></label>
+                <label>Partner-Typ<select id="pitchPartner"><option>Lokales Unternehmen</option><option>Creator</option><option>Nonprofit-Team</option><option>Arbeitgeber</option></select></label>
+                <label>UTM-Kanal<input id="pitchChannel" value="daily-growth" maxlength="32" /></label>
+                <textarea id="pitchOutput" readonly></textarea>
+              </div>
+              <div class="pitch-preview">
+                <article><p class="tag">Revenue-Stream</p><strong id="pitchRevenue">0 EUR</strong><p class="muted">Sponsor-Ask aus dem gewaehlten Eintrag.</p></article>
+                <article><p class="tag">Daily Revenue</p><strong id="pitchDaily">0 EUR</strong><p class="muted">Heute als erster Partner-Pitch messbar.</p></article>
+                <article><p class="tag">User-Growth</p><strong id="pitchGrowth">+0</strong><p class="muted">Ziel: ein neuer Partner-Lead durch teilbaren Pitch.</p></article>
+              </div>
+              <button class="app-copy" type="button" id="copyPitch">Pitch kopieren</button>
             </div>
 
             <div class="app-panel app-share" data-app-panel="share">
@@ -1333,20 +1355,20 @@
 
       <section class="growth-loop">
         <div class="wrap">
-          <div class="section-head"><div><p class="eyebrow">Iteration 6 bis 113</p><h2>Daily Growth Cockpit</h2></div><p class="muted">Ein oeffentliches Tagesboard macht den Verbesserungszyklus nachvollziehbar: Idee generieren, intern posten, umsetzen, monetarisieren, messen und in mehr Nutzen reinvestieren.</p></div>
+          <div class="section-head"><div><p class="eyebrow">Iteration 6 bis 114</p><h2>Daily Growth Cockpit</h2></div><p class="muted">Ein oeffentliches Tagesboard macht den Verbesserungszyklus nachvollziehbar: Idee generieren, intern posten, umsetzen, monetarisieren, messen und in mehr Nutzen reinvestieren.</p></div>
           <div class="loop-grid">
-            <article class="loop-panel"><p class="tag">Heute umgesetzt</p><h3>Text-to-Impact Reply Loop</h3><p class="muted">Das Cockpit schafft Vertrauen fuer Partner, weil Fortschritt, Umsatzhypothese und Reinvestition nicht versteckt bleiben. Spaeter koennen echte Analytics, Zahlungsdaten und Social-APIs hier andocken.</p><div class="loop-steps"><article><p class="tag">1</p><p>Idee: Text-to-Impact Reply Loop.</p></article><article><p class="tag">2</p><p>Social: Open Self Commons plus Launch-Texte.</p></article><article><p class="tag">3</p><p>Ship: Mobile Reply-Pfade fuer Give, Proof und Monthly live.</p></article><article><p class="tag">4</p><p>Revenue: 99-Euro Reply Flow Audit oder 390-Euro Text-to-Impact Sprint.</p></article><article><p class="tag">5</p><p>Track: Reply-Starts, Micro-Gifts, Proof-Replies, Monthly-Opt-ins, Share-Forwards, Sponsor-Leads und Text-Revenue.</p></article><article><p class="tag">6</p><p>Reinvest: bessere Mobile-UX, SMS/DM-Vorlagen, Attribution, Proof-Automation, Creator-Distribution, Growth-Tests und Impact-Fonds.</p></article></div></article>
+            <article class="loop-panel"><p class="tag">Heute umgesetzt</p><h3>Partner Pitch Builder</h3><p class="muted">Der Builder uebersetzt jeden gespeicherten Impact-Eintrag in einen konkreten Sponsor-Ask. So wird aus guter Absicht ein teilbarer Lead-Pfad mit Preis, Wirkung, UTM-Link und Reinvestitionsplan.</p><div class="loop-steps"><article><p class="tag">1</p><p>Idee: Partner Pitch Builder.</p></article><article><p class="tag">2</p><p>Social: Open Self Commons plus Launch-Texte.</p></article><article><p class="tag">3</p><p>Ship: Pitch-Tab im Impact Workspace live.</p></article><article><p class="tag">4</p><p>Revenue: 99-Euro Impact Audit, 390-Euro Growth Sprint oder 29-Euro Sponsor-Start.</p></article><article><p class="tag">5</p><p>Track: Pitch-Kopien, Sponsor-Leads, Stripe-Link-Klicks, abgeschlossene Eintraege und Partner-Revenue.</p></article><article><p class="tag">6</p><p>Reinvest: bessere Pitch-Algorithmen, CRM-Signale, Social-Distribution, Proof-Automation, Partner-Templates und Impact-Fonds.</p></article></div></article>
             <div>
               <div class="metric-board">
-                <article class="track-card"><p class="tag">Features umgesetzt</p><strong>1/1</strong><p class="muted">Iteration 113 als sichtbarer Text-to-Impact Reply Loop gebaut.</p></article>
+                <article class="track-card"><p class="tag">Features umgesetzt</p><strong>1/1</strong><p class="muted">Iteration 114 als Partner Pitch Builder im Impact Workspace gebaut.</p></article>
                 <article class="track-card"><p class="tag">Social-Posts</p><strong>1/1</strong><p class="muted">Interner Open-Self-Commons-Post ist veroeffentlicht; externe Kanaele sind als Launch-Pack vorbereitet.</p></article>
-                <article class="track-card"><p class="tag">Revenue heute</p><strong>0 Euro</strong><p class="muted">Aktueller Ist-Wert; neues Ziel: erster 99-Euro Reply Flow Audit.</p></article>
-                <article class="track-card"><p class="tag">User-Growth</p><strong>+0%</strong><p class="muted">Baseline; gemessen werden Reply-Starts, Micro-Gifts, Proof-Replies, Monthly-Opt-ins, Share-Forwards, Sponsor-Leads und Text-Revenue.</p></article>
+                <article class="track-card"><p class="tag">Revenue heute</p><strong>0 Euro</strong><p class="muted">Aktueller Ist-Wert; neues Ziel: erster 99-Euro Impact Audit ueber Partner-Pitch.</p></article>
+                <article class="track-card"><p class="tag">User-Growth</p><strong>+0%</strong><p class="muted">Baseline; gemessen werden Pitch-Kopien, Sponsor-Leads, Stripe-Link-Klicks, Shares und Partner-Revenue.</p></article>
               </div>
               <div class="social-pack">
-                <article><p class="tag">LinkedIn</p><p class="muted">Iteration 113: Text-to-Impact Reply Loop. Mobile Fundraising funktioniert besser, wenn ein Reply sofort zu Micro-Gift, Proof, Monatsoption oder Share fuehrt.</p></article>
-                <article><p class="tag">TikTok / Reel</p><p class="muted">Hook: Ein Text kann mehr sein als ein Link. Reply GIVE, PROOF oder MONTHLY und aus Aufmerksamkeit wird messbare Wirkung.</p></article>
-                <article><p class="tag">Twitter / X</p><p class="muted">Text-to-Impact Reply Loop: 99-Euro Audit, 390-Euro Sprint, Track: Reply-Starts, Micro-Gifts, Proof-Replies, Monthly-Opt-ins und Text-Revenue.</p></article>
+                <article><p class="tag">LinkedIn</p><p class="muted">Iteration 114: Partner Pitch Builder. Gute Taten brauchen nicht nur Inspiration, sondern einen klaren Sponsor-Ask mit Preis, Wirkung, Proof und naechstem Schritt.</p></article>
+                <article><p class="tag">TikTok / Reel</p><p class="muted">Hook: Aus einer guten Tat wird in 10 Sekunden ein Partner-Pitch: Was kostet es, was bewirkt es, wer soll es finanzieren?</p></article>
+                <article><p class="tag">Twitter / X</p><p class="muted">Partner Pitch Builder: Board-Eintrag rein, Sponsor-Ask raus. Ziel: mehr Partner-Leads, Stripe-Klicks und finanzierte gute Taten.</p></article>
               </div>
               <p class="tag" style="margin-top:16px">Social-Posting-Status: intern im Open Self Commons veroeffentlicht; externe Netzwerke brauchen autorisierte Connectoren.</p>
             </div>
@@ -4218,6 +4240,7 @@
           <div class="feed" style="margin-top:24px"><article><p><strong>@nur-gutes</strong> / Tagesidee / Iteration 21</p><p class="muted">Neue Business-Idee: Trusted Ask Relay. Persoenliche DMs, kleine Gruppen und Community-Kanaele verwandeln Proofs in konkrete Bitten, Antworten und Folgebeitraege.</p><p class="tag">Neu umgesetzt</p></article></div>
           <div class="feed" style="margin-top:24px"><article><p><strong>@nur-gutes</strong> / Tagesidee / Iteration 20</p><p class="muted">Neue Business-Idee: Skill-Impact Passport. Gute Taten, erlernte Skills und Proofs werden als teilbares Profil sichtbar, damit Vertrauen, Teams und neue Spenden wachsen.</p><p class="tag">Neu umgesetzt</p></article></div>
           <div class="feed" style="margin-top:24px"><article><p><strong>@nur-gutes</strong> / Tagesidee / Iteration 19</p><p class="muted">Neue Business-Idee: Asset-Giving Gateway. DAF-, Aktien-, Krypto- und Non-Cash-Gaben werden in klare Impact-Pfade, Proofs und Partnerseiten uebersetzt.</p><p class="tag">Neu umgesetzt</p></article></div>
+          <div class="feed" style="margin-top:24px"><article><p><strong>@nur-gutes</strong> / Tagesidee / Iteration 114</p><p class="muted">Neue Business-Idee: Partner Pitch Builder. Jeder gespeicherte Impact-Eintrag wird zu einem sponsorfaehigen Ask mit Preis, Wirkung, UTM-Share-Link, Social-Text und Reinvestitionsplan.</p><p class="tag">Neu umgesetzt</p></article></div>
           <div class="grid3" style="margin-top:48px"><article class="plain-card"><p class="tag">Prompt-Bibliothek</p><p class="today">Was habe ich lange verteidigt, obwohl es mir nicht mehr dient?</p><p class="today">Welche gute Eigenschaft verstecke ich, weil sie nicht cool wirkt?</p><p class="today">Wem wuerde mein Mut helfen, wenn ich ihn heute kleiner teste?</p></article><article class="plain-card"><p class="tag">Starter-Uebungen</p><h3>Morgenfrage</h3><p class="muted">Was wuerde ich heute tun, wenn Anerkennung keine Rolle spielt?</p><h3>Talent-Spur</h3><p class="muted">Welche Aufgabe gibt mir Energie, obwohl sie fuer andere anstrengend wirkt?</p></article><article class="plain-card dark"><p class="eyebrow">Community-Regeln</p><p>Anonym zuerst. Keine Diagnosen. Forkable Wissen. Langsamkeit ist ein Feature.</p></article></div>
         </div>
       </section>
@@ -4350,11 +4373,46 @@
           qs("#shareText").value = lines.join("\n");
         }
 
+        function renderPitch() {
+          const select = qs("#pitchItem");
+          const previous = select.value;
+          select.innerHTML = items.map((item) => `<option value="${escapeHtml(item.id)}">${escapeHtml(item.title)}</option>`).join("");
+          if (items.some((item) => item.id === previous)) select.value = previous;
+          const item = items.find((entry) => entry.id === select.value) || items[0];
+          const partner = qs("#pitchPartner").value;
+          const channel = qs("#pitchChannel").value.trim() || "daily-growth";
+          const amount = Number(item?.amount) || 0;
+          const impact = amount * 0.4;
+          const shareUrl = `${location.origin}${location.pathname}#app?utm_source=${encodeURIComponent(channel)}&utm_medium=partner_pitch&utm_campaign=${encodeURIComponent(item?.id || "impact")}`;
+          const pitch = [
+            `Partner Pitch fuer ${partner}`,
+            "",
+            `Projekt: ${item?.title || "Neue gute Tat"}`,
+            `Ask: ${money(amount)} als Sponsor-Start oder Pilotbudget.`,
+            `Wirkung: ${money(impact)} werden als Impact-Anteil fuer gute Taten, Proofs und naechste Umsetzung reserviert.`,
+            `Warum jetzt: ${item?.text || "Der naechste konkrete Schritt ist vorbereitet."}`,
+            `Naechster Schritt: ${item?.next || "15-Minuten-Partnergespraech vereinbaren."}`,
+            "",
+            "Reinvestition:",
+            "40% gute Taten, 25% bessere Algorithmen und Automatisierung, 20% Growth/Marketing, 15% Betrieb und Qualitaet.",
+            "",
+            `Share-Link: ${shareUrl}`,
+            "",
+            "Kurztext:",
+            `Wir suchen einen Partner fuer: ${item?.title || "eine gute Tat"}. Mit ${money(amount)} wird Wirkung sichtbar, teilbar und als Proof fuer weitere Unterstuetzung nutzbar.`
+          ].join("\n");
+          qs("#pitchOutput").value = pitch;
+          qs("#pitchRevenue").textContent = money(amount);
+          qs("#pitchDaily").textContent = amount ? money(amount) : "0 EUR";
+          qs("#pitchGrowth").textContent = amount ? "+1 Lead" : "+0";
+        }
+
         function renderAll() {
           renderStats();
           renderBoard();
           renderPayments();
           renderShare();
+          renderPitch();
         }
 
         qsa("[data-app-tab]").forEach((tab) => {
@@ -4421,6 +4479,11 @@
           qs("#stripeForm input")?.focus();
         });
 
+        ["#pitchItem", "#pitchPartner", "#pitchChannel"].forEach((selector) => {
+          qs(selector).addEventListener("input", renderPitch);
+          qs(selector).addEventListener("change", renderPitch);
+        });
+
         qs("#copyShare").addEventListener("click", async () => {
           const text = qs("#shareText").value;
           try {
@@ -4432,6 +4495,20 @@
           }
           setTimeout(() => {
             qs("#copyShare").textContent = "Text kopieren";
+          }, 1800);
+        });
+
+        qs("#copyPitch").addEventListener("click", async () => {
+          const text = qs("#pitchOutput").value;
+          try {
+            await navigator.clipboard.writeText(text);
+            qs("#copyPitch").textContent = "Pitch kopiert";
+          } catch (error) {
+            qs("#pitchOutput").select();
+            qs("#copyPitch").textContent = "Pitch markiert";
+          }
+          setTimeout(() => {
+            qs("#copyPitch").textContent = "Pitch kopieren";
           }, 1800);
         });
 
