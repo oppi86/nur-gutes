@@ -1090,8 +1090,8 @@
       .app-panel { display: none; }
       .app-panel.active { display: block; }
       .app-form { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
-      .app-form label, .stripe-grid label, .pitch-grid label, .trust-grid label { display: grid; gap: 6px; color: #575952; font-size: 12px; font-weight: 900; text-transform: uppercase; }
-      .app-form input, .app-form select, .app-form textarea, .stripe-grid input, .app-share textarea, .pitch-grid input, .pitch-grid select, .pitch-grid textarea, .trust-grid input, .trust-grid select, .trust-grid textarea { width: 100%; border: 1px solid #d9d1c4; border-radius: 8px; background: #fff; color: #20211d; font: inherit; padding: 12px; min-width: 0; }
+      .app-form label, .stripe-grid label, .pitch-grid label, .trust-grid label, .proof-grid label { display: grid; gap: 6px; color: #575952; font-size: 12px; font-weight: 900; text-transform: uppercase; }
+      .app-form input, .app-form select, .app-form textarea, .stripe-grid input, .app-share textarea, .pitch-grid input, .pitch-grid select, .pitch-grid textarea, .trust-grid input, .trust-grid select, .trust-grid textarea, .proof-grid input, .proof-grid select, .proof-grid textarea { width: 100%; border: 1px solid #d9d1c4; border-radius: 8px; background: #fff; color: #20211d; font: inherit; padding: 12px; min-width: 0; }
       .app-form textarea, .app-wide { grid-column: 1 / -1; }
       .app-actions-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 16px 0; }
       .app-filter { background: #f7f4ef; color: #575952; border: 1px solid #e7e1d7; }
@@ -1121,9 +1121,14 @@
       .trust-pulse-score strong { display: block; color: #17332f; font-size: 34px; line-height: 1; }
       .trust-plan { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; margin-top: 16px; }
       .trust-plan article { border: 1px solid #e7e1d7; box-shadow: none; padding: 16px; }
+      .proof-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; }
+      .proof-grid textarea { grid-column: 1 / -1; min-height: 245px; resize: vertical; }
+      .proof-ledger { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; margin: 16px 0; }
+      .proof-ledger article { border: 1px solid #e7e1d7; box-shadow: none; padding: 16px; }
+      .proof-ledger strong { display: block; color: #17332f; font-size: 24px; line-height: 1.05; margin-top: 4px; }
       footer { background: #20211d; color: white; padding: 40px 48px; }
       @media (max-width: 860px) {
-        .app-shell, .app-form, .stripe-grid, .pay-grid, .pitch-grid, .pitch-preview, .trust-grid, .trust-plan { grid-template-columns: 1fr; }
+        .app-shell, .app-form, .stripe-grid, .pay-grid, .pitch-grid, .pitch-preview, .trust-grid, .trust-plan, .proof-grid, .proof-ledger { grid-template-columns: 1fr; }
         .app-intro { margin-bottom: 20px; }
         .app-card-head { display: block; }
       }
@@ -1170,6 +1175,7 @@
               <button class="app-tab" type="button" aria-selected="false" data-app-tab="payments">Stripe</button>
               <button class="app-tab" type="button" aria-selected="false" data-app-tab="pitch">Pitch</button>
               <button class="app-tab" type="button" aria-selected="false" data-app-tab="trust">Trust</button>
+              <button class="app-tab" type="button" aria-selected="false" data-app-tab="proof">Proof</button>
               <button class="app-tab" type="button" aria-selected="false" data-app-tab="share">Social</button>
             </div>
 
@@ -1235,6 +1241,23 @@
                 <article><p class="tag">User-Growth</p><p class="muted">Ziel: ein Rueckkehrsignal statt einmaliger Aufmerksamkeit.</p></article>
               </div>
               <button class="app-copy" type="button" id="copyTrust">Trust Pulse kopieren</button>
+            </div>
+
+            <div class="app-panel" data-app-panel="proof">
+              <p class="muted">Der Proof Receipt Builder erstellt aus einem Impact-Eintrag einen teilbaren Wirkungsbeleg mit Betrag, Beweisbedarf, naechstem Update und CTA.</p>
+              <div class="proof-grid">
+                <label>Impact-Eintrag<select id="proofItem"></select></label>
+                <label>Status<select id="proofStatus"><option>Geplant</option><option>Finanziert</option><option>In Umsetzung</option><option>Belegt</option></select></label>
+                <label>Beweisart<select id="proofEvidence"><option>Foto / Kurzvideo</option><option>Partner-Bestaetigung</option><option>Quittung / Budget</option><option>Community-Stimme</option></select></label>
+                <label>Update in Tagen<input id="proofDays" type="number" min="1" max="90" value="7" /></label>
+                <textarea id="proofOutput" readonly></textarea>
+              </div>
+              <div class="proof-ledger">
+                <article><p class="tag">Receipt-ID</p><strong id="proofId">NG-000</strong><p class="muted">Teilbarer Beleg fuer Vertrauen und Wiederkehr.</p></article>
+                <article><p class="tag">Revenue-Stream</p><strong>79 EUR</strong><p class="muted">Proof Receipt Audit oder 390-Euro Proof Pack Sprint.</p></article>
+                <article><p class="tag">Impact-Anteil</p><strong id="proofImpact">0 EUR</strong><p class="muted">40% fuer gute Taten und Proof-Automation.</p></article>
+              </div>
+              <button class="app-copy" type="button" id="copyProof">Proof Receipt kopieren</button>
             </div>
 
             <div class="app-panel app-share" data-app-panel="share">
@@ -1380,20 +1403,20 @@
 
       <section class="growth-loop">
         <div class="wrap">
-          <div class="section-head"><div><p class="eyebrow">Iteration 6 bis 115</p><h2>Daily Growth Cockpit</h2></div><p class="muted">Ein oeffentliches Tagesboard macht den Verbesserungszyklus nachvollziehbar: Idee generieren, intern posten, umsetzen, monetarisieren, messen und in mehr Nutzen reinvestieren.</p></div>
+          <div class="section-head"><div><p class="eyebrow">Iteration 6 bis 116</p><h2>Daily Growth Cockpit</h2></div><p class="muted">Ein oeffentliches Tagesboard macht den Verbesserungszyklus nachvollziehbar: Idee generieren, intern posten, umsetzen, monetarisieren, messen und in mehr Nutzen reinvestieren.</p></div>
           <div class="loop-grid">
-            <article class="loop-panel"><p class="tag">Heute umgesetzt</p><h3>Trust Pulse Follow-up Planner</h3><p class="muted">Der Planner macht aus Einmal-Aufmerksamkeit eine Beziehung: Nach Spende, Share, Reply oder Pitch-Klick entsteht eine menschliche Drei-Kontakt-Strecke aus Dank, Proof, Praeferenzfrage und leichtem Monats- oder Partnerpfad.</p><div class="loop-steps"><article><p class="tag">1</p><p>Idee: Trust Pulse Follow-up Planner.</p></article><article><p class="tag">2</p><p>Social: Open Self Commons plus Launch-Texte.</p></article><article><p class="tag">3</p><p>Ship: Trust-Tab im Impact Workspace live.</p></article><article><p class="tag">4</p><p>Revenue: 99-Euro Retention Audit oder 290-Euro Trust Pulse Setup.</p></article><article><p class="tag">5</p><p>Track: Trust-Pulse-Kopien, Rueckkehrsignale, Monatsupgrades, zweite Gaben, Partner-Antworten und Retention-Revenue.</p></article><article><p class="tag">6</p><p>Reinvest: bessere Follow-up-Algorithmen, Proof-Automation, CRM-Signale, Consent-UX, Growth-Tests und Impact-Fonds.</p></article></div></article>
+            <article class="loop-panel"><p class="tag">Heute umgesetzt</p><h3>Proof Receipt Builder</h3><p class="muted">Der Builder macht Wirkung belegbar: Aus jedem Impact-Eintrag entsteht ein teilbarer Receipt mit Betrag, Status, Beweisart, naechstem Update, CTA und Reinvestitionslogik.</p><div class="loop-steps"><article><p class="tag">1</p><p>Idee: Proof Receipt Builder.</p></article><article><p class="tag">2</p><p>Social: Open Self Commons plus Launch-Texte.</p></article><article><p class="tag">3</p><p>Ship: Proof-Tab im Impact Workspace live.</p></article><article><p class="tag">4</p><p>Revenue: 79-Euro Proof Receipt Audit oder 390-Euro Proof Pack Sprint.</p></article><article><p class="tag">5</p><p>Track: Receipt-Kopien, Proof-Klicks, Sponsor-Vertrauen, zweite Gaben, Monatsupgrades und Partner-Revenue.</p></article><article><p class="tag">6</p><p>Reinvest: bessere Proof-Algorithmen, Beleg-Templates, Trust-UX, AI-Zitierbarkeit, Growth-Tests und Impact-Fonds.</p></article></div></article>
             <div>
               <div class="metric-board">
-                <article class="track-card"><p class="tag">Features umgesetzt</p><strong>1/1</strong><p class="muted">Iteration 115 als Trust Pulse Follow-up Planner im Impact Workspace gebaut.</p></article>
+                <article class="track-card"><p class="tag">Features umgesetzt</p><strong>1/1</strong><p class="muted">Iteration 116 als Proof Receipt Builder im Impact Workspace gebaut.</p></article>
                 <article class="track-card"><p class="tag">Social-Posts</p><strong>1/1</strong><p class="muted">Interner Open-Self-Commons-Post ist veroeffentlicht; externe Kanaele sind als Launch-Pack vorbereitet.</p></article>
-                <article class="track-card"><p class="tag">Revenue heute</p><strong>0 Euro</strong><p class="muted">Aktueller Ist-Wert; neues Ziel: erster 99-Euro Retention Audit oder 290-Euro Trust Pulse Setup.</p></article>
-                <article class="track-card"><p class="tag">User-Growth</p><strong>+0%</strong><p class="muted">Baseline; gemessen werden Trust-Pulse-Kopien, Rueckkehrsignale, Monatsupgrades, zweite Gaben und Partner-Antworten.</p></article>
+                <article class="track-card"><p class="tag">Revenue heute</p><strong>0 Euro</strong><p class="muted">Aktueller Ist-Wert; neues Ziel: erster 79-Euro Proof Receipt Audit oder 390-Euro Proof Pack Sprint.</p></article>
+                <article class="track-card"><p class="tag">User-Growth</p><strong>+0%</strong><p class="muted">Baseline; gemessen werden Receipt-Kopien, Proof-Klicks, zweite Gaben, Monatsupgrades und Sponsor-Antworten.</p></article>
               </div>
               <div class="social-pack">
-                <article><p class="tag">LinkedIn</p><p class="muted">Iteration 115: Trust Pulse Follow-up Planner. Gute Taten wachsen, wenn nach dem ersten Signal ein menschlicher Dank, ein Proof und eine respektvolle naechste Wahl folgen.</p></article>
-                <article><p class="tag">TikTok / Reel</p><p class="muted">Hook: Der erste Klick ist nicht die Beziehung. Trust Pulse macht daraus Dank, Proof und eine leichte zweite gute Handlung.</p></article>
-                <article><p class="tag">Twitter / X</p><p class="muted">Trust Pulse Planner: Impact-Eintrag rein, 3-Touch-Follow-up raus. Ziel: mehr Rueckkehrsignale, zweite Gaben und Monatsupgrades.</p></article>
+                <article><p class="tag">LinkedIn</p><p class="muted">Iteration 116: Proof Receipt Builder. Gute Taten brauchen einen Beleg, der Betrag, Wirkung, naechstes Update und CTA in Sekunden erklaert.</p></article>
+                <article><p class="tag">TikTok / Reel</p><p class="muted">Hook: Nicht nur sagen, dass etwas Gutes passiert. Zeig den Receipt: Betrag, Status, Proof und naechste gute Handlung.</p></article>
+                <article><p class="tag">Twitter / X</p><p class="muted">Proof Receipt Builder: Impact-Eintrag rein, teilbarer Wirkungsbeleg raus. Ziel: mehr Vertrauen, zweite Gaben und Sponsor-Replies.</p></article>
               </div>
               <p class="tag" style="margin-top:16px">Social-Posting-Status: intern im Open Self Commons veroeffentlicht; externe Netzwerke brauchen autorisierte Connectoren.</p>
             </div>
@@ -4265,6 +4288,7 @@
           <div class="feed" style="margin-top:24px"><article><p><strong>@nur-gutes</strong> / Tagesidee / Iteration 21</p><p class="muted">Neue Business-Idee: Trusted Ask Relay. Persoenliche DMs, kleine Gruppen und Community-Kanaele verwandeln Proofs in konkrete Bitten, Antworten und Folgebeitraege.</p><p class="tag">Neu umgesetzt</p></article></div>
           <div class="feed" style="margin-top:24px"><article><p><strong>@nur-gutes</strong> / Tagesidee / Iteration 20</p><p class="muted">Neue Business-Idee: Skill-Impact Passport. Gute Taten, erlernte Skills und Proofs werden als teilbares Profil sichtbar, damit Vertrauen, Teams und neue Spenden wachsen.</p><p class="tag">Neu umgesetzt</p></article></div>
           <div class="feed" style="margin-top:24px"><article><p><strong>@nur-gutes</strong> / Tagesidee / Iteration 19</p><p class="muted">Neue Business-Idee: Asset-Giving Gateway. DAF-, Aktien-, Krypto- und Non-Cash-Gaben werden in klare Impact-Pfade, Proofs und Partnerseiten uebersetzt.</p><p class="tag">Neu umgesetzt</p></article></div>
+          <div class="feed" style="margin-top:24px"><article><p><strong>@nur-gutes</strong> / Tagesidee / Iteration 116</p><p class="muted">Neue Business-Idee: Proof Receipt Builder. Jeder Impact-Eintrag wird zu einem teilbaren Wirkungsbeleg mit Betrag, Status, Beweisart, naechstem Update, CTA und Reinvestitionsplan.</p><p class="tag">Neu umgesetzt</p></article></div>
           <div class="feed" style="margin-top:24px"><article><p><strong>@nur-gutes</strong> / Tagesidee / Iteration 115</p><p class="muted">Neue Business-Idee: Trust Pulse Follow-up Planner. Aus Spende, Share, Reply oder Pitch-Klick entsteht ein menschlicher Drei-Kontakt-Plan mit Dank, Proof, Praeferenzfrage, Monatsoption und Retention-Revenue.</p><p class="tag">Neu umgesetzt</p></article></div>
           <div class="feed" style="margin-top:24px"><article><p><strong>@nur-gutes</strong> / Tagesidee / Iteration 114</p><p class="muted">Neue Business-Idee: Partner Pitch Builder. Jeder gespeicherte Impact-Eintrag wird zu einem sponsorfaehigen Ask mit Preis, Wirkung, UTM-Share-Link, Social-Text und Reinvestitionsplan.</p><p class="tag">Neu umgesetzt</p></article></div>
           <div class="grid3" style="margin-top:48px"><article class="plain-card"><p class="tag">Prompt-Bibliothek</p><p class="today">Was habe ich lange verteidigt, obwohl es mir nicht mehr dient?</p><p class="today">Welche gute Eigenschaft verstecke ich, weil sie nicht cool wirkt?</p><p class="today">Wem wuerde mein Mut helfen, wenn ich ihn heute kleiner teste?</p></article><article class="plain-card"><p class="tag">Starter-Uebungen</p><h3>Morgenfrage</h3><p class="muted">Was wuerde ich heute tun, wenn Anerkennung keine Rolle spielt?</p><h3>Talent-Spur</h3><p class="muted">Welche Aufgabe gibt mir Energie, obwohl sie fuer andere anstrengend wirkt?</p></article><article class="plain-card dark"><p class="eyebrow">Community-Regeln</p><p>Anonym zuerst. Keine Diagnosen. Forkable Wissen. Langsamkeit ist ein Feature.</p></article></div>
@@ -4472,6 +4496,45 @@
           qs("#trustScoreText").textContent = score >= 85 ? "Sehr bereit: jetzt persoenlich follow-uppen." : "Bereit: Proof und Praeferenzfrage machen den naechsten Kontakt staerker.";
         }
 
+        function renderProof() {
+          const select = qs("#proofItem");
+          const previous = select.value;
+          select.innerHTML = items.map((item) => `<option value="${escapeHtml(item.id)}">${escapeHtml(item.title)}</option>`).join("");
+          if (items.some((item) => item.id === previous)) select.value = previous;
+          const item = items.find((entry) => entry.id === select.value) || items[0];
+          const status = qs("#proofStatus").value;
+          const evidence = qs("#proofEvidence").value;
+          const days = Math.max(1, Number(qs("#proofDays").value) || 7);
+          const amount = Number(item?.amount) || 0;
+          const receiptId = `NG-${String(item?.id || "impact").replace(/[^a-z0-9]/gi, "").slice(-6).toUpperCase()}-${String(days).padStart(2, "0")}`;
+          const updateDate = new Date(Date.now() + days * 86400000).toISOString().slice(0, 10);
+          const shareUrl = `${location.origin}${location.pathname}#app?receipt=${encodeURIComponent(receiptId)}`;
+          const proof = [
+            `Proof Receipt ${receiptId}`,
+            "",
+            `Projekt: ${item?.title || "Neue gute Tat"}`,
+            `Status: ${status}`,
+            `Finanzierungsziel: ${money(amount)}`,
+            `Impact-Anteil: ${money(amount * 0.4)}`,
+            `Beweisart: ${evidence}`,
+            `Naechstes Update: ${updateDate}`,
+            "",
+            `Was passiert: ${item?.text || "Eine konkrete gute Tat wird umgesetzt und belegbar gemacht."}`,
+            `Naechster Schritt: ${item?.next || "Proof sammeln und Update teilen."}`,
+            "",
+            "CTA:",
+            "Teile diesen Receipt, finanziere den naechsten Schritt oder frage nach dem Proof-Update.",
+            "",
+            "Reinvestition:",
+            "40% gute Taten, 25% Proof-Automation und bessere Algorithmen, 20% Growth/Marketing, 15% Betrieb und Qualitaet.",
+            "",
+            `Share-Link: ${shareUrl}`
+          ].join("\n");
+          qs("#proofOutput").value = proof;
+          qs("#proofId").textContent = receiptId;
+          qs("#proofImpact").textContent = money(amount * 0.4);
+        }
+
         function renderAll() {
           renderStats();
           renderBoard();
@@ -4479,6 +4542,7 @@
           renderShare();
           renderPitch();
           renderTrust();
+          renderProof();
         }
 
         qsa("[data-app-tab]").forEach((tab) => {
@@ -4555,6 +4619,11 @@
           qs(selector).addEventListener("change", renderTrust);
         });
 
+        ["#proofItem", "#proofStatus", "#proofEvidence", "#proofDays"].forEach((selector) => {
+          qs(selector).addEventListener("input", renderProof);
+          qs(selector).addEventListener("change", renderProof);
+        });
+
         qs("#copyShare").addEventListener("click", async () => {
           const text = qs("#shareText").value;
           try {
@@ -4594,6 +4663,20 @@
           }
           setTimeout(() => {
             qs("#copyTrust").textContent = "Trust Pulse kopieren";
+          }, 1800);
+        });
+
+        qs("#copyProof").addEventListener("click", async () => {
+          const text = qs("#proofOutput").value;
+          try {
+            await navigator.clipboard.writeText(text);
+            qs("#copyProof").textContent = "Proof Receipt kopiert";
+          } catch (error) {
+            qs("#proofOutput").select();
+            qs("#copyProof").textContent = "Proof Receipt markiert";
+          }
+          setTimeout(() => {
+            qs("#copyProof").textContent = "Proof Receipt kopieren";
           }, 1800);
         });
 
