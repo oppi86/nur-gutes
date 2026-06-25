@@ -1090,8 +1090,8 @@
       .app-panel { display: none; }
       .app-panel.active { display: block; }
       .app-form { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
-      .app-form label, .stripe-grid label, .pitch-grid label, .trust-grid label, .proof-grid label { display: grid; gap: 6px; color: #575952; font-size: 12px; font-weight: 900; text-transform: uppercase; }
-      .app-form input, .app-form select, .app-form textarea, .stripe-grid input, .app-share textarea, .pitch-grid input, .pitch-grid select, .pitch-grid textarea, .trust-grid input, .trust-grid select, .trust-grid textarea, .proof-grid input, .proof-grid select, .proof-grid textarea { width: 100%; border: 1px solid #d9d1c4; border-radius: 8px; background: #fff; color: #20211d; font: inherit; padding: 12px; min-width: 0; }
+      .app-form label, .stripe-grid label, .pitch-grid label, .trust-grid label, .proof-grid label, .monthly-grid label { display: grid; gap: 6px; color: #575952; font-size: 12px; font-weight: 900; text-transform: uppercase; }
+      .app-form input, .app-form select, .app-form textarea, .stripe-grid input, .app-share textarea, .pitch-grid input, .pitch-grid select, .pitch-grid textarea, .trust-grid input, .trust-grid select, .trust-grid textarea, .proof-grid input, .proof-grid select, .proof-grid textarea, .monthly-grid input, .monthly-grid select, .monthly-grid textarea { width: 100%; border: 1px solid #d9d1c4; border-radius: 8px; background: #fff; color: #20211d; font: inherit; padding: 12px; min-width: 0; }
       .app-form textarea, .app-wide { grid-column: 1 / -1; }
       .app-actions-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 16px 0; }
       .app-filter { background: #f7f4ef; color: #575952; border: 1px solid #e7e1d7; }
@@ -1126,9 +1126,14 @@
       .proof-ledger { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; margin: 16px 0; }
       .proof-ledger article { border: 1px solid #e7e1d7; box-shadow: none; padding: 16px; }
       .proof-ledger strong { display: block; color: #17332f; font-size: 24px; line-height: 1.05; margin-top: 4px; }
+      .monthly-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
+      .monthly-grid textarea { grid-column: 1 / -1; min-height: 240px; resize: vertical; }
+      .monthly-tiers { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; margin: 16px 0; }
+      .monthly-tiers article { border: 1px solid #e7e1d7; box-shadow: none; padding: 16px; }
+      .monthly-tiers strong { display: block; color: #17332f; font-size: 26px; line-height: 1.05; margin-top: 4px; }
       footer { background: #20211d; color: white; padding: 40px 48px; }
       @media (max-width: 860px) {
-        .app-shell, .app-form, .stripe-grid, .pay-grid, .pitch-grid, .pitch-preview, .trust-grid, .trust-plan, .proof-grid, .proof-ledger { grid-template-columns: 1fr; }
+        .app-shell, .app-form, .stripe-grid, .pay-grid, .pitch-grid, .pitch-preview, .trust-grid, .trust-plan, .proof-grid, .proof-ledger, .monthly-grid, .monthly-tiers { grid-template-columns: 1fr; }
         .app-intro { margin-bottom: 20px; }
         .app-card-head { display: block; }
       }
@@ -1176,6 +1181,7 @@
               <button class="app-tab" type="button" aria-selected="false" data-app-tab="pitch">Pitch</button>
               <button class="app-tab" type="button" aria-selected="false" data-app-tab="trust">Trust</button>
               <button class="app-tab" type="button" aria-selected="false" data-app-tab="proof">Proof</button>
+              <button class="app-tab" type="button" aria-selected="false" data-app-tab="monthly">Monthly</button>
               <button class="app-tab" type="button" aria-selected="false" data-app-tab="share">Social</button>
             </div>
 
@@ -1258,6 +1264,22 @@
                 <article><p class="tag">Impact-Anteil</p><strong id="proofImpact">0 EUR</strong><p class="muted">40% fuer gute Taten und Proof-Automation.</p></article>
               </div>
               <button class="app-copy" type="button" id="copyProof">Proof Receipt kopieren</button>
+            </div>
+
+            <div class="app-panel" data-app-panel="monthly">
+              <p class="muted">Der Recurring Gift Ladder Builder macht aus einem Impact-Eintrag drei monatliche Stufen mit Wirkungssatz, Proof-Rhythmus und Stripe-Monthly-Pfad.</p>
+              <div class="monthly-grid">
+                <label>Impact-Eintrag<select id="monthlyItem"></select></label>
+                <label>Basisbetrag EUR<input id="monthlyBase" type="number" min="3" max="999" value="9" /></label>
+                <label>Proof-Rhythmus<select id="monthlyRhythm"><option>monatlich</option><option>alle 14 Tage</option><option>quartalsweise</option></select></label>
+                <textarea id="monthlyOutput" readonly></textarea>
+              </div>
+              <div class="monthly-tiers">
+                <article><p class="tag">Starter</p><strong id="monthlyStarter">0 EUR</strong><p class="muted">Niedrige Huerde fuer erste Wiederkehr.</p></article>
+                <article><p class="tag">Builder</p><strong id="monthlyBuilder">0 EUR</strong><p class="muted">Planbare Proofs und naechste gute Tat.</p></article>
+                <article><p class="tag">Anchor</p><strong id="monthlyAnchor">0 EUR</strong><p class="muted">Partner-Signal fuer stabile Wirkung.</p></article>
+              </div>
+              <button class="app-copy" type="button" id="copyMonthly">Monthly Ladder kopieren</button>
             </div>
 
             <div class="app-panel app-share" data-app-panel="share">
@@ -1403,20 +1425,20 @@
 
       <section class="growth-loop">
         <div class="wrap">
-          <div class="section-head"><div><p class="eyebrow">Iteration 6 bis 116</p><h2>Daily Growth Cockpit</h2></div><p class="muted">Ein oeffentliches Tagesboard macht den Verbesserungszyklus nachvollziehbar: Idee generieren, intern posten, umsetzen, monetarisieren, messen und in mehr Nutzen reinvestieren.</p></div>
+          <div class="section-head"><div><p class="eyebrow">Iteration 6 bis 117</p><h2>Daily Growth Cockpit</h2></div><p class="muted">Ein oeffentliches Tagesboard macht den Verbesserungszyklus nachvollziehbar: Idee generieren, intern posten, umsetzen, monetarisieren, messen und in mehr Nutzen reinvestieren.</p></div>
           <div class="loop-grid">
-            <article class="loop-panel"><p class="tag">Heute umgesetzt</p><h3>Proof Receipt Builder</h3><p class="muted">Der Builder macht Wirkung belegbar: Aus jedem Impact-Eintrag entsteht ein teilbarer Receipt mit Betrag, Status, Beweisart, naechstem Update, CTA und Reinvestitionslogik.</p><div class="loop-steps"><article><p class="tag">1</p><p>Idee: Proof Receipt Builder.</p></article><article><p class="tag">2</p><p>Social: Open Self Commons plus Launch-Texte.</p></article><article><p class="tag">3</p><p>Ship: Proof-Tab im Impact Workspace live.</p></article><article><p class="tag">4</p><p>Revenue: 79-Euro Proof Receipt Audit oder 390-Euro Proof Pack Sprint.</p></article><article><p class="tag">5</p><p>Track: Receipt-Kopien, Proof-Klicks, Sponsor-Vertrauen, zweite Gaben, Monatsupgrades und Partner-Revenue.</p></article><article><p class="tag">6</p><p>Reinvest: bessere Proof-Algorithmen, Beleg-Templates, Trust-UX, AI-Zitierbarkeit, Growth-Tests und Impact-Fonds.</p></article></div></article>
+            <article class="loop-panel"><p class="tag">Heute umgesetzt</p><h3>Recurring Gift Ladder Builder</h3><p class="muted">Der Builder uebersetzt einen Impact-Eintrag in drei wiederkehrende Monatsstufen mit Wirkungssatz, Proof-Rhythmus, Monthly-CTA und klarer Reinvestitionslogik.</p><div class="loop-steps"><article><p class="tag">1</p><p>Idee: Recurring Gift Ladder Builder.</p></article><article><p class="tag">2</p><p>Social: Open Self Commons plus Launch-Texte.</p></article><article><p class="tag">3</p><p>Ship: Monthly-Tab im Impact Workspace live.</p></article><article><p class="tag">4</p><p>Revenue: 49-Euro Monthly Ladder Audit oder 290-Euro Recurring Setup Sprint.</p></article><article><p class="tag">5</p><p>Track: Ladder-Kopien, Monthly-Link-Klicks, Wiederkehrstarts, MRR-Ziel, Proof-Views und Retention-Signale.</p></article><article><p class="tag">6</p><p>Reinvest: bessere Ladder-Algorithmen, Stripe-Monthly-UX, Proof-Automation, Lifecycle-Messaging, Growth-Tests und Impact-Fonds.</p></article></div></article>
             <div>
               <div class="metric-board">
-                <article class="track-card"><p class="tag">Features umgesetzt</p><strong>1/1</strong><p class="muted">Iteration 116 als Proof Receipt Builder im Impact Workspace gebaut.</p></article>
+                <article class="track-card"><p class="tag">Features umgesetzt</p><strong>1/1</strong><p class="muted">Iteration 117 als Recurring Gift Ladder Builder im Impact Workspace gebaut.</p></article>
                 <article class="track-card"><p class="tag">Social-Posts</p><strong>1/1</strong><p class="muted">Interner Open-Self-Commons-Post ist veroeffentlicht; externe Kanaele sind als Launch-Pack vorbereitet.</p></article>
-                <article class="track-card"><p class="tag">Revenue heute</p><strong>0 Euro</strong><p class="muted">Aktueller Ist-Wert; neues Ziel: erster 79-Euro Proof Receipt Audit oder 390-Euro Proof Pack Sprint.</p></article>
-                <article class="track-card"><p class="tag">User-Growth</p><strong>+0%</strong><p class="muted">Baseline; gemessen werden Receipt-Kopien, Proof-Klicks, zweite Gaben, Monatsupgrades und Sponsor-Antworten.</p></article>
+                <article class="track-card"><p class="tag">Revenue heute</p><strong>0 Euro</strong><p class="muted">Aktueller Ist-Wert; neues Ziel: erster 49-Euro Monthly Ladder Audit oder 290-Euro Recurring Setup Sprint.</p></article>
+                <article class="track-card"><p class="tag">User-Growth</p><strong>+0%</strong><p class="muted">Baseline; gemessen werden Ladder-Kopien, Monthly-Link-Klicks, Wiederkehrstarts, MRR-Ziel und Proof-Views.</p></article>
               </div>
               <div class="social-pack">
-                <article><p class="tag">LinkedIn</p><p class="muted">Iteration 116: Proof Receipt Builder. Gute Taten brauchen einen Beleg, der Betrag, Wirkung, naechstes Update und CTA in Sekunden erklaert.</p></article>
-                <article><p class="tag">TikTok / Reel</p><p class="muted">Hook: Nicht nur sagen, dass etwas Gutes passiert. Zeig den Receipt: Betrag, Status, Proof und naechste gute Handlung.</p></article>
-                <article><p class="tag">Twitter / X</p><p class="muted">Proof Receipt Builder: Impact-Eintrag rein, teilbarer Wirkungsbeleg raus. Ziel: mehr Vertrauen, zweite Gaben und Sponsor-Replies.</p></article>
+                <article><p class="tag">LinkedIn</p><p class="muted">Iteration 117: Recurring Gift Ladder Builder. Aus einem Impact-Eintrag entstehen drei Monatsstufen mit Proof-Rhythmus und klarer MRR-Route.</p></article>
+                <article><p class="tag">TikTok / Reel</p><p class="muted">Hook: Einmal helfen ist gut. Planbar helfen ist staerker. Aus einer guten Tat wird eine Monthly Ladder mit sichtbarem Proof.</p></article>
+                <article><p class="tag">Twitter / X</p><p class="muted">Recurring Gift Ladder: Impact-Eintrag rein, drei Monatsstufen raus. Ziel: mehr MRR, Proof-Views und wiederkehrende Wirkung.</p></article>
               </div>
               <p class="tag" style="margin-top:16px">Social-Posting-Status: intern im Open Self Commons veroeffentlicht; externe Netzwerke brauchen autorisierte Connectoren.</p>
             </div>
@@ -4288,6 +4310,7 @@
           <div class="feed" style="margin-top:24px"><article><p><strong>@nur-gutes</strong> / Tagesidee / Iteration 21</p><p class="muted">Neue Business-Idee: Trusted Ask Relay. Persoenliche DMs, kleine Gruppen und Community-Kanaele verwandeln Proofs in konkrete Bitten, Antworten und Folgebeitraege.</p><p class="tag">Neu umgesetzt</p></article></div>
           <div class="feed" style="margin-top:24px"><article><p><strong>@nur-gutes</strong> / Tagesidee / Iteration 20</p><p class="muted">Neue Business-Idee: Skill-Impact Passport. Gute Taten, erlernte Skills und Proofs werden als teilbares Profil sichtbar, damit Vertrauen, Teams und neue Spenden wachsen.</p><p class="tag">Neu umgesetzt</p></article></div>
           <div class="feed" style="margin-top:24px"><article><p><strong>@nur-gutes</strong> / Tagesidee / Iteration 19</p><p class="muted">Neue Business-Idee: Asset-Giving Gateway. DAF-, Aktien-, Krypto- und Non-Cash-Gaben werden in klare Impact-Pfade, Proofs und Partnerseiten uebersetzt.</p><p class="tag">Neu umgesetzt</p></article></div>
+          <div class="feed" style="margin-top:24px"><article><p><strong>@nur-gutes</strong> / Tagesidee / Iteration 117</p><p class="muted">Neue Business-Idee: Recurring Gift Ladder Builder. Jeder Impact-Eintrag wird zu drei monatlichen Stufen mit Proof-Rhythmus, MRR-Ziel, Monthly-CTA und Reinvestitionsplan.</p><p class="tag">Neu umgesetzt</p></article></div>
           <div class="feed" style="margin-top:24px"><article><p><strong>@nur-gutes</strong> / Tagesidee / Iteration 116</p><p class="muted">Neue Business-Idee: Proof Receipt Builder. Jeder Impact-Eintrag wird zu einem teilbaren Wirkungsbeleg mit Betrag, Status, Beweisart, naechstem Update, CTA und Reinvestitionsplan.</p><p class="tag">Neu umgesetzt</p></article></div>
           <div class="feed" style="margin-top:24px"><article><p><strong>@nur-gutes</strong> / Tagesidee / Iteration 115</p><p class="muted">Neue Business-Idee: Trust Pulse Follow-up Planner. Aus Spende, Share, Reply oder Pitch-Klick entsteht ein menschlicher Drei-Kontakt-Plan mit Dank, Proof, Praeferenzfrage, Monatsoption und Retention-Revenue.</p><p class="tag">Neu umgesetzt</p></article></div>
           <div class="feed" style="margin-top:24px"><article><p><strong>@nur-gutes</strong> / Tagesidee / Iteration 114</p><p class="muted">Neue Business-Idee: Partner Pitch Builder. Jeder gespeicherte Impact-Eintrag wird zu einem sponsorfaehigen Ask mit Preis, Wirkung, UTM-Share-Link, Social-Text und Reinvestitionsplan.</p><p class="tag">Neu umgesetzt</p></article></div>
@@ -4535,6 +4558,47 @@
           qs("#proofImpact").textContent = money(amount * 0.4);
         }
 
+        function renderMonthly() {
+          const select = qs("#monthlyItem");
+          const previous = select.value;
+          select.innerHTML = items.map((item) => `<option value="${escapeHtml(item.id)}">${escapeHtml(item.title)}</option>`).join("");
+          if (items.some((item) => item.id === previous)) select.value = previous;
+          const item = items.find((entry) => entry.id === select.value) || items[0];
+          const base = Math.max(3, Number(qs("#monthlyBase").value) || 9);
+          const rhythm = qs("#monthlyRhythm").value;
+          const starter = base;
+          const builder = base * 3;
+          const anchor = base * 7;
+          const mrrTarget = starter + builder + anchor;
+          const monthlyLink = stripeLinks.monthly || `${location.origin}${location.pathname}#app`;
+          const ladder = [
+            `Recurring Gift Ladder fuer ${item?.title || "Neue gute Tat"}`,
+            "",
+            `Starter: ${money(starter)} pro Monat - niedrige Huerde fuer erste Wiederkehr.`,
+            `Builder: ${money(builder)} pro Monat - finanziert Proof-Rhythmus und naechste gute Tat.`,
+            `Anchor: ${money(anchor)} pro Monat - gibt Planungssicherheit und Partner-Signal.`,
+            "",
+            `MRR-Ziel bei je einem Start: ${money(mrrTarget)}.`,
+            `Proof-Rhythmus: ${rhythm}.`,
+            `Impact-Anteil bei einem Monatszyklus: ${money(mrrTarget * 0.4)}.`,
+            "",
+            `Warum es passt: ${item?.text || "Wiederkehrende kleine Beitraege machen Wirkung planbar und sichtbar."}`,
+            `Naechster Schritt: ${item?.next || "Monthly-Link teilen und ersten Proof-Termin festlegen."}`,
+            "",
+            "CTA:",
+            `Starte eine Monatsstufe und erhalte ${rhythm} einen Proof, was aus dem Beitrag passiert.`,
+            "",
+            `Monthly-Link: ${monthlyLink}`,
+            "",
+            "Reinvestition:",
+            "40% gute Taten, 25% bessere Ladder-Algorithmen und Stripe-Monthly-UX, 20% Growth/Marketing, 15% Betrieb und Qualitaet."
+          ].join("\n");
+          qs("#monthlyOutput").value = ladder;
+          qs("#monthlyStarter").textContent = money(starter);
+          qs("#monthlyBuilder").textContent = money(builder);
+          qs("#monthlyAnchor").textContent = money(anchor);
+        }
+
         function renderAll() {
           renderStats();
           renderBoard();
@@ -4543,6 +4607,7 @@
           renderPitch();
           renderTrust();
           renderProof();
+          renderMonthly();
         }
 
         qsa("[data-app-tab]").forEach((tab) => {
@@ -4624,6 +4689,11 @@
           qs(selector).addEventListener("change", renderProof);
         });
 
+        ["#monthlyItem", "#monthlyBase", "#monthlyRhythm"].forEach((selector) => {
+          qs(selector).addEventListener("input", renderMonthly);
+          qs(selector).addEventListener("change", renderMonthly);
+        });
+
         qs("#copyShare").addEventListener("click", async () => {
           const text = qs("#shareText").value;
           try {
@@ -4677,6 +4747,20 @@
           }
           setTimeout(() => {
             qs("#copyProof").textContent = "Proof Receipt kopieren";
+          }, 1800);
+        });
+
+        qs("#copyMonthly").addEventListener("click", async () => {
+          const text = qs("#monthlyOutput").value;
+          try {
+            await navigator.clipboard.writeText(text);
+            qs("#copyMonthly").textContent = "Monthly Ladder kopiert";
+          } catch (error) {
+            qs("#monthlyOutput").select();
+            qs("#copyMonthly").textContent = "Monthly Ladder markiert";
+          }
+          setTimeout(() => {
+            qs("#copyMonthly").textContent = "Monthly Ladder kopieren";
           }, 1800);
         });
 
