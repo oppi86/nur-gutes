@@ -71,6 +71,13 @@
       .metric-row { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; margin-top: 18px; }
       .metric { border-radius: 8px; background: rgba(255,255,255,.12); padding: 16px; }
       .metric strong { display: block; font-size: 28px; line-height: 1; }
+      .resource-control { background: #fff; }
+      .resource-panel { border: 1px solid #e7e1d7; box-shadow: none; padding: 24px; }
+      .resource-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+      .resource-list { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; margin-top: 16px; }
+      .resource-list a { border: 1px solid #e7e1d7; border-radius: 8px; background: #f7f4ef; color: #17332f; font-size: 13px; font-weight: 900; padding: 12px; text-decoration: none; }
+      .resource-section { display: none; }
+      .show-resources .resource-section { display: block; }
       .marketplace { background: #fff; }
       .bounty-board { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; margin-top: 24px; }
       .bounty { border: 1px solid #e7e1d7; box-shadow: none; padding: 20px; }
@@ -1170,7 +1177,7 @@
       .second-score strong { display: block; color: #17332f; font-size: 26px; line-height: 1.05; margin-top: 4px; }
       footer { background: #20211d; color: white; padding: 40px 48px; }
       @media (max-width: 860px) {
-        .app-shell, .tool-router, .app-form, .stripe-grid, .pay-grid, .pitch-grid, .pitch-preview, .trust-grid, .trust-plan, .proof-grid, .proof-ledger, .monthly-grid, .monthly-tiers, .second-grid, .second-score { grid-template-columns: 1fr; }
+        .app-shell, .tool-router, .resource-list, .app-form, .stripe-grid, .pay-grid, .pitch-grid, .pitch-preview, .trust-grid, .trust-plan, .proof-grid, .proof-ledger, .monthly-grid, .monthly-tiers, .second-grid, .second-score { grid-template-columns: 1fr; }
         .app-intro { margin-bottom: 20px; }
         .app-card-head { display: block; }
       }
@@ -1421,6 +1428,21 @@
         <div class="wrap"><div class="idea-list"><article>Practitioner Trust Creator Desk: glaubwuerdige Fachleute, Praktiker und Community-Stimmen werden zu kurzen Proof-Clips mit Rolle, Evidenz, Offenlegung, CTA und Messpfad.</article></div></div>
         <div class="wrap"><div class="idea-list"><article>DAF Grant Unlock Desk: DAF- und Vermoegensspender bekommen einen entscheidungsreifen Grant-Pfad mit Problem, Proof, Grant-Fit, Advisor-Frage und naechstem Ask.</article></div></div>
         <div class="wrap"><div class="idea-list"><article>Zero-Click Trust Beacon: zitierbare Antwortkarten zeigen Wirkung, Kosten, Belege und naechsten Schritt, damit KI-Suchen Vertrauen und Spendenpfad nicht verschlucken.</article><article>Creator Proof Clip Studio: aus einer guten Tat entsteht ein wiederverwendbarer Creator-Clip mit Hook, Offenlegung, Proof-Link, CTA, Sponsor-Angebot und Reuse-Metriken.</article><article>Mobile Sponsor Conversion Lab: ein mobile-first Sponsor-Pfad verbindet drei Tiers, Monatsoption, Match-Hinweis, Trust-Signal und Conversion-Metriken zu schnellerem Umsatz.</article><article>Good News Action Brief Desk: echte positive Artikel werden mit Quelle, Kontext, naechster guter Tat, Share-Text und Sponsor-Slot zu handlungsfaehigen Briefings.</article><article>P2P Ambassador Relay Kit: Top-P2P-Fundraiser werden nach Events zu wiederkehrenden Ambassadors mit quarterly DIY-Mission, Proof-Pack, Referral-Ladder und Recurring-Giving-Bruecke.</article><article>AI Personalization Trust Sandbox: kleine Nonprofits testen AI-Spendernachrichten vor dem Versand mit PII-Maske, Consent-Check, Human Review, Trust-Score und Retention-Signal.</article><article>Millennial Giving Signal Board: kleine Nonprofits uebersetzen Millennial-Spendensignale in Email-first Outreach, Identitaetsbotschaften, Trust-Belege, Matching-Hinweise und DAF-Next-Steps.</article><article>Human Connection Timebank: kleine Nonprofits machen AI-Zeitersparnis sichtbar und reservieren die gewonnenen Minuten fuer echte Dankanrufe, persoenliche Updates, Lapsed-Donor-Check-ins und Mid-Level-Beziehungen.</article><article>Everyday Donor Tax Prompt: kleine Nonprofits erklaeren Standard-Deduction-Spendern die neue 2026-Cash-Gift-Chance mit klarer Grenze, Receipt-Reminder, Jahresziel und vorsichtigem Disclaimer.</article><article>Warm Intro Partner Pipeline Board: kleine Nonprofits verwandeln Board-, Team- und Community-Netzwerke in messbare Corporate-Partnerchancen mit Owner, Proof-Pack, Fit-Score und naechstem Ask.</article><article>Funding Mix Resilience Map: kleine Nonprofits machen Einnahme-Abhaengigkeiten sichtbar und waehlen den naechsten Finanzierungsstream mit Risiko, Pipeline und Reserve-Monaten.</article><article>Transparent Checkout Trust Guard: kleine Nonprofits senken Spendenabbrueche mit klarer Gebuehreninfo, Betrag-zu-Wirkung, Wallet-CTA, Monatsoption und Proof-Link.</article><article>Volunteer Surge Slot Builder: kleine Nonprofits verwandeln den erwarteten Volunteer-Schub in 30-, 90- und 180-Minuten-Slots mit Materialbedarf, Betreuungslast, Proof und Corporate-Fit.</article><article>Micro-Creator Proof Co-op: kleine Nonprofits arbeiten mit 2-3 glaubwuerdigen Nischen-Creatorn an Proof-Clips, UGC-Rechten, Offenlegung und messbaren Spendenrouten.</article><article>Lapse-to-Love Retention Sentinel: kleine Nonprofits erkennen mit consent-sicherer AI fruehe Abwanderungssignale und loesen menschliche Dank-, Proof- und Rueckkehrmomente aus.</article><article>DAF & Asset Gift Readiness Hub: kleine Nonprofits machen DAF-, Aktien-, Krypto- und andere Asset-Gaben mit Advisor-Brief, Annahmeprozess und Proof entscheidungsreif.</article><article>Payroll Giving Activation Desk: kleine Nonprofits machen Arbeitgeber-Spenden, Payroll Giving, Matching Gifts und Wallet-Links zu einem klaren Monatsgabe-Pfad.</article><article>Email Deliverability Rescue Desk: kleine Nonprofits pruefen Inbox-Zustellung, Betreff, Frequenz, Segment und Email/Text-Bruecke, damit gute Wirkung wirklich gesehen wird.</article><article>Volunteer Infrastructure Scoreboard: kleine Nonprofits pruefen Rollen, Betreuung, Proof, Risiko und Rueckkehrpfad, bevor ein Volunteer-Schub mehr Arbeit als Wirkung erzeugt.</article><article>Donor Consent Compass: Unterstuetzer waehlen sichtbar, welche Daten, Kanaele, AI-Personalisierung und Wirkungsthemen erlaubt sind, damit bessere Ansprache auf Vertrauen statt stiller Uebergriffigkeit basiert.</article><article>Donor Fatigue Relief Switchboard: kleine Nonprofits erkennen Ask-Muedigkeit und waehlen stattdessen Dank, Proof, Pause, Praeferenzfrage oder persoenliches Update, bevor Vertrauen abbricht.</article><article>Workplace Match Claim Nudge: Spender und Volunteers bekommen nach der Aktion einen Arbeitgeber-Match-Hinweis, HR-Text und Claim-Reminder, damit ungenutzte Matching-Mittel zu echter Zusatzwirkung werden.</article><article>Gen Z Share-to-Service Proof Sprint: junge Unterstuetzer starten eine kleine hilfreiche Aktion, teilen sie mit Proof und fuehren Freunde zu Micro-Gift, Volunteer-Slot oder Partner-Sponsor.</article><article>AI Search Maturity Radar: kleine Nonprofits pruefen, ob AI-Suchen sie nur zufaellig finden oder ob Mission, Proof, Quellen und Donate-Next-Step aktiv in Antwortmaschinen sichtbar werden.</article><article>Volunteer Capacity Router: kurze Corporate- und Gen-Z-Volunteering-Impulse werden nach Zeit, Skill, Betreuungslast und Proof-Bedarf sortiert, damit Nonprofits mehr Hilfe aufnehmen koennen, ohne Volunteer Manager zu ueberlasten.</article><article>Lifecycle Signal Clean Room: kleine Nonprofits bereinigen Spender-, Proof-, Consent- und Kanal-Signale, bevor AI, Personalisierung oder Next-Best-Ask schlechte Daten in schlechte Beziehungen verwandeln.</article><article>One-Tap Monthly Upgrade Prompt: nach einem mobilen Micro-Gift zeigt die Website Proof, drei kleine Monatsstufen und eine wallet-freundliche Wiederkehr-Option, damit spontane Hilfe zu planbarer Wirkung wird.</article><article>Wallet QR Giving Bridge: QR-Codes, SMS und digitale Wallets verbinden Events, Poster und Social-Posts mit einem schnellen Micro-Gift, Proof-Link und Monatsoption.</article><article>Human Trust Touchpoint Calendar: kleine Nonprofits planen drei menschliche Nicht-Ask-Kontakte nach Spende, Quest oder Event, damit Vertrauen, Retention und Monatsgaben ohne Donor Fatigue wachsen.</article><article>Gen Z Good Quest Launchpad: junge Unterstuetzer starten kleine Social-Quests mit Proof, Share-Code, 7-Euro-Micro-Giving und Campus-Sprint, damit Engagement zu wiederkehrender Wirkung wird.</article><article>Company-Sponsored Action Pack: Unternehmen bekommen ein klares Team-Volunteering-Paket mit Materialbedarf, Proof, Matching-Gift-Hinweis und Payroll-Giving-Follow-up, damit Mitarbeitendenzeit zu wiederkehrender Wirkung wird.</article><article>DAF Windfall Readiness Desk: kleine Impact-Projekte bekommen einen entscheidungsreifen DAF-Brief mit Problem, Proof, Budget, Timing und Advisor-Frage fuer neue Vermoegensspender.</article><article>90-Day Recurring Bridge: Peer-to-peer-, Event- und Erstspender bekommen in den ersten 90 Tagen Proof, Wahl und Monatsoption, damit Einmaligkeit zu planbarer Wirkung wird.</article><article>Trust-to-Action Proof Router: jeder Wirkungsbeleg bekommt drei klare Folgepfade fuer Spende, Share und Rueckkehr, damit Vertrauen sofort in messbare Handlung wird.</article><article>Everyday Service Action Ladder: junge Unterstuetzer waehlen eine 10-, 30- oder 60-Minuten-Aktion, bekommen Proof und koennen danach teilen, wiederkommen oder leicht spenden.</article><article>Donor Intent FAQ Matrix: kleine Nonprofits beantworten die wichtigsten Spenderfragen zu Wirkung, Vertrauen, Kosten und naechstem Schritt als zitierbare FAQ-Karten mit Proof und CTA.</article><article>Human Welcome Signal Kit: neue Unterstuetzer bekommen nach der ersten Aktion drei menschliche Signale aus Dank, Proof, Praeferenzfrage und naechstem leichten Schritt statt kalter Automationsserie.</article><article>Ethical Impact Clip Bounty: kleine Nonprofits verwandeln eine gepruefte Wirkungsgeschichte in kurze Creator-Clips mit Offenlegung, Proof-Link, Bounty-Regel und messbarem Spendenpfad.</article><article>Mid-Level Upgrade Briefing: kleine Nonprofits erkennen treue Monats- und Wiederholungsspender, planen drei persoenliche Touchpoints und formulieren einen passenden Upgrade-Ask mit Proof.</article><article>Skill Sprint Volunteer Menu: kleine Nonprofits verpacken 90-Minuten-Skill-Aufgaben fuer Corporate Volunteers mit Ergebnis, Rolle, Vorbereitung, Proof und Follow-up-Spendenpfad.</article><article>Privacy-First Donor Preference Desk: kleine Nonprofits sammeln freiwillige Praeferenzen zu Wirkung, Kanal, Frequenz, Datenschutz und naechstem Ask, bevor AI-Personalisierung Vertrauen kostet.</article><article>90-Second Impact Story Kit: kleine Teams verwandeln eine gute Tat in Hook, Mensch, Problem, Proof, CTA und Wiederverwendung fuer Social, E-Mail, Partner und AI-Antworten.</article><article>Wallet Recurring Giving Lane: mobile Spender bekommen einen schnellen Wallet-Hinweis, kleine Betragsstufen, Monatsoption, sofortigen Dank und Proof-Link statt langer Formularstrecke.</article><article>Local Trust Coalition Page: Nonprofits, lokale Betriebe und Community-Stimmen zeigen gemeinsam, welche Dienste gebraucht werden, wer sie prueft und welcher Partner die naechste gute Tat finanziert.</article><article>Donor Journey Signal Map: kleine Nonprofits ordnen Erstgabe, Dank, Proof, zweite Gabe, Monatsoption und Rueckkehrsignal in eine klare naechste Beziehungshandlung.</article><article>Grant Readiness Fast Check: kleine Nonprofits pruefen Grant-Fit, Impact-Belege, Budgetrisiko, Community-Voice und Reporting-Luecken, bevor sie knappe Schreibzeit investieren.</article><article>Cause Partner Promise Card: lokale Marken bekommen eine transparente Kampagnenkarte mit Spendenanteil, Cap, Partnerrolle, Proof-Rhythmus und Kundinnen-CTA.</article><article>AI Answer Visibility Kit: gute Taten werden fuer AI Overviews, ChatGPT, Perplexity und Copilot zitierbar gemacht mit klaren Fakten, Quellen, Fragen, Proof und Donate-Next-Step.</article><article>Fair Help Pool Builder: direkte Crowdfunding-Hilfe wird zu einem transparenten Hilfepool mit Need-Check, Prioritaet, Proof, schneller Share-Seite und fairer Mittelverteilung.</article><article>Micro-Member Proof Quest: junge Unterstuetzer starten mit 3-Euro-Monatsgaben, waehlen eine Mini-Quest und bekommen sichtbaren Proof, Community-Signal und Rueckkehrpfad.</article><article>Employee Volunteer ROI Kit: kleine Nonprofits verwandeln Corporate Volunteering in ein partnerfaehiges Angebot mit Rollen, VTO-Wert, Teamnutzen, Impact-Proof und Follow-up-Ask.</article><article>Creator Trust Collab Kit: kleine Nonprofits finden glaubwuerdige Nischen-Creator, bauen transparente Story-Briefs und messen Saves, Shares, DMs und Spenden statt nur Reichweite.</article></div></div>
+      </section>
+
+      <section class="resource-control" id="ressourcen">
+        <div class="wrap">
+          <article class="resource-panel">
+            <p class="eyebrow">Ressourcenpaket</p>
+            <h2>Alte Startmodule nur bei Bedarf anzeigen</h2>
+            <p class="muted">Die fruehen Modelle, Rechner und Wunschlisten bleiben verfuegbar, blockieren aber nicht mehr den direkten Weg zum Workspace und Growth-Cockpit.</p>
+            <div class="resource-actions">
+              <button class="app-action" type="button" id="toggleResources">Ressourcen anzeigen</button>
+              <a class="button yellow" href="#app">Workspace nutzen</a>
+            </div>
+            <div class="resource-list" id="resourceList"></div>
+          </article>
+        </div>
       </section>
 
       <section class="week">
@@ -4828,6 +4850,42 @@
           renderIdeas();
         }
 
+        function setupResourcePanel() {
+          const toggle = qs("#toggleResources");
+          const list = qs("#resourceList");
+          if (!toggle || !list) return;
+          const resources = [".week", ".funding", ".marketplace", ".guide-shop", ".calculator", ".wishlist"]
+            .map((selector) => qs(selector))
+            .filter(Boolean)
+            .map((section, index) => {
+              section.classList.add("resource-section");
+              if (!section.id) section.id = `ressource-${index + 1}`;
+              const title = section.querySelector("h2")?.textContent?.trim() || `Ressource ${index + 1}`;
+              return { id: section.id, title };
+            });
+          const closedLabel = `Ressourcen anzeigen (${resources.length})`;
+          toggle.textContent = closedLabel;
+          list.innerHTML = resources.map((item) => (
+            `<a href="#${escapeHtml(item.id)}" data-resource-target="${escapeHtml(item.id)}">${escapeHtml(item.title)}</a>`
+          )).join("");
+          const openResources = (targetId) => {
+            document.body.classList.add("show-resources");
+            toggle.textContent = "Ressourcen ausblenden";
+            if (!targetId) return;
+            requestAnimationFrame(() => document.getElementById(targetId)?.scrollIntoView({ behavior: "smooth", block: "start" }));
+          };
+          toggle.addEventListener("click", () => {
+            document.body.classList.toggle("show-resources");
+            toggle.textContent = document.body.classList.contains("show-resources") ? "Ressourcen ausblenden" : closedLabel;
+          });
+          list.addEventListener("click", (event) => {
+            const link = event.target.closest("[data-resource-target]");
+            if (!link) return;
+            event.preventDefault();
+            openResources(link.dataset.resourceTarget);
+          });
+        }
+
         function setupCommonsFeed() {
           const section = qs("#finden");
           const search = qs("#commonsSearch");
@@ -4897,6 +4955,7 @@
 
         setupDailyArchive();
         setupIdeaExplorer();
+        setupResourcePanel();
         setupCommonsFeed();
         setActiveTool("board");
         qsa("[data-app-tab]").forEach((tab) => {
