@@ -4860,6 +4860,14 @@
           if (shouldFocus) search?.focus();
         }
 
+        function revealSavedBoardItem() {
+          currentFilter = "all";
+          currentBoardSearch = "";
+          const search = qs("#boardSearch");
+          if (search) search.value = "";
+          qsa("[data-filter]").forEach((filterButton) => filterButton.classList.toggle("active", filterButton.dataset.filter === "all"));
+        }
+
         function resetEmptyCurrentFilter() {
           if (currentFilter === "all") return;
           if (items.some((item) => item.status === currentFilter)) return;
@@ -5365,6 +5373,7 @@
           }
           setEditMode("");
           setBoardFormCollapsed(true);
+          revealSavedBoardItem();
           saveItems();
           renderAll();
         });
