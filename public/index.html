@@ -4476,7 +4476,7 @@
         const itemKey = "nurGutesImpactItems";
         const stripeKey = "nurGutesStripeLinks";
         const focusKey = "nurGutesFocusMode";
-        const removedDoneKey = "nurGutesRemovedDone";
+        const removedItemsKey = "nurGutesRemovedDone";
         const seedItems = [
           {
             id: "seed-proof-1",
@@ -4526,13 +4526,13 @@
         let focusMode = localStorage.getItem(focusKey) === "true";
         let currentFilter = "all";
         let currentBoardSearch = "";
-        let lastRemovedDone = loadJson(removedDoneKey, []);
+        let lastRemovedItems = loadJson(removedItemsKey, []);
 
         const qs = (selector) => document.querySelector(selector);
         const qsa = (selector) => Array.from(document.querySelectorAll(selector));
         const saveItems = () => localStorage.setItem(itemKey, JSON.stringify(items));
         const saveStripe = () => localStorage.setItem(stripeKey, JSON.stringify(stripeLinks));
-        const saveRemovedDone = () => localStorage.setItem(removedDoneKey, JSON.stringify(lastRemovedDone));
+        const saveRemovedItems = () => localStorage.setItem(removedItemsKey, JSON.stringify(lastRemovedItems));
         const csvCell = (value) => `"${String(value ?? "").replace(/"/g, '""')}"`;
 
         function setFocusMode(enabled, shouldScroll = false) {
@@ -4638,8 +4638,8 @@
           }
           const restoreDoneButton = qs("#restoreDoneButton");
           if (restoreDoneButton) {
-            restoreDoneButton.disabled = lastRemovedDone.length === 0;
-            restoreDoneButton.textContent = lastRemovedDone.length ? `Entfernte wiederherstellen (${lastRemovedDone.length})` : "Entfernte wiederherstellen";
+            restoreDoneButton.disabled = lastRemovedItems.length === 0;
+            restoreDoneButton.textContent = lastRemovedItems.length ? `Entfernte wiederherstellen (${lastRemovedItems.length})` : "Entfernte wiederherstellen";
           }
           if (!visibleItems.length) {
             list.innerHTML = '<article class="app-card"><p class="muted">Keine passenden Eintraege. Suche oder Statusfilter anpassen.</p></article>';
@@ -5145,7 +5145,9 @@
             return;
           }
           if (button.dataset.delete) {
+            lastRemovedItems = items.filter((item) => item.id === card.dataset.id);
             items = items.filter((item) => item.id !== card.dataset.id);
+            saveRemovedItems();
           } else if (button.dataset.status) {
             items = items.map((item) => item.id === card.dataset.id ? { ...item, status: button.dataset.status } : item);
           }
@@ -5162,20 +5164,21 @@
         });
         qs("#clearDoneButton")?.addEventListener("click", () => {
           const before = items.length;
-          lastRemovedDone = items.filter((item) => item.status === "done");
+          lastRemovedItems = items.filter((item) => item.status === "done");
           items = items.filter((item) => item.status !== "done");
           if (before === items.length) return;
-          saveRemovedDone();
+          saveRemovedItems();
           currentFilter = "all";
           qsa("[data-filter]").forEach((filterButton) => filterButton.classList.toggle("active", filterButton.dataset.filter === "all"));
           saveItems();
           renderAll();
         });
         qs("#restoreDoneButton")?.addEventListener("click", () => {
-          if (!lastRemovedDone.length) return;
-          items = [...lastRemovedDone, ...items];
-          lastRemovedDone = [];
-          saveRemovedDone();
+          if (!lastRemovedItems.length) return;
+          const existingIds = new Set(items.map((item) => item.id));
+          items = [...lastRemovedItems.filter((item) => !existingIds.has(item.id)), ...items];
+          lastRemovedItems = [];
+          saveRemovedItems();
           currentFilter = "all";
           qsa("[data-filter]").forEach((filterButton) => filterButton.classList.toggle("active", filterButton.dataset.filter === "all"));
           saveItems();
