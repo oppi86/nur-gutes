@@ -1295,6 +1295,7 @@
                 <button class="app-filter" type="button" data-filter="active">Aktiv</button>
                 <button class="app-filter" type="button" data-filter="done">Fertig</button>
                 <button class="app-filter" type="button" id="clearDoneButton" disabled>Fertige entfernen</button>
+                <button class="app-filter" type="button" id="restoreDoneButton" disabled>Entfernte wiederherstellen</button>
               </div>
               <div class="app-list" id="impactList"></div>
             </div>
@@ -4524,6 +4525,7 @@
         let focusMode = localStorage.getItem(focusKey) === "true";
         let currentFilter = "all";
         let currentBoardSearch = "";
+        let lastRemovedDone = [];
 
         const qs = (selector) => document.querySelector(selector);
         const qsa = (selector) => Array.from(document.querySelectorAll(selector));
@@ -4631,6 +4633,11 @@
           if (clearDoneButton) {
             clearDoneButton.disabled = doneCount === 0;
             clearDoneButton.textContent = doneCount ? `Fertige entfernen (${doneCount})` : "Fertige entfernen";
+          }
+          const restoreDoneButton = qs("#restoreDoneButton");
+          if (restoreDoneButton) {
+            restoreDoneButton.disabled = lastRemovedDone.length === 0;
+            restoreDoneButton.textContent = lastRemovedDone.length ? `Entfernte wiederherstellen (${lastRemovedDone.length})` : "Entfernte wiederherstellen";
           }
           if (!visibleItems.length) {
             list.innerHTML = '<article class="app-card"><p class="muted">Keine passenden Eintraege. Suche oder Statusfilter anpassen.</p></article>';
@@ -5153,8 +5160,18 @@
         });
         qs("#clearDoneButton")?.addEventListener("click", () => {
           const before = items.length;
+          lastRemovedDone = items.filter((item) => item.status === "done");
           items = items.filter((item) => item.status !== "done");
           if (before === items.length) return;
+          currentFilter = "all";
+          qsa("[data-filter]").forEach((filterButton) => filterButton.classList.toggle("active", filterButton.dataset.filter === "all"));
+          saveItems();
+          renderAll();
+        });
+        qs("#restoreDoneButton")?.addEventListener("click", () => {
+          if (!lastRemovedDone.length) return;
+          items = [...lastRemovedDone, ...items];
+          lastRemovedDone = [];
           currentFilter = "all";
           qsa("[data-filter]").forEach((filterButton) => filterButton.classList.toggle("active", filterButton.dataset.filter === "all"));
           saveItems();
