@@ -1111,6 +1111,9 @@
       .app-stats { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; margin-top: 20px; }
       .app-stats article { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); box-shadow: none; padding: 16px; }
       .app-stats strong { display: block; color: #f9d65c; font-size: 28px; line-height: 1; margin-bottom: 6px; }
+      .app-next-action { display: grid; gap: 8px; margin-top: 18px; }
+      .app-next-action button { width: 100%; border: 0; border-radius: 8px; background: #fff; color: #17332f; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 12px 14px; }
+      .app-next-action p { margin: 0; font-size: 13px; color: rgba(255,255,255,.8); }
       .app-note { border: 1px solid rgba(255,255,255,.18); border-radius: 8px; padding: 14px; margin-top: 18px; font-size: 14px; color: rgba(255,255,255,.86); }
       .app-mode-control { display: grid; gap: 8px; margin-top: 18px; }
       .app-mode-toggle { width: 100%; border: 0; border-radius: 8px; background: #f9d65c; color: #20211d; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 12px 14px; }
@@ -1226,6 +1229,10 @@
               <article><strong id="metricRevenue">0 EUR</strong><span>Revenue-Ziel</span></article>
               <article><strong id="metricImpact">0 EUR</strong><span>Impact-Anteil 40%</span></article>
               <article><strong id="metricDone">0</strong><span>abgeschlossen</span></article>
+            </div>
+            <div class="app-next-action">
+              <button type="button" id="nextActionButton">Naechste Aktion starten</button>
+              <p id="nextActionStatus">Der Launcher waehlt den sinnvollsten naechsten Tool-Schritt.</p>
             </div>
             <p class="app-note">Revenue-Reinvestition: 40% gute Taten, 25% bessere Algorithmen und Automatisierung, 20% Growth/Marketing, 15% Betrieb und Qualitaet.</p>
             <div class="app-mode-control">
@@ -4528,6 +4535,37 @@
           if (shouldScroll) requestAnimationFrame(() => qs("#app")?.scrollIntoView({ behavior: "smooth", block: "start" }));
         }
 
+        function recommendNextAction() {
+          const item = items.find((entry) => entry.status === "active")
+            || items.find((entry) => entry.status === "planned")
+            || items.find((entry) => entry.status !== "done")
+            || items[0];
+          if (!item) return null;
+          const amount = Number(item.amount) || 0;
+          const category = item.category || "";
+          if (item.status === "active") return { item, tool: "proof", label: "Proof-Update", reason: "Aktive Eintraege brauchen jetzt einen sichtbaren Beleg." };
+          if (category === "Business Idee" || amount >= 100) return { item, tool: "pitch", label: "Partner-Pitch", reason: "Groessere oder kommerzielle Ideen brauchen zuerst einen klaren Ask." };
+          if (category === "Selbstfindung") return { item, tool: "trust", label: "Trust Pulse", reason: "Selbstfindungsimpulse brauchen eine gute Antwort statt mehr Druck." };
+          if (amount > 0) return { item, tool: "monthly", label: "Monthly Ladder", reason: "Kleine finanzierbare Vorhaben werden durch Wiederkehr planbarer." };
+          return { item, tool: "share", label: "Social-Post", reason: "Nicht finanzierte Eintraege brauchen zuerst Reichweite und Rueckmeldung." };
+        }
+
+        function renderNextAction() {
+          const action = recommendNextAction();
+          const button = qs("#nextActionButton");
+          const status = qs("#nextActionStatus");
+          if (!button || !status) return;
+          if (!action) {
+            button.disabled = true;
+            button.textContent = "Erst Eintrag anlegen";
+            status.textContent = "Noch kein Board-Eintrag vorhanden.";
+            return;
+          }
+          button.disabled = false;
+          button.textContent = `${action.label} starten`;
+          status.textContent = `${action.item.title}: ${action.reason}`;
+        }
+
         function renderStats() {
           const activeItems = items.filter((item) => item.status !== "done");
           const revenue = items.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
@@ -4966,6 +5004,7 @@
 
         function renderAll() {
           renderStats();
+          renderNextAction();
           renderBoard();
           renderPayments();
           renderShare();
@@ -5010,6 +5049,12 @@
         setupCommonsFeed();
         setFocusMode(focusMode);
         qs("#focusModeToggle")?.addEventListener("click", () => setFocusMode(!focusMode, true));
+        qs("#nextActionButton")?.addEventListener("click", () => {
+          const action = recommendNextAction();
+          if (!action) return;
+          setFocusMode(true);
+          openItemTool(action.item.id, action.tool);
+        });
         setActiveTool("board");
         qsa("[data-app-tab]").forEach((tab) => {
           tab.addEventListener("click", () => setActiveTool(tab.dataset.appTab));
