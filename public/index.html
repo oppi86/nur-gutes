@@ -1112,6 +1112,9 @@
       .app-stats article { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); box-shadow: none; padding: 16px; }
       .app-stats strong { display: block; color: #f9d65c; font-size: 28px; line-height: 1; margin-bottom: 6px; }
       .app-note { border: 1px solid rgba(255,255,255,.18); border-radius: 8px; padding: 14px; margin-top: 18px; font-size: 14px; color: rgba(255,255,255,.86); }
+      .app-mode-control { display: grid; gap: 8px; margin-top: 18px; }
+      .app-mode-toggle { width: 100%; border: 0; border-radius: 8px; background: #f9d65c; color: #20211d; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 12px 14px; }
+      .app-mode-status { margin: 0; font-size: 13px; color: rgba(255,255,255,.8); }
       .app-workbench { border: 1px solid #e7e1d7; box-shadow: none; padding: 20px; }
       .tool-router { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: end; border: 1px solid #e7e1d7; border-radius: 8px; background: #f7f4ef; padding: 14px; margin-bottom: 14px; }
       .tool-router label { display: grid; gap: 6px; color: #575952; font-size: 12px; font-weight: 900; text-transform: uppercase; }
@@ -1178,6 +1181,11 @@
       .second-score { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; margin: 16px 0; }
       .second-score article { border: 1px solid #e7e1d7; box-shadow: none; padding: 16px; }
       .second-score strong { display: block; color: #17332f; font-size: 26px; line-height: 1.05; margin-top: 4px; }
+      .focus-mode main > section:not(.hero):not(.impact-app), .focus-mode footer { display: none; }
+      .focus-mode .hero { min-height: auto; padding-top: 14px; padding-bottom: 14px; background: #17332f; }
+      .focus-mode .hero img, .focus-mode .shade, .focus-mode .hero-content { display: none; }
+      .focus-mode nav div a:not([href="#app"]) { display: none; }
+      .focus-mode .impact-app { min-height: calc(100vh - 56px); padding-top: 32px; }
       footer { background: #20211d; color: white; padding: 40px 48px; }
       @media (max-width: 860px) {
         .app-shell, .tool-router, .resource-list, .app-form, .stripe-grid, .pay-grid, .pitch-grid, .pitch-preview, .trust-grid, .trust-plan, .proof-grid, .proof-ledger, .monthly-grid, .monthly-tiers, .second-grid, .second-score { grid-template-columns: 1fr; }
@@ -1220,6 +1228,10 @@
               <article><strong id="metricDone">0</strong><span>abgeschlossen</span></article>
             </div>
             <p class="app-note">Revenue-Reinvestition: 40% gute Taten, 25% bessere Algorithmen und Automatisierung, 20% Growth/Marketing, 15% Betrieb und Qualitaet.</p>
+            <div class="app-mode-control">
+              <button class="app-mode-toggle" type="button" id="focusModeToggle" aria-pressed="false">Arbeitsmodus aktivieren</button>
+              <p class="app-mode-status" id="focusModeStatus">Magazinbereiche bleiben sichtbar.</p>
+            </div>
           </article>
           <article class="app-workbench">
             <div class="tool-router">
@@ -4446,6 +4458,7 @@
       (() => {
         const itemKey = "nurGutesImpactItems";
         const stripeKey = "nurGutesStripeLinks";
+        const focusKey = "nurGutesFocusMode";
         const seedItems = [
           {
             id: "seed-proof-1",
@@ -4492,6 +4505,7 @@
         };
         let items = loadJson(itemKey, seedItems);
         let stripeLinks = loadJson(stripeKey, {});
+        let focusMode = localStorage.getItem(focusKey) === "true";
         let currentFilter = "all";
         let currentBoardSearch = "";
 
@@ -4499,6 +4513,20 @@
         const qsa = (selector) => Array.from(document.querySelectorAll(selector));
         const saveItems = () => localStorage.setItem(itemKey, JSON.stringify(items));
         const saveStripe = () => localStorage.setItem(stripeKey, JSON.stringify(stripeLinks));
+
+        function setFocusMode(enabled, shouldScroll = false) {
+          focusMode = Boolean(enabled);
+          document.body.classList.toggle("focus-mode", focusMode);
+          localStorage.setItem(focusKey, String(focusMode));
+          const button = qs("#focusModeToggle");
+          const status = qs("#focusModeStatus");
+          if (button) {
+            button.setAttribute("aria-pressed", String(focusMode));
+            button.textContent = focusMode ? "Magazinmodus anzeigen" : "Arbeitsmodus aktivieren";
+          }
+          if (status) status.textContent = focusMode ? "Nur Workspace und Navigation sind sichtbar." : "Magazinbereiche bleiben sichtbar.";
+          if (shouldScroll) requestAnimationFrame(() => qs("#app")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+        }
 
         function renderStats() {
           const activeItems = items.filter((item) => item.status !== "done");
@@ -4980,6 +5008,8 @@
         setupIdeaExplorer();
         setupResourcePanel();
         setupCommonsFeed();
+        setFocusMode(focusMode);
+        qs("#focusModeToggle")?.addEventListener("click", () => setFocusMode(!focusMode, true));
         setActiveTool("board");
         qsa("[data-app-tab]").forEach((tab) => {
           tab.addEventListener("click", () => setActiveTool(tab.dataset.appTab));
