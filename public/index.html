@@ -4494,6 +4494,7 @@
         const itemKey = "nurGutesImpactItems";
         const stripeKey = "nurGutesStripeLinks";
         const focusKey = "nurGutesFocusMode";
+        const activeToolKey = "nurGutesActiveTool";
         const compactBoardKey = "nurGutesCompactBoard";
         const boardFormCollapsedKey = "nurGutesBoardFormCollapsed";
         const removedItemsKey = "nurGutesRemovedDone";
@@ -4544,6 +4545,7 @@
         let items = loadJson(itemKey, seedItems);
         let stripeLinks = loadJson(stripeKey, {});
         let focusMode = localStorage.getItem(focusKey) === "true";
+        let activeTool = localStorage.getItem(activeToolKey) || "board";
         let boardCompact = localStorage.getItem(compactBoardKey) === "true";
         let boardFormCollapsed = localStorage.getItem(boardFormCollapsedKey) !== "false";
         let currentFilter = "all";
@@ -5235,14 +5237,16 @@
           second: "Berechne Timing und Betrag fuer die zweite Gabe nach einem Signal.",
           share: "Bereite kurze Posting-Texte fuer externe Kanaele vor."
         };
-        function setActiveTool(name) {
+        function setActiveTool(name, shouldPersist = true) {
           const selectedName = qsa("[data-app-panel]").some((panel) => panel.dataset.appPanel === name) ? name : "board";
+          activeTool = selectedName;
           qsa("[data-app-tab]").forEach((button) => button.setAttribute("aria-selected", button.dataset.appTab === selectedName ? "true" : "false"));
           qsa("[data-app-panel]").forEach((panel) => panel.classList.toggle("active", panel.dataset.appPanel === selectedName));
           const router = qs("#toolRouter");
           const hint = qs("#toolRouterHint");
           if (router) router.value = selectedName;
           if (hint) hint.textContent = toolHints[selectedName] || toolHints.board;
+          if (shouldPersist) localStorage.setItem(activeToolKey, selectedName);
         }
         function openItemTool(itemId, toolName) {
           const select = qs(`#${toolName}Item`);
@@ -5267,7 +5271,7 @@
           openItemTool(action.item.id, action.tool);
         });
         qs("#exportBoardButton")?.addEventListener("click", exportBoardCsv);
-        setActiveTool("board");
+        setActiveTool(activeTool, false);
         qsa("[data-app-tab]").forEach((tab) => {
           tab.addEventListener("click", () => setActiveTool(tab.dataset.appTab));
         });
