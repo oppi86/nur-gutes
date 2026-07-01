@@ -4623,13 +4623,18 @@
           qs("#stripeStatus").textContent = connected ? "Stripe Payment Links verbunden" : "Stripe Payment Links nicht verbunden";
         }
 
-        function renderBoard() {
-          const list = qs("#impactList");
+        function getVisibleBoardItems() {
           const query = currentBoardSearch.trim().toLowerCase();
           const filteredItems = currentFilter === "all" ? items : items.filter((item) => item.status === currentFilter);
           const visibleItems = query ? filteredItems.filter((item) => (
             `${item.title || ""} ${item.category || ""} ${item.status || ""} ${item.next || ""} ${item.text || ""}`.toLowerCase().includes(query)
           )) : filteredItems;
+          return { query, filteredItems, visibleItems };
+        }
+
+        function renderBoard() {
+          const list = qs("#impactList");
+          const { query, filteredItems, visibleItems } = getVisibleBoardItems();
           const count = qs("#boardCount");
           if (count) count.textContent = query ? `${visibleItems.length} Treffer in ${filteredItems.length} gefilterten Eintraegen` : `${visibleItems.length} von ${items.length} Eintraegen sichtbar`;
           const doneCount = items.filter((item) => item.status === "done").length;
@@ -4647,7 +4652,7 @@
             list.innerHTML = '<article class="app-card"><p class="muted">Keine passenden Eintraege. Suche oder Statusfilter anpassen.</p></article>';
             return;
           }
-          list.innerHTML = visibleItems.map((item) => `
+          list.innerHTML = visibleItems.map((item, index) => `
             <article class="app-card" data-id="${escapeHtml(item.id)}">
               <div class="app-card-head">
                 <div>
@@ -4665,9 +4670,24 @@
               <button type="button" data-open-tool="proof">Proof</button>
               <button type="button" data-open-tool="monthly">Monthly</button>
               <button type="button" data-edit="true">Bearbeiten</button>
+              <button type="button" data-move="up" ${index === 0 ? "disabled" : ""}>Hoch</button>
+              <button type="button" data-move="down" ${index === visibleItems.length - 1 ? "disabled" : ""}>Runter</button>
               <button type="button" data-delete="true">Loeschen</button>
             </article>
           `).join("");
+        }
+
+        function moveBoardItem(itemId, direction) {
+          const { visibleItems } = getVisibleBoardItems();
+          const currentVisibleIndex = visibleItems.findIndex((item) => item.id === itemId);
+          const nextVisibleIndex = direction === "up" ? currentVisibleIndex - 1 : currentVisibleIndex + 1;
+          if (currentVisibleIndex < 0 || nextVisibleIndex < 0 || nextVisibleIndex >= visibleItems.length) return;
+          const currentIndex = items.findIndex((item) => item.id === itemId);
+          const targetIndex = items.findIndex((item) => item.id === visibleItems[nextVisibleIndex].id);
+          if (currentIndex < 0 || targetIndex < 0) return;
+          const reorderedItems = [...items];
+          [reorderedItems[currentIndex], reorderedItems[targetIndex]] = [reorderedItems[targetIndex], reorderedItems[currentIndex]];
+          items = reorderedItems;
         }
 
         function setEditMode(itemId = "") {
@@ -5180,6 +5200,12 @@
           if (button.dataset.edit) {
             setEditMode(card.dataset.id);
             requestAnimationFrame(() => qs("#impactForm")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+            return;
+          }
+          if (button.dataset.move) {
+            moveBoardItem(card.dataset.id, button.dataset.move);
+            saveItems();
+            renderAll();
             return;
           }
           if (button.dataset.delete) {
