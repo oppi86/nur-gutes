@@ -1285,7 +1285,8 @@
                 <label>Revenue-Ziel EUR<input id="impactAmount" name="amount" type="number" min="0" step="1" value="29" /></label>
                 <label>Naechster Schritt<input id="impactNext" name="next" maxlength="120" placeholder="Wen schreibe ich heute an?" /></label>
                 <label class="app-wide">Kurzbeschreibung<textarea id="impactText" name="text" rows="3" maxlength="240" placeholder="Was wird besser, fuer wen, und wie sieht der erste Beweis aus?"></textarea></label>
-                <button class="app-action app-wide" type="submit">Eintrag speichern</button>
+                <button class="app-action app-wide" type="submit" id="impactSubmitButton">Eintrag speichern</button>
+                <button class="app-filter app-wide" type="button" id="cancelEditButton" hidden>Bearbeitung abbrechen</button>
               </form>
               <label class="board-search">Board durchsuchen<input id="boardSearch" type="search" placeholder="Titel, Kategorie, Schritt oder Beschreibung" autocomplete="off" /></label>
               <p class="board-count" id="boardCount">Eintraege werden geladen.</p>
@@ -4526,6 +4527,7 @@
         let focusMode = localStorage.getItem(focusKey) === "true";
         let currentFilter = "all";
         let currentBoardSearch = "";
+        let editingItemId = "";
         let lastRemovedItems = loadJson(removedItemsKey, []);
 
         const qs = (selector) => document.querySelector(selector);
@@ -4662,9 +4664,35 @@
               <button type="button" data-open-tool="pitch">Pitch</button>
               <button type="button" data-open-tool="proof">Proof</button>
               <button type="button" data-open-tool="monthly">Monthly</button>
+              <button type="button" data-edit="true">Bearbeiten</button>
               <button type="button" data-delete="true">Loeschen</button>
             </article>
           `).join("");
+        }
+
+        function setEditMode(itemId = "") {
+          editingItemId = itemId;
+          const form = qs("#impactForm");
+          const submitButton = qs("#impactSubmitButton");
+          const cancelButton = qs("#cancelEditButton");
+          const item = items.find((entry) => entry.id === editingItemId);
+          if (!form || !submitButton || !cancelButton) return;
+          if (!item) {
+            editingItemId = "";
+            submitButton.textContent = "Eintrag speichern";
+            cancelButton.hidden = true;
+            form.reset();
+            qs("#impactAmount").value = 29;
+            return;
+          }
+          form.title.value = item.title || "";
+          form.category.value = item.category || "Gute Tat";
+          form.amount.value = Number(item.amount) || 0;
+          form.next.value = item.next || "";
+          form.text.value = item.text || "";
+          submitButton.textContent = "Eintrag aktualisieren";
+          cancelButton.hidden = false;
+          qs("#impactTitle")?.focus();
         }
 
         function renderPayments() {
@@ -5120,21 +5148,26 @@
         qs("#impactForm").addEventListener("submit", (event) => {
           event.preventDefault();
           const form = event.currentTarget;
-          items.unshift({
-            id: `impact-${Date.now()}`,
+          const nextItem = {
+            id: editingItemId || `impact-${Date.now()}`,
             title: form.title.value.trim(),
             category: form.category.value,
             amount: Number(form.amount.value) || 0,
             next: form.next.value.trim(),
             text: form.text.value.trim() || "Ein kleiner konkreter Schritt mit sichtbarem Nutzen.",
-            status: "planned",
-            createdAt: new Date().toISOString().slice(0, 10)
-          });
-          form.reset();
-          qs("#impactAmount").value = 29;
+            status: items.find((item) => item.id === editingItemId)?.status || "planned",
+            createdAt: items.find((item) => item.id === editingItemId)?.createdAt || new Date().toISOString().slice(0, 10)
+          };
+          if (editingItemId) {
+            items = items.map((item) => item.id === editingItemId ? nextItem : item);
+          } else {
+            items.unshift(nextItem);
+          }
+          setEditMode("");
           saveItems();
           renderAll();
         });
+        qs("#cancelEditButton")?.addEventListener("click", () => setEditMode(""));
 
         qs("#impactList").addEventListener("click", (event) => {
           const button = event.target.closest("button");
@@ -5144,10 +5177,16 @@
             openItemTool(card.dataset.id, button.dataset.openTool);
             return;
           }
+          if (button.dataset.edit) {
+            setEditMode(card.dataset.id);
+            requestAnimationFrame(() => qs("#impactForm")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+            return;
+          }
           if (button.dataset.delete) {
             lastRemovedItems = items.filter((item) => item.id === card.dataset.id);
             items = items.filter((item) => item.id !== card.dataset.id);
             saveRemovedItems();
+            if (editingItemId === card.dataset.id) setEditMode("");
           } else if (button.dataset.status) {
             items = items.map((item) => item.id === card.dataset.id ? { ...item, status: button.dataset.status } : item);
           }
