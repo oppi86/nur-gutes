@@ -1100,7 +1100,12 @@
       .tool-router label { display: grid; gap: 6px; color: #575952; font-size: 12px; font-weight: 900; text-transform: uppercase; }
       .tool-router select { width: 100%; border: 1px solid #d9d1c4; border-radius: 8px; background: #fff; color: #20211d; font: inherit; padding: 12px; min-width: 0; }
       .tool-router p { margin: 0; font-size: 13px; color: #575952; }
-      .app-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+      .tool-tabs { border: 1px solid #e7e1d7; border-radius: 8px; background: #fff; margin-bottom: 18px; }
+      .tool-tabs summary { cursor: pointer; color: #17332f; font-size: 13px; font-weight: 900; list-style-position: inside; padding: 12px 14px; }
+      .tool-tabs[open] summary { border-bottom: 1px solid #e7e1d7; }
+      .app-tabs { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px; }
+      .tool-tabs:not([open]) .app-tabs { display: none; }
+      .tool-tabs[open] .app-tabs { display: flex; }
       .app-tab, .app-action, .app-filter, .app-pay, .app-copy, .app-card button { border: 0; border-radius: 8px; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 11px 13px; }
       .app-tab { background: #e6efe1; color: #17332f; }
       .app-tab[aria-selected="true"], .app-action, .app-pay { background: #f9d65c; color: #20211d; }
@@ -1212,16 +1217,19 @@
               </label>
               <p id="toolRouterHint">Waehle eine Aufgabe; der passende Workspace oeffnet sich direkt.</p>
             </div>
-            <div class="app-tabs" role="tablist" aria-label="Impact Workspace">
-              <button class="app-tab" type="button" aria-selected="true" data-app-tab="board">Board</button>
-              <button class="app-tab" type="button" aria-selected="false" data-app-tab="payments">Stripe</button>
-              <button class="app-tab" type="button" aria-selected="false" data-app-tab="pitch">Pitch</button>
-              <button class="app-tab" type="button" aria-selected="false" data-app-tab="trust">Trust</button>
-              <button class="app-tab" type="button" aria-selected="false" data-app-tab="proof">Proof</button>
-              <button class="app-tab" type="button" aria-selected="false" data-app-tab="monthly">Monthly</button>
-              <button class="app-tab" type="button" aria-selected="false" data-app-tab="second">Second</button>
-              <button class="app-tab" type="button" aria-selected="false" data-app-tab="share">Social</button>
-            </div>
+            <details class="tool-tabs">
+              <summary>Direktzugriff auf alle Tools</summary>
+              <div class="app-tabs" role="tablist" aria-label="Impact Workspace">
+                <button class="app-tab" type="button" aria-selected="true" data-app-tab="board">Board</button>
+                <button class="app-tab" type="button" aria-selected="false" data-app-tab="payments">Stripe</button>
+                <button class="app-tab" type="button" aria-selected="false" data-app-tab="pitch">Pitch</button>
+                <button class="app-tab" type="button" aria-selected="false" data-app-tab="trust">Trust</button>
+                <button class="app-tab" type="button" aria-selected="false" data-app-tab="proof">Proof</button>
+                <button class="app-tab" type="button" aria-selected="false" data-app-tab="monthly">Monthly</button>
+                <button class="app-tab" type="button" aria-selected="false" data-app-tab="second">Second</button>
+                <button class="app-tab" type="button" aria-selected="false" data-app-tab="share">Social</button>
+              </div>
+            </details>
 
             <div class="app-panel active" data-app-panel="board">
               <form class="app-form" id="impactForm">
