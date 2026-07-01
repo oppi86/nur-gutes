@@ -4693,6 +4693,20 @@
         function renderBoard() {
           const list = qs("#impactList");
           const { query, filteredItems, visibleItems } = getVisibleBoardItems();
+          const filterLabels = {
+            all: "Alle",
+            planned: "Geplant",
+            active: "Aktiv",
+            done: "Fertig"
+          };
+          const filterCounts = items.reduce((counts, item) => {
+            counts[item.status] = (counts[item.status] || 0) + 1;
+            return counts;
+          }, { all: items.length, planned: 0, active: 0, done: 0 });
+          qsa("[data-filter]").forEach((button) => {
+            const filter = button.dataset.filter;
+            button.textContent = `${filterLabels[filter] || filter} (${filterCounts[filter] || 0})`;
+          });
           list?.classList.toggle("compact", boardCompact);
           const compactBoardButton = qs("#compactBoardButton");
           if (compactBoardButton) {
