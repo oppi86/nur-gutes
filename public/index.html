@@ -1132,6 +1132,9 @@
       .app-form label, .stripe-grid label, .pitch-grid label, .trust-grid label, .proof-grid label, .monthly-grid label, .second-grid label { display: grid; gap: 6px; color: #575952; font-size: 12px; font-weight: 900; text-transform: uppercase; }
       .app-form input, .app-form select, .app-form textarea, .stripe-grid input, .app-share textarea, .pitch-grid input, .pitch-grid select, .pitch-grid textarea, .trust-grid input, .trust-grid select, .trust-grid textarea, .proof-grid input, .proof-grid select, .proof-grid textarea, .monthly-grid input, .monthly-grid select, .monthly-grid textarea, .second-grid input, .second-grid select, .second-grid textarea { width: 100%; border: 1px solid #d9d1c4; border-radius: 8px; background: #fff; color: #20211d; font: inherit; padding: 12px; min-width: 0; }
       .app-form textarea, .app-wide { grid-column: 1 / -1; }
+      .board-search { display: grid; gap: 6px; margin-top: 16px; color: #575952; font-size: 12px; font-weight: 900; text-transform: uppercase; }
+      .board-search input { width: 100%; border: 1px solid #d9d1c4; border-radius: 8px; background: #fff; color: #20211d; font: inherit; padding: 12px; min-width: 0; }
+      .board-count { margin: 10px 0 0; font-size: 13px; color: #575952; }
       .app-actions-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 16px 0; }
       .app-filter { background: #f7f4ef; color: #575952; border: 1px solid #e7e1d7; }
       .app-filter.active { background: #17332f; color: white; border-color: #17332f; }
@@ -1257,6 +1260,8 @@
                 <label class="app-wide">Kurzbeschreibung<textarea id="impactText" name="text" rows="3" maxlength="240" placeholder="Was wird besser, fuer wen, und wie sieht der erste Beweis aus?"></textarea></label>
                 <button class="app-action app-wide" type="submit">Eintrag speichern</button>
               </form>
+              <label class="board-search">Board durchsuchen<input id="boardSearch" type="search" placeholder="Titel, Kategorie, Schritt oder Beschreibung" autocomplete="off" /></label>
+              <p class="board-count" id="boardCount">Eintraege werden geladen.</p>
               <div class="app-actions-row" aria-label="Board Filter">
                 <button class="app-filter active" type="button" data-filter="all">Alle</button>
                 <button class="app-filter" type="button" data-filter="planned">Geplant</button>
@@ -4488,6 +4493,7 @@
         let items = loadJson(itemKey, seedItems);
         let stripeLinks = loadJson(stripeKey, {});
         let currentFilter = "all";
+        let currentBoardSearch = "";
 
         const qs = (selector) => document.querySelector(selector);
         const qsa = (selector) => Array.from(document.querySelectorAll(selector));
@@ -4507,9 +4513,15 @@
 
         function renderBoard() {
           const list = qs("#impactList");
-          const visibleItems = currentFilter === "all" ? items : items.filter((item) => item.status === currentFilter);
+          const query = currentBoardSearch.trim().toLowerCase();
+          const filteredItems = currentFilter === "all" ? items : items.filter((item) => item.status === currentFilter);
+          const visibleItems = query ? filteredItems.filter((item) => (
+            `${item.title || ""} ${item.category || ""} ${item.status || ""} ${item.next || ""} ${item.text || ""}`.toLowerCase().includes(query)
+          )) : filteredItems;
+          const count = qs("#boardCount");
+          if (count) count.textContent = query ? `${visibleItems.length} Treffer in ${filteredItems.length} gefilterten Eintraegen` : `${visibleItems.length} von ${items.length} Eintraegen sichtbar`;
           if (!visibleItems.length) {
-            list.innerHTML = '<article class="app-card"><p class="muted">Keine Eintraege in diesem Filter. Leg den ersten naechsten Schritt an.</p></article>';
+            list.innerHTML = '<article class="app-card"><p class="muted">Keine passenden Eintraege. Suche oder Statusfilter anpassen.</p></article>';
             return;
           }
           list.innerHTML = visibleItems.map((item) => `
@@ -5001,6 +5013,10 @@
             qsa("[data-filter]").forEach((filterButton) => filterButton.classList.toggle("active", filterButton === button));
             renderBoard();
           });
+        });
+        qs("#boardSearch")?.addEventListener("input", (event) => {
+          currentBoardSearch = event.target.value;
+          renderBoard();
         });
 
         qs("#stripeForm").addEventListener("submit", (event) => {
