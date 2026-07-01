@@ -1147,6 +1147,7 @@
       .app-actions-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 16px 0; }
       .app-filter { background: #f7f4ef; color: #575952; border: 1px solid #e7e1d7; }
       .app-filter.active { background: #17332f; color: white; border-color: #17332f; }
+      .app-filter:disabled { cursor: not-allowed; opacity: .48; }
       .app-list { display: grid; gap: 12px; }
       .app-card { border: 1px solid #e7e1d7; box-shadow: none; padding: 16px; }
       .app-card-head { display: flex; gap: 12px; align-items: flex-start; justify-content: space-between; }
@@ -1293,6 +1294,7 @@
                 <button class="app-filter" type="button" data-filter="planned">Geplant</button>
                 <button class="app-filter" type="button" data-filter="active">Aktiv</button>
                 <button class="app-filter" type="button" data-filter="done">Fertig</button>
+                <button class="app-filter" type="button" id="clearDoneButton" disabled>Fertige entfernen</button>
               </div>
               <div class="app-list" id="impactList"></div>
             </div>
@@ -4624,6 +4626,12 @@
           )) : filteredItems;
           const count = qs("#boardCount");
           if (count) count.textContent = query ? `${visibleItems.length} Treffer in ${filteredItems.length} gefilterten Eintraegen` : `${visibleItems.length} von ${items.length} Eintraegen sichtbar`;
+          const doneCount = items.filter((item) => item.status === "done").length;
+          const clearDoneButton = qs("#clearDoneButton");
+          if (clearDoneButton) {
+            clearDoneButton.disabled = doneCount === 0;
+            clearDoneButton.textContent = doneCount ? `Fertige entfernen (${doneCount})` : "Fertige entfernen";
+          }
           if (!visibleItems.length) {
             list.innerHTML = '<article class="app-card"><p class="muted">Keine passenden Eintraege. Suche oder Statusfilter anpassen.</p></article>';
             return;
@@ -5142,6 +5150,15 @@
             qsa("[data-filter]").forEach((filterButton) => filterButton.classList.toggle("active", filterButton === button));
             renderBoard();
           });
+        });
+        qs("#clearDoneButton")?.addEventListener("click", () => {
+          const before = items.length;
+          items = items.filter((item) => item.status !== "done");
+          if (before === items.length) return;
+          currentFilter = "all";
+          qsa("[data-filter]").forEach((filterButton) => filterButton.classList.toggle("active", filterButton.dataset.filter === "all"));
+          saveItems();
+          renderAll();
         });
         qs("#boardSearch")?.addEventListener("input", (event) => {
           currentBoardSearch = event.target.value;
