@@ -93,10 +93,13 @@
       .archive-shell { display: grid; grid-template-columns: .85fr 1.15fr; gap: 24px; align-items: start; }
       .archive-panel { border: 1px solid #e7e1d7; box-shadow: none; padding: 24px; }
       .archive-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+      .archive-search { display: grid; gap: 8px; margin: 12px 0 14px; }
+      .archive-search input { width: 100%; border: 1px solid #d9d1c4; border-radius: 8px; background: #fff; color: #20211d; font: inherit; padding: 12px; min-width: 0; }
       .archive-list { display: grid; gap: 10px; max-height: 420px; overflow: auto; padding-right: 4px; }
       .archive-item { border: 1px solid #e7e1d7; border-radius: 8px; background: #f7f4ef; padding: 12px; }
       .archive-item a { color: #17332f; font-weight: 900; text-decoration: none; }
       .archive-item p { margin: 6px 0 0; }
+      .archive-empty { border: 1px dashed #d9d1c4; border-radius: 8px; padding: 16px; }
       .legacy-daily-section { display: none; }
       .show-legacy .legacy-daily-section { display: block; }
       .creator-kit { background: #fff; }
@@ -1492,6 +1495,10 @@
           </article>
           <article class="archive-panel">
             <p class="tag">Komprimierte Historie</p>
+            <label class="archive-search">Archiv durchsuchen
+              <input id="archiveSearch" type="search" placeholder="z.B. Monthly, Trust, Volunteer" autocomplete="off" />
+            </label>
+            <p class="muted" id="archiveCount">Archiv wird geladen.</p>
             <div class="archive-list" id="archiveList"></div>
           </article>
         </div>
@@ -4697,30 +4704,54 @@
 
         function setupDailyArchive() {
           const archiveList = qs("#archiveList");
+          const archiveSearch = qs("#archiveSearch");
+          const archiveCount = qs("#archiveCount");
           const toggle = qs("#toggleArchive");
           const growthLoop = qs(".growth-loop");
           const commons = qs("#taten");
-          if (!archiveList || !toggle || !growthLoop || !commons) return;
-          const legacySections = qsa("main > section").filter((section) => {
+          if (!archiveList || !archiveSearch || !archiveCount || !toggle || !growthLoop || !commons) return;
+          const legacyItems = qsa("main > section").filter((section) => {
             const afterGrowth = Boolean(growthLoop.compareDocumentPosition(section) & Node.DOCUMENT_POSITION_FOLLOWING);
             const beforeCommons = Boolean(section.compareDocumentPosition(commons) & Node.DOCUMENT_POSITION_FOLLOWING);
             return afterGrowth && beforeCommons && !section.classList.contains("archive-control");
-          });
-          legacySections.forEach((section, index) => {
+          }).map((section, index) => {
             section.classList.add("legacy-daily-section");
             if (!section.id) section.id = `daily-archive-${index + 1}`;
-          });
-          archiveList.innerHTML = legacySections.map((section, index) => {
             const title = section.querySelector("h2")?.textContent?.trim() || `Archiv-Eintrag ${index + 1}`;
             const label = section.querySelector(".eyebrow, .tag")?.textContent?.trim() || "Daily Iteration";
-            return `<article class="archive-item"><a href="#${escapeHtml(section.id)}">${escapeHtml(title)}</a><p class="muted">${escapeHtml(label)}</p></article>`;
-          }).join("");
-          const closedLabel = `Archiv anzeigen (${legacySections.length})`;
+            const searchText = `${title} ${label} ${section.textContent || ""}`.toLowerCase();
+            return { id: section.id, title, label, searchText };
+          });
+          const closedLabel = `Archiv anzeigen (${legacyItems.length})`;
           toggle.textContent = closedLabel;
+          const openArchive = (targetId) => {
+            document.body.classList.add("show-legacy");
+            toggle.textContent = "Archiv ausblenden";
+            if (!targetId) return;
+            const target = document.getElementById(targetId);
+            if (!target) return;
+            requestAnimationFrame(() => target.scrollIntoView({ behavior: "smooth", block: "start" }));
+          };
+          const renderArchive = () => {
+            const query = archiveSearch.value.trim().toLowerCase();
+            const matches = query ? legacyItems.filter((item) => item.searchText.includes(query)) : legacyItems;
+            archiveCount.textContent = query ? `${matches.length} Treffer fuer "${archiveSearch.value.trim()}"` : `${legacyItems.length} archivierte Iterationen`;
+            archiveList.innerHTML = matches.length ? matches.map((item) => (
+              `<article class="archive-item"><a href="#${escapeHtml(item.id)}" data-archive-target="${escapeHtml(item.id)}">${escapeHtml(item.title)}</a><p class="muted">${escapeHtml(item.label)}</p></article>`
+            )).join("") : `<article class="archive-empty"><p class="muted">Keine Archivtreffer. Suche kuerzer formulieren oder Archiv anzeigen.</p></article>`;
+          };
+          archiveSearch.addEventListener("input", renderArchive);
+          archiveList.addEventListener("click", (event) => {
+            const link = event.target.closest("[data-archive-target]");
+            if (!link) return;
+            event.preventDefault();
+            openArchive(link.dataset.archiveTarget);
+          });
           toggle.addEventListener("click", () => {
             document.body.classList.toggle("show-legacy");
             toggle.textContent = document.body.classList.contains("show-legacy") ? "Archiv ausblenden" : closedLabel;
           });
+          renderArchive();
         }
 
         function renderAll() {
