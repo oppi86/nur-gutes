@@ -4626,7 +4626,9 @@
           if (form) form.hidden = boardFormCollapsed;
           if (button) {
             button.setAttribute("aria-expanded", String(!boardFormCollapsed));
-            button.textContent = boardFormCollapsed ? "Neuen Eintrag erfassen" : "Formular ausblenden";
+            button.textContent = editingItemId
+              ? (boardFormCollapsed ? "Bearbeitung fortsetzen" : "Bearbeitung ausblenden")
+              : (boardFormCollapsed ? "Neuen Eintrag erfassen" : "Formular ausblenden");
           }
           if (shouldPersist) localStorage.setItem(boardFormCollapsedKey, String(boardFormCollapsed));
         }
