@@ -4612,10 +4612,7 @@
         }
 
         function recommendNextAction() {
-          const item = items.find((entry) => entry.status === "active")
-            || items.find((entry) => entry.status === "planned")
-            || items.find((entry) => entry.status !== "done")
-            || items[0];
+          const item = items.find((entry) => entry.status !== "done") || items[0];
           if (!item) return null;
           const amount = Number(item.amount) || 0;
           const category = item.category || "";
