@@ -4708,7 +4708,9 @@
           }, { all: items.length, planned: 0, active: 0, done: 0 });
           qsa("[data-filter]").forEach((button) => {
             const filter = button.dataset.filter;
-            button.textContent = `${filterLabels[filter] || filter} (${filterCounts[filter] || 0})`;
+            const filterCount = filterCounts[filter] || 0;
+            button.textContent = `${filterLabels[filter] || filter} (${filterCount})`;
+            button.disabled = filter !== "all" && filterCount === 0 && currentFilter !== filter;
           });
           list?.classList.toggle("compact", boardCompact);
           const compactBoardButton = qs("#compactBoardButton");
