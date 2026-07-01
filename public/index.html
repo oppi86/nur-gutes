@@ -4645,12 +4645,13 @@
 
         function exportBoardCsv() {
           const status = qs("#exportBoardStatus");
-          if (!items.length) {
-            if (status) status.textContent = "Kein Board-Eintrag zum Exportieren.";
+          const { query, visibleItems } = getVisibleBoardItems();
+          if (!visibleItems.length) {
+            if (status) status.textContent = "Keine sichtbaren Board-Eintraege zum Exportieren.";
             return;
           }
           const header = ["Titel", "Kategorie", "Status", "Revenue EUR", "Impact EUR", "Naechster Schritt", "Beschreibung", "Erstellt am"];
-          const rows = items.map((item) => [
+          const rows = visibleItems.map((item) => [
             item.title,
             item.category,
             item.status,
@@ -4665,12 +4666,13 @@
           const url = URL.createObjectURL(blob);
           const link = document.createElement("a");
           link.href = url;
-          link.download = `nur-gutes-board-${new Date().toISOString().slice(0, 10)}.csv`;
+          const scope = currentFilter === "all" && !query ? "alle" : "sichtbar";
+          link.download = `nur-gutes-board-${scope}-${new Date().toISOString().slice(0, 10)}.csv`;
           document.body.appendChild(link);
           link.click();
           link.remove();
           URL.revokeObjectURL(url);
-          if (status) status.textContent = `${items.length} Eintraege als CSV vorbereitet.`;
+          if (status) status.textContent = `${visibleItems.length} sichtbare Eintraege als CSV vorbereitet.`;
         }
 
         function renderStats() {
