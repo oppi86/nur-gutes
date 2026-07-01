@@ -4476,6 +4476,7 @@
         const itemKey = "nurGutesImpactItems";
         const stripeKey = "nurGutesStripeLinks";
         const focusKey = "nurGutesFocusMode";
+        const removedDoneKey = "nurGutesRemovedDone";
         const seedItems = [
           {
             id: "seed-proof-1",
@@ -4525,12 +4526,13 @@
         let focusMode = localStorage.getItem(focusKey) === "true";
         let currentFilter = "all";
         let currentBoardSearch = "";
-        let lastRemovedDone = [];
+        let lastRemovedDone = loadJson(removedDoneKey, []);
 
         const qs = (selector) => document.querySelector(selector);
         const qsa = (selector) => Array.from(document.querySelectorAll(selector));
         const saveItems = () => localStorage.setItem(itemKey, JSON.stringify(items));
         const saveStripe = () => localStorage.setItem(stripeKey, JSON.stringify(stripeLinks));
+        const saveRemovedDone = () => localStorage.setItem(removedDoneKey, JSON.stringify(lastRemovedDone));
         const csvCell = (value) => `"${String(value ?? "").replace(/"/g, '""')}"`;
 
         function setFocusMode(enabled, shouldScroll = false) {
@@ -5163,6 +5165,7 @@
           lastRemovedDone = items.filter((item) => item.status === "done");
           items = items.filter((item) => item.status !== "done");
           if (before === items.length) return;
+          saveRemovedDone();
           currentFilter = "all";
           qsa("[data-filter]").forEach((filterButton) => filterButton.classList.toggle("active", filterButton.dataset.filter === "all"));
           saveItems();
@@ -5172,6 +5175,7 @@
           if (!lastRemovedDone.length) return;
           items = [...lastRemovedDone, ...items];
           lastRemovedDone = [];
+          saveRemovedDone();
           currentFilter = "all";
           qsa("[data-filter]").forEach((filterButton) => filterButton.classList.toggle("active", filterButton.dataset.filter === "all"));
           saveItems();
