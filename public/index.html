@@ -5463,8 +5463,7 @@
           items = [...lastRemovedItems.filter((item) => !existingIds.has(item.id)), ...items];
           lastRemovedItems = [];
           saveRemovedItems();
-          currentFilter = "all";
-          qsa("[data-filter]").forEach((filterButton) => filterButton.classList.toggle("active", filterButton.dataset.filter === "all"));
+          revealSavedBoardItem();
           saveItems();
           renderAll();
         });
