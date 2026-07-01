@@ -1114,6 +1114,9 @@
       .app-next-action { display: grid; gap: 8px; margin-top: 18px; }
       .app-next-action button { width: 100%; border: 0; border-radius: 8px; background: #fff; color: #17332f; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 12px 14px; }
       .app-next-action p { margin: 0; font-size: 13px; color: rgba(255,255,255,.8); }
+      .app-export { display: grid; gap: 8px; margin-top: 18px; }
+      .app-export button { width: 100%; border: 1px solid rgba(255,255,255,.3); border-radius: 8px; background: rgba(255,255,255,.1); color: white; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 12px 14px; }
+      .app-export p { margin: 0; font-size: 13px; color: rgba(255,255,255,.8); }
       .app-note { border: 1px solid rgba(255,255,255,.18); border-radius: 8px; padding: 14px; margin-top: 18px; font-size: 14px; color: rgba(255,255,255,.86); }
       .app-mode-control { display: grid; gap: 8px; margin-top: 18px; }
       .app-mode-toggle { width: 100%; border: 0; border-radius: 8px; background: #f9d65c; color: #20211d; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 12px 14px; }
@@ -1233,6 +1236,10 @@
             <div class="app-next-action">
               <button type="button" id="nextActionButton">Naechste Aktion starten</button>
               <p id="nextActionStatus">Der Launcher waehlt den sinnvollsten naechsten Tool-Schritt.</p>
+            </div>
+            <div class="app-export">
+              <button type="button" id="exportBoardButton">Board als CSV exportieren</button>
+              <p id="exportBoardStatus">Export fuer Sheets, CRM oder Partner-Reporting.</p>
             </div>
             <p class="app-note">Revenue-Reinvestition: 40% gute Taten, 25% bessere Algorithmen und Automatisierung, 20% Growth/Marketing, 15% Betrieb und Qualitaet.</p>
             <div class="app-mode-control">
@@ -4520,6 +4527,7 @@
         const qsa = (selector) => Array.from(document.querySelectorAll(selector));
         const saveItems = () => localStorage.setItem(itemKey, JSON.stringify(items));
         const saveStripe = () => localStorage.setItem(stripeKey, JSON.stringify(stripeLinks));
+        const csvCell = (value) => `"${String(value ?? "").replace(/"/g, '""')}"`;
 
         function setFocusMode(enabled, shouldScroll = false) {
           focusMode = Boolean(enabled);
@@ -4564,6 +4572,36 @@
           button.disabled = false;
           button.textContent = `${action.label} starten`;
           status.textContent = `${action.item.title}: ${action.reason}`;
+        }
+
+        function exportBoardCsv() {
+          const status = qs("#exportBoardStatus");
+          if (!items.length) {
+            if (status) status.textContent = "Kein Board-Eintrag zum Exportieren.";
+            return;
+          }
+          const header = ["Titel", "Kategorie", "Status", "Revenue EUR", "Impact EUR", "Naechster Schritt", "Beschreibung", "Erstellt am"];
+          const rows = items.map((item) => [
+            item.title,
+            item.category,
+            item.status,
+            Math.round(Number(item.amount) || 0),
+            Math.round((Number(item.amount) || 0) * 0.4),
+            item.next,
+            item.text,
+            item.createdAt
+          ]);
+          const csv = [header, ...rows].map((row) => row.map(csvCell).join(",")).join("\n");
+          const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `nur-gutes-board-${new Date().toISOString().slice(0, 10)}.csv`;
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          URL.revokeObjectURL(url);
+          if (status) status.textContent = `${items.length} Eintraege als CSV vorbereitet.`;
         }
 
         function renderStats() {
@@ -5055,6 +5093,7 @@
           setFocusMode(true);
           openItemTool(action.item.id, action.tool);
         });
+        qs("#exportBoardButton")?.addEventListener("click", exportBoardCsv);
         setActiveTool("board");
         qsa("[data-app-tab]").forEach((tab) => {
           tab.addEventListener("click", () => setActiveTool(tab.dataset.appTab));
