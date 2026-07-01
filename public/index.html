@@ -1156,6 +1156,9 @@
       .app-card-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
       .app-card-meta span { border-radius: 999px; background: #e6efe1; color: #17332f; padding: 7px 10px; font-size: 12px; font-weight: 900; }
       .app-card button { background: #f7f4ef; border: 1px solid #e7e1d7; color: #20211d; margin-top: 12px; margin-right: 6px; }
+      .app-list.compact .app-card { padding: 12px 14px; }
+      .app-list.compact .app-card p.muted, .app-list.compact .app-card-meta, .app-list.compact .app-card button[data-open-tool], .app-list.compact .app-card button[data-copy-item], .app-list.compact .app-card button[data-move] { display: none; }
+      .app-list.compact .app-card h3 { font-size: 17px; margin-bottom: 0; }
       .stripe-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
       .pay-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; margin-top: 16px; }
       .app-pay { text-align: center; }
@@ -1295,6 +1298,7 @@
                 <button class="app-filter" type="button" data-filter="planned">Geplant</button>
                 <button class="app-filter" type="button" data-filter="active">Aktiv</button>
                 <button class="app-filter" type="button" data-filter="done">Fertig</button>
+                <button class="app-filter" type="button" id="compactBoardButton" aria-pressed="false">Kompakt</button>
                 <button class="app-filter" type="button" id="clearDoneButton" disabled>Fertige entfernen</button>
                 <button class="app-filter" type="button" id="restoreDoneButton" disabled>Entfernte wiederherstellen</button>
               </div>
@@ -4477,6 +4481,7 @@
         const itemKey = "nurGutesImpactItems";
         const stripeKey = "nurGutesStripeLinks";
         const focusKey = "nurGutesFocusMode";
+        const compactBoardKey = "nurGutesCompactBoard";
         const removedItemsKey = "nurGutesRemovedDone";
         const seedItems = [
           {
@@ -4525,6 +4530,7 @@
         let items = loadJson(itemKey, seedItems);
         let stripeLinks = loadJson(stripeKey, {});
         let focusMode = localStorage.getItem(focusKey) === "true";
+        let boardCompact = localStorage.getItem(compactBoardKey) === "true";
         let currentFilter = "all";
         let currentBoardSearch = "";
         let editingItemId = "";
@@ -4666,6 +4672,13 @@
         function renderBoard() {
           const list = qs("#impactList");
           const { query, filteredItems, visibleItems } = getVisibleBoardItems();
+          list?.classList.toggle("compact", boardCompact);
+          const compactBoardButton = qs("#compactBoardButton");
+          if (compactBoardButton) {
+            compactBoardButton.classList.toggle("active", boardCompact);
+            compactBoardButton.setAttribute("aria-pressed", String(boardCompact));
+            compactBoardButton.textContent = boardCompact ? "Normalansicht" : "Kompakt";
+          }
           const count = qs("#boardCount");
           if (count) count.textContent = query ? `${visibleItems.length} Treffer in ${filteredItems.length} gefilterten Eintraegen` : `${visibleItems.length} von ${items.length} Eintraegen sichtbar`;
           const doneCount = items.filter((item) => item.status === "done").length;
@@ -5290,6 +5303,11 @@
           qsa("[data-filter]").forEach((filterButton) => filterButton.classList.toggle("active", filterButton.dataset.filter === "all"));
           saveItems();
           renderAll();
+        });
+        qs("#compactBoardButton")?.addEventListener("click", () => {
+          boardCompact = !boardCompact;
+          localStorage.setItem(compactBoardKey, String(boardCompact));
+          renderBoard();
         });
         qs("#boardSearch")?.addEventListener("input", (event) => {
           currentBoardSearch = event.target.value;
