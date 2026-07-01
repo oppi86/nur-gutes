@@ -4537,6 +4537,37 @@
         const saveRemovedItems = () => localStorage.setItem(removedItemsKey, JSON.stringify(lastRemovedItems));
         const csvCell = (value) => `"${String(value ?? "").replace(/"/g, '""')}"`;
 
+        async function copyText(text) {
+          try {
+            await navigator.clipboard.writeText(text);
+            return true;
+          } catch (error) {
+            const field = document.createElement("textarea");
+            field.value = text;
+            field.setAttribute("readonly", "");
+            field.style.position = "fixed";
+            field.style.left = "-9999px";
+            document.body.appendChild(field);
+            field.select();
+            const copied = document.execCommand("copy");
+            field.remove();
+            return copied;
+          }
+        }
+
+        function itemShareText(item) {
+          const amount = Number(item?.amount) || 0;
+          return [
+            `Nur Gutes Eintrag: ${item?.title || "Neue gute Tat"}`,
+            `Kategorie: ${item?.category || "Offen"} / Status: ${item?.status || "planned"}`,
+            `Revenue-Ziel: ${money(amount)} | Impact-Anteil 40%: ${money(amount * 0.4)}`,
+            `Naechster Schritt: ${item?.next || "Naechsten Schritt klaeren"}`,
+            `Kurz: ${item?.text || "Ein kleiner konkreter Schritt mit sichtbarem Nutzen."}`,
+            "",
+            "Reinvestition: 40% gute Taten, 25% bessere Algorithmen und Automatisierung, 20% Growth/Marketing, 15% Betrieb und Qualitaet."
+          ].join("\n");
+        }
+
         function setFocusMode(enabled, shouldScroll = false) {
           focusMode = Boolean(enabled);
           document.body.classList.toggle("focus-mode", focusMode);
@@ -4670,6 +4701,7 @@
               <button type="button" data-open-tool="proof">Proof</button>
               <button type="button" data-open-tool="monthly">Monthly</button>
               <button type="button" data-edit="true">Bearbeiten</button>
+              <button type="button" data-copy-item="true">Kopieren</button>
               <button type="button" data-move="up" ${index === 0 ? "disabled" : ""}>Hoch</button>
               <button type="button" data-move="down" ${index === visibleItems.length - 1 ? "disabled" : ""}>Runter</button>
               <button type="button" data-delete="true">Loeschen</button>
@@ -5189,7 +5221,7 @@
         });
         qs("#cancelEditButton")?.addEventListener("click", () => setEditMode(""));
 
-        qs("#impactList").addEventListener("click", (event) => {
+        qs("#impactList").addEventListener("click", async (event) => {
           const button = event.target.closest("button");
           const card = event.target.closest("[data-id]");
           if (!button || !card) return;
@@ -5200,6 +5232,16 @@
           if (button.dataset.edit) {
             setEditMode(card.dataset.id);
             requestAnimationFrame(() => qs("#impactForm")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+            return;
+          }
+          if (button.dataset.copyItem) {
+            const item = items.find((entry) => entry.id === card.dataset.id);
+            if (!item) return;
+            const didCopy = await copyText(itemShareText(item));
+            button.textContent = didCopy ? "Kopiert" : "Text bereit";
+            setTimeout(() => {
+              button.textContent = "Kopieren";
+            }, 1600);
             return;
           }
           if (button.dataset.move) {
