@@ -4578,6 +4578,20 @@
           }
         }
 
+        function setupCopyButton(buttonSelector, outputSelector, copiedLabel, fallbackLabel, resetLabel) {
+          const button = qs(buttonSelector);
+          const output = qs(outputSelector);
+          if (!button || !output) return;
+          button.addEventListener("click", async () => {
+            const didCopy = await copyText(output.value);
+            if (!didCopy) output.select();
+            button.textContent = didCopy ? copiedLabel : fallbackLabel;
+            setTimeout(() => {
+              button.textContent = resetLabel;
+            }, 1800);
+          });
+        }
+
         function itemShareText(item) {
           const amount = Number(item?.amount) || 0;
           return [
@@ -5504,89 +5518,14 @@
           qs(selector).addEventListener("change", renderSecondGift);
         });
 
-        qs("#copyShare").addEventListener("click", async () => {
-          const text = qs("#shareText").value;
-          try {
-            await navigator.clipboard.writeText(text);
-            qs("#copyShare").textContent = "Kopiert";
-          } catch (error) {
-            qs("#shareText").select();
-            qs("#copyShare").textContent = "Text markiert";
-          }
-          setTimeout(() => {
-            qs("#copyShare").textContent = "Text kopieren";
-          }, 1800);
-        });
-
-        qs("#copyPitch").addEventListener("click", async () => {
-          const text = qs("#pitchOutput").value;
-          try {
-            await navigator.clipboard.writeText(text);
-            qs("#copyPitch").textContent = "Pitch kopiert";
-          } catch (error) {
-            qs("#pitchOutput").select();
-            qs("#copyPitch").textContent = "Pitch markiert";
-          }
-          setTimeout(() => {
-            qs("#copyPitch").textContent = "Pitch kopieren";
-          }, 1800);
-        });
-
-        qs("#copyTrust").addEventListener("click", async () => {
-          const text = qs("#trustOutput").value;
-          try {
-            await navigator.clipboard.writeText(text);
-            qs("#copyTrust").textContent = "Trust Pulse kopiert";
-          } catch (error) {
-            qs("#trustOutput").select();
-            qs("#copyTrust").textContent = "Trust Pulse markiert";
-          }
-          setTimeout(() => {
-            qs("#copyTrust").textContent = "Trust Pulse kopieren";
-          }, 1800);
-        });
-
-        qs("#copyProof").addEventListener("click", async () => {
-          const text = qs("#proofOutput").value;
-          try {
-            await navigator.clipboard.writeText(text);
-            qs("#copyProof").textContent = "Proof Receipt kopiert";
-          } catch (error) {
-            qs("#proofOutput").select();
-            qs("#copyProof").textContent = "Proof Receipt markiert";
-          }
-          setTimeout(() => {
-            qs("#copyProof").textContent = "Proof Receipt kopieren";
-          }, 1800);
-        });
-
-        qs("#copyMonthly").addEventListener("click", async () => {
-          const text = qs("#monthlyOutput").value;
-          try {
-            await navigator.clipboard.writeText(text);
-            qs("#copyMonthly").textContent = "Monthly Ladder kopiert";
-          } catch (error) {
-            qs("#monthlyOutput").select();
-            qs("#copyMonthly").textContent = "Monthly Ladder markiert";
-          }
-          setTimeout(() => {
-            qs("#copyMonthly").textContent = "Monthly Ladder kopieren";
-          }, 1800);
-        });
-
-        qs("#copySecond").addEventListener("click", async () => {
-          const text = qs("#secondOutput").value;
-          try {
-            await navigator.clipboard.writeText(text);
-            qs("#copySecond").textContent = "Second Gift Plan kopiert";
-          } catch (error) {
-            qs("#secondOutput").select();
-            qs("#copySecond").textContent = "Second Gift Plan markiert";
-          }
-          setTimeout(() => {
-            qs("#copySecond").textContent = "Second Gift Plan kopieren";
-          }, 1800);
-        });
+        [
+          ["#copyShare", "#shareText", "Kopiert", "Text markiert", "Text kopieren"],
+          ["#copyPitch", "#pitchOutput", "Pitch kopiert", "Pitch markiert", "Pitch kopieren"],
+          ["#copyTrust", "#trustOutput", "Trust Pulse kopiert", "Trust Pulse markiert", "Trust Pulse kopieren"],
+          ["#copyProof", "#proofOutput", "Proof Receipt kopiert", "Proof Receipt markiert", "Proof Receipt kopieren"],
+          ["#copyMonthly", "#monthlyOutput", "Monthly Ladder kopiert", "Monthly Ladder markiert", "Monthly Ladder kopieren"],
+          ["#copySecond", "#secondOutput", "Second Gift Plan kopiert", "Second Gift Plan markiert", "Second Gift Plan kopieren"]
+        ].forEach((config) => setupCopyButton(...config));
 
         renderAll();
       })();
