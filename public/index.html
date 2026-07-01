@@ -5430,6 +5430,7 @@
               setEditMode("");
               setBoardFormCollapsed(true);
             }
+            resetEmptyCurrentFilter();
           } else if (button.dataset.status) {
             items = items.map((item) => item.id === card.dataset.id ? { ...item, status: button.dataset.status } : item);
             resetEmptyCurrentFilter();
