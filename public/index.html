@@ -4834,12 +4834,16 @@
 
         function resetBoardView() {
           currentFilter = "all";
+          qsa("[data-filter]").forEach((filterButton) => filterButton.classList.toggle("active", filterButton.dataset.filter === "all"));
+          clearBoardSearchValue();
+        }
+
+        function clearBoardSearchValue(shouldFocus = true) {
           currentBoardSearch = "";
           const search = qs("#boardSearch");
           if (search) search.value = "";
-          qsa("[data-filter]").forEach((filterButton) => filterButton.classList.toggle("active", filterButton.dataset.filter === "all"));
           renderBoard();
-          search?.focus();
+          if (shouldFocus) search?.focus();
         }
 
         function resetEmptyCurrentFilter() {
@@ -5448,17 +5452,16 @@
           renderBoard();
         });
         qs("#boardSearch")?.addEventListener("keydown", (event) => {
-          if (event.key !== "Enter" || event.isComposing) return;
-          event.preventDefault();
-          startFirstVisibleBoardItem();
+          if (event.isComposing) return;
+          if (event.key === "Enter") {
+            event.preventDefault();
+            startFirstVisibleBoardItem();
+          } else if (event.key === "Escape" && currentBoardSearch.trim()) {
+            event.preventDefault();
+            clearBoardSearchValue();
+          }
         });
-        qs("#clearBoardSearch")?.addEventListener("click", () => {
-          currentBoardSearch = "";
-          const search = qs("#boardSearch");
-          if (search) search.value = "";
-          renderBoard();
-          search?.focus();
-        });
+        qs("#clearBoardSearch")?.addEventListener("click", () => clearBoardSearchValue());
 
         qs("#stripeForm").addEventListener("submit", (event) => {
           event.preventDefault();
