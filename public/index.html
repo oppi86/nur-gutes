@@ -5330,6 +5330,7 @@
         function openItemTool(itemId, toolName) {
           const select = qs(`#${toolName}Item`);
           if (select && items.some((item) => item.id === itemId)) select.value = itemId;
+          setFocusMode(true);
           setActiveTool(toolName);
           renderAll();
           const panel = qs(`[data-app-panel="${toolName}"]`);
