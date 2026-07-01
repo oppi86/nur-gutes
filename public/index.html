@@ -4798,6 +4798,13 @@
           search?.focus();
         }
 
+        function resetEmptyCurrentFilter() {
+          if (currentFilter === "all") return;
+          if (items.some((item) => item.status === currentFilter)) return;
+          currentFilter = "all";
+          qsa("[data-filter]").forEach((filterButton) => filterButton.classList.toggle("active", filterButton.dataset.filter === "all"));
+        }
+
         function setEditMode(itemId = "") {
           editingItemId = itemId;
           const form = qs("#impactForm");
@@ -5353,6 +5360,7 @@
             }
           } else if (button.dataset.status) {
             items = items.map((item) => item.id === card.dataset.id ? { ...item, status: button.dataset.status } : item);
+            resetEmptyCurrentFilter();
           }
           saveItems();
           renderAll();
