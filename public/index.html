@@ -46,6 +46,12 @@
       .dark .muted { color: rgba(255,255,255,.78); }
       .idea-list { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
       .idea-list article { background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.16); box-shadow: none; padding: 20px; }
+      .idea-tools { display: grid; gap: 10px; margin-top: 18px; }
+      .idea-tools input { width: 100%; border: 1px solid rgba(255,255,255,.28); border-radius: 8px; background: rgba(255,255,255,.09); color: white; font: inherit; padding: 12px; min-width: 0; }
+      .idea-tools input::placeholder { color: rgba(255,255,255,.62); }
+      .idea-tools button { width: fit-content; border: 0; border-radius: 8px; background: #f9d65c; color: #20211d; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 11px 13px; }
+      .idea-tools .muted { color: rgba(255,255,255,.76); }
+      .idea-list article.idea-hidden, #ideen .wrap.idea-empty { display: none; }
       .week { background: #f6edcf; }
       .week-grid, .commons-grid, .impact-grid { display: grid; grid-template-columns: .85fr 1.15fr; gap: 32px; align-items: start; }
       .week-title { background: #f9d65c; padding: 36px; }
@@ -1366,7 +1372,7 @@
       </section>
 
       <section id="ideen" class="dark">
-        <div class="wrap impact-grid"><div><p class="eyebrow">Business Ideen</p><h2>Kleine Modelle, die Geld verdienen und Menschen helfen</h2><p class="muted">Die besten Ideen sind nah am Alltag: echtes Beduerfnis, einfacher Test, fairer Preis, sichtbare Wirkung.</p></div><div class="idea-list"><article>Klimabildung als spielbare Schulstunde.</article><article>Faire Gruenderinnen-Netzwerke lokal verbinden.</article><article>Abwasser-zu-Energie-Beratung fuer Kommunen.</article><article>Purpose-Finanzierung fuer kleine Unternehmen.</article><article>Impact-Partner-Seiten fuer lokale Betriebe: jeder Partner finanziert eine gute Tat und bekommt eine transparente Wirkungsseite.</article><article>Gute-Taten-Auftragsboerse: Menschen und Firmen finanzieren kleine Aufgaben, die nach Umsetzung als teilbare Wirkungsgeschichte erscheinen.</article><article>Pay-what-you-can Mini-Guides: kompakte Anleitungen werden geteilt, finanzieren Bounties und bringen neue Menschen auf die Plattform.</article><article>Wirkungsrechner: zeigt transparent, wie Partner, Guides und Bounties Einnahmen in konkrete gute Taten verwandeln.</article><article>Wirkungs-Wunschliste: die Community schlaegt gute Taten vor, stimmt darueber ab und macht die besten Ideen fuer Sponsoren finanzierbar.</article><article>Daily Growth Cockpit: ein oeffentliches Tagesboard verbindet Idee, Social-Validierung, Umsatz, Wachstum und Reinvestition.</article><article>Micro-Creator Impact Kit: kleine Creator erhalten Story-Vorlagen, Referral-Codes und Impact-Bounties, um Reichweite direkt in gute Taten zu verwandeln.</article><article>Monthly Impact Circle: wiederkehrende kleine Monatsbeitraege finanzieren planbare gute Taten, Retention-Kommunikation und die naechsten Website-Verbesserungen.</article><article>Impact Match Engine: ein kurzer Matching-Bereich empfiehlt Besuchern den passenden Weg ueber Zeit, Geld oder Reichweite und erhoeht die Conversion zu Wirkung.</article><article>Impact Match Multiplier: Partner verdoppeln kleine Beitraege sichtbar, schaffen Dringlichkeit und machen aus Social-Traffic messbare Wirkung.</article><article>Impact Ambassador Relay: kleine Botschafter starten teilbare Wirkungsketten mit Code, Einladung und messbarem Revenue-Ziel.</article><article>Impact Receipt Ledger: jede gute Tat erhaelt einen oeffentlichen Beleg mit Betrag, Wirkung, naechstem Schritt und teilbarer Vertrauensspur.</article><article>Next Best Good Action: ein transparenter Empfehlungsbereich fuehrt Besucher anhand ihres Signals zur naechsten guten Handlung mit Revenue-Potenzial.</article><article>7-Day Good Challenge Board: Teams und Einzelne bekommen sieben kleine Aufgaben, die Teilnahme, Social Shares und Sponsor-Slots ausloesen.</article><article>Gratitude Loop Builder: aus einer guten Tat entsteht eine Dank- und Update-Strecke, die Vertrauen, Wiederkehr und Monatsbeitraege staerkt.</article><article>Impact Proof Snapshot: jede gute Tat bekommt einen Mini-Wirkungsbericht, der beantwortet, was sich veraendert hat und wie man es weiss.</article><article>Round-Up Partner Kit: lokale Betriebe sammeln Cent-Betraege, buendeln sie zu Proof-Snapshots und machen kleine Kassenmomente zu messbarer Wirkung.</article><article>Match-Gift Booster: Unterstuetzer pruefen, ob ihr Arbeitgeber kleine Spenden verdoppelt, und machen aus einem Beitrag zwei sichtbare gute Taten.</article></div></div>
+        <div class="wrap impact-grid"><div><p class="eyebrow">Business Ideen</p><h2>Kleine Modelle, die Geld verdienen und Menschen helfen</h2><p class="muted">Die besten Ideen sind nah am Alltag: echtes Beduerfnis, einfacher Test, fairer Preis, sichtbare Wirkung.</p><div class="idea-tools"><label>Ideen durchsuchen<input id="ideaSearch" type="search" placeholder="z.B. Monthly, Trust, Volunteer" autocomplete="off" /></label><p class="muted" id="ideaCount">Ideen werden geladen.</p><button type="button" id="toggleIdeas">Alle Ideen anzeigen</button></div></div><div class="idea-list"><article>Klimabildung als spielbare Schulstunde.</article><article>Faire Gruenderinnen-Netzwerke lokal verbinden.</article><article>Abwasser-zu-Energie-Beratung fuer Kommunen.</article><article>Purpose-Finanzierung fuer kleine Unternehmen.</article><article>Impact-Partner-Seiten fuer lokale Betriebe: jeder Partner finanziert eine gute Tat und bekommt eine transparente Wirkungsseite.</article><article>Gute-Taten-Auftragsboerse: Menschen und Firmen finanzieren kleine Aufgaben, die nach Umsetzung als teilbare Wirkungsgeschichte erscheinen.</article><article>Pay-what-you-can Mini-Guides: kompakte Anleitungen werden geteilt, finanzieren Bounties und bringen neue Menschen auf die Plattform.</article><article>Wirkungsrechner: zeigt transparent, wie Partner, Guides und Bounties Einnahmen in konkrete gute Taten verwandeln.</article><article>Wirkungs-Wunschliste: die Community schlaegt gute Taten vor, stimmt darueber ab und macht die besten Ideen fuer Sponsoren finanzierbar.</article><article>Daily Growth Cockpit: ein oeffentliches Tagesboard verbindet Idee, Social-Validierung, Umsatz, Wachstum und Reinvestition.</article><article>Micro-Creator Impact Kit: kleine Creator erhalten Story-Vorlagen, Referral-Codes und Impact-Bounties, um Reichweite direkt in gute Taten zu verwandeln.</article><article>Monthly Impact Circle: wiederkehrende kleine Monatsbeitraege finanzieren planbare gute Taten, Retention-Kommunikation und die naechsten Website-Verbesserungen.</article><article>Impact Match Engine: ein kurzer Matching-Bereich empfiehlt Besuchern den passenden Weg ueber Zeit, Geld oder Reichweite und erhoeht die Conversion zu Wirkung.</article><article>Impact Match Multiplier: Partner verdoppeln kleine Beitraege sichtbar, schaffen Dringlichkeit und machen aus Social-Traffic messbare Wirkung.</article><article>Impact Ambassador Relay: kleine Botschafter starten teilbare Wirkungsketten mit Code, Einladung und messbarem Revenue-Ziel.</article><article>Impact Receipt Ledger: jede gute Tat erhaelt einen oeffentlichen Beleg mit Betrag, Wirkung, naechstem Schritt und teilbarer Vertrauensspur.</article><article>Next Best Good Action: ein transparenter Empfehlungsbereich fuehrt Besucher anhand ihres Signals zur naechsten guten Handlung mit Revenue-Potenzial.</article><article>7-Day Good Challenge Board: Teams und Einzelne bekommen sieben kleine Aufgaben, die Teilnahme, Social Shares und Sponsor-Slots ausloesen.</article><article>Gratitude Loop Builder: aus einer guten Tat entsteht eine Dank- und Update-Strecke, die Vertrauen, Wiederkehr und Monatsbeitraege staerkt.</article><article>Impact Proof Snapshot: jede gute Tat bekommt einen Mini-Wirkungsbericht, der beantwortet, was sich veraendert hat und wie man es weiss.</article><article>Round-Up Partner Kit: lokale Betriebe sammeln Cent-Betraege, buendeln sie zu Proof-Snapshots und machen kleine Kassenmomente zu messbarer Wirkung.</article><article>Match-Gift Booster: Unterstuetzer pruefen, ob ihr Arbeitgeber kleine Spenden verdoppelt, und machen aus einem Beitrag zwei sichtbare gute Taten.</article></div></div>
         <div class="wrap"><div class="idea-list"><article>Asset-Giving Gateway: DAF-, Aktien-, Krypto- und Non-Cash-Gaben werden in klare Impact-Pfade, Proofs und Partnerseiten uebersetzt.</article></div></div>
         <div class="wrap"><div class="idea-list"><article>Skill-Impact Passport: gute Taten, erlernte Skills und Proofs werden als teilbares Profil sichtbar, damit Vertrauen, Jobs, Teams und Spenden wachsen.</article></div></div>
         <div class="wrap"><div class="idea-list"><article>Trusted Ask Relay: persoenliche DMs, kleine Gruppen und Community-Kanaele verwandeln Proofs in konkrete Bitten, Antworten und Folgebeitraege.</article></div></div>
@@ -4781,6 +4787,43 @@
           renderArchive();
         }
 
+        function setupIdeaExplorer() {
+          const section = qs("#ideen");
+          const search = qs("#ideaSearch");
+          const count = qs("#ideaCount");
+          const toggle = qs("#toggleIdeas");
+          if (!section || !search || !count || !toggle) return;
+          const visibleLimit = 8;
+          let expanded = false;
+          const ideas = qsa("#ideen .idea-list article").map((article) => ({
+            article,
+            wrap: article.closest(".wrap"),
+            searchText: (article.textContent || "").toLowerCase()
+          }));
+          const renderIdeas = () => {
+            const query = search.value.trim().toLowerCase();
+            const matches = query ? ideas.filter((idea) => idea.searchText.includes(query)) : ideas;
+            const visibleSet = new Set((expanded || query ? matches : matches.slice(0, visibleLimit)).map((idea) => idea.article));
+            ideas.forEach((idea) => idea.article.classList.toggle("idea-hidden", !visibleSet.has(idea.article)));
+            qsa("#ideen .wrap").forEach((wrap, index) => {
+              const hasIdeas = wrap.querySelector(".idea-list");
+              if (!hasIdeas || index === 0) return;
+              const hasVisibleIdea = Boolean(wrap.querySelector(".idea-list article:not(.idea-hidden)"));
+              wrap.classList.toggle("idea-empty", !hasVisibleIdea);
+            });
+            const shown = visibleSet.size;
+            count.textContent = query ? `${matches.length} Treffer, ${shown} sichtbar` : `${shown} von ${ideas.length} Ideen sichtbar`;
+            toggle.textContent = expanded ? "Ideen einklappen" : `Alle ${ideas.length} Ideen anzeigen`;
+            toggle.hidden = Boolean(query);
+          };
+          search.addEventListener("input", renderIdeas);
+          toggle.addEventListener("click", () => {
+            expanded = !expanded;
+            renderIdeas();
+          });
+          renderIdeas();
+        }
+
         function renderAll() {
           renderStats();
           renderBoard();
@@ -4814,6 +4857,7 @@
         }
 
         setupDailyArchive();
+        setupIdeaExplorer();
         setActiveTool("board");
         qsa("[data-app-tab]").forEach((tab) => {
           tab.addEventListener("click", () => setActiveTool(tab.dataset.appTab));
