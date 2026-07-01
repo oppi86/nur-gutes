@@ -4733,7 +4733,7 @@
             restoreDoneButton.textContent = lastRemovedItems.length ? `Entfernte wiederherstellen (${lastRemovedItems.length})` : "Entfernte wiederherstellen";
           }
           if (!visibleItems.length) {
-            list.innerHTML = '<article class="app-card"><p class="muted">Keine passenden Eintraege. Suche oder Statusfilter anpassen.</p></article>';
+            list.innerHTML = '<article class="app-card"><p class="muted">Keine passenden Eintraege. Suche oder Statusfilter anpassen.</p><button type="button" data-reset-board-view="true">Ansicht zuruecksetzen</button></article>';
             return;
           }
           list.innerHTML = visibleItems.map((item, index) => `
@@ -4780,6 +4780,16 @@
           const reorderedItems = [...items];
           [reorderedItems[currentIndex], reorderedItems[targetIndex]] = [reorderedItems[targetIndex], reorderedItems[currentIndex]];
           items = reorderedItems;
+        }
+
+        function resetBoardView() {
+          currentFilter = "all";
+          currentBoardSearch = "";
+          const search = qs("#boardSearch");
+          if (search) search.value = "";
+          qsa("[data-filter]").forEach((filterButton) => filterButton.classList.toggle("active", filterButton.dataset.filter === "all"));
+          renderBoard();
+          search?.focus();
         }
 
         function setEditMode(itemId = "") {
@@ -5293,8 +5303,13 @@
 
         qs("#impactList").addEventListener("click", async (event) => {
           const button = event.target.closest("button");
+          if (!button) return;
+          if (button.dataset.resetBoardView) {
+            resetBoardView();
+            return;
+          }
           const card = event.target.closest("[data-id]");
-          if (!button || !card) return;
+          if (!card) return;
           if (button.dataset.openTool) {
             openItemTool(card.dataset.id, button.dataset.openTool);
             return;
