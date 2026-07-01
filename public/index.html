@@ -4645,6 +4645,25 @@
           status.textContent = `${action.item.title}: ${action.reason}`;
         }
 
+        function startRecommendedAction() {
+          const action = recommendNextAction();
+          if (!action) return;
+          const wasPlanned = action.item.status === "planned";
+          if (wasPlanned) {
+            items = items.map((item) => item.id === action.item.id ? { ...item, status: "active" } : item);
+            resetEmptyCurrentFilter();
+            saveItems();
+          }
+          setFocusMode(true);
+          openItemTool(action.item.id, action.tool);
+          const status = qs("#nextActionStatus");
+          if (status) {
+            status.textContent = wasPlanned
+              ? `${action.item.title} ist jetzt aktiv. Das passende Tool ist geoeffnet.`
+              : `${action.item.title}: Das passende Tool ist geoeffnet.`;
+          }
+        }
+
         function exportBoardCsv() {
           const status = qs("#exportBoardStatus");
           const { query, visibleItems } = getVisibleBoardItems();
@@ -5271,12 +5290,7 @@
         setFocusMode(focusMode);
         setBoardFormCollapsed(boardFormCollapsed, false);
         qs("#focusModeToggle")?.addEventListener("click", () => setFocusMode(!focusMode, true));
-        qs("#nextActionButton")?.addEventListener("click", () => {
-          const action = recommendNextAction();
-          if (!action) return;
-          setFocusMode(true);
-          openItemTool(action.item.id, action.tool);
-        });
+        qs("#nextActionButton")?.addEventListener("click", startRecommendedAction);
         qs("#exportBoardButton")?.addEventListener("click", exportBoardCsv);
         setActiveTool(activeTool, false);
         qsa("[data-app-tab]").forEach((tab) => {
