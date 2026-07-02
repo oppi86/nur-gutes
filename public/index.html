@@ -6094,7 +6094,9 @@
           if (!link || !link.classList.contains("missing")) return;
           event.preventDefault();
           qsa("[data-app-tab]").find((tab) => tab.dataset.appTab === "payments")?.click();
-          qs("#stripeForm input")?.focus();
+          const field = qs("#stripeForm")?.elements[link.dataset.payLink];
+          field?.scrollIntoView({ behavior: "smooth", block: "center" });
+          field?.focus();
         });
         qs("#shareChannel")?.addEventListener("change", (event) => {
           savedShareChannel = event.target.value;
