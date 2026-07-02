@@ -1141,6 +1141,7 @@
       .app-mode-control { display: grid; gap: 8px; margin-top: 18px; }
       .app-mode-toggle { width: 100%; border: 0; border-radius: 8px; background: #f9d65c; color: #20211d; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 12px 14px; }
       .app-mode-reset { width: 100%; border: 1px solid rgba(255,255,255,.28); border-radius: 8px; background: rgba(255,255,255,.1); color: white; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 12px 14px; }
+      .app-mode-reset:disabled { cursor: not-allowed; opacity: .55; }
       .app-mode-status { margin: 0; font-size: 13px; color: rgba(255,255,255,.8); }
       .app-workbench { border: 1px solid #e7e1d7; box-shadow: none; padding: 20px; }
       .tool-router { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: end; border: 1px solid #e7e1d7; border-radius: 8px; background: #f7f4ef; padding: 14px; margin-bottom: 14px; }
@@ -4847,16 +4848,32 @@
           const openDailySections = qsa(".legacy-daily-section.archive-visible").filter((section) => getComputedStyle(section).display !== "none").length;
           const resourceSections = qsa(".resource-section").length;
           const openResourceSections = qsa(".resource-section").filter((section) => getComputedStyle(section).display !== "none").length;
-          return { visibleSections, archivedDailySections, openDailySections, resourceSections, openResourceSections };
+          const hasOpenChrome = document.body.classList.contains("show-legacy")
+            || document.body.classList.contains("show-resources")
+            || dailyDetailsOpen
+            || Boolean(savedToolDetails.router)
+            || Boolean(savedToolDetails.tabs);
+          const isClean = focusMode && visibleSections <= 2 && openDailySections === 0 && openResourceSections === 0 && !hasOpenChrome;
+          return { visibleSections, archivedDailySections, openDailySections, resourceSections, openResourceSections, isClean };
         }
 
         function renderDashboardCompactness() {
           const status = qs("#dashboardCompactnessStatus");
-          if (!status) return;
-          const { visibleSections, archivedDailySections, openDailySections, resourceSections, openResourceSections } = getDashboardCompactness();
-          status.textContent = focusMode
-            ? `Kompakt: ${visibleSections} sichtbare Bereiche, ${archivedDailySections} Daily-Iterationen im Archiv, ${resourceSections} Ressourcen eingeklappt.`
-            : `Magazinansicht: ${visibleSections} Bereiche sichtbar, ${openDailySections} Archiv-Iterationen und ${openResourceSections} Ressourcen geoeffnet.`;
+          const resetButton = qs("#resetDashboardButton");
+          const { visibleSections, archivedDailySections, openDailySections, resourceSections, openResourceSections, isClean } = getDashboardCompactness();
+          if (status) {
+            status.textContent = focusMode
+              ? `Kompakt: ${visibleSections} sichtbare Bereiche, ${archivedDailySections} Daily-Iterationen im Archiv, ${resourceSections} Ressourcen eingeklappt.`
+              : `Magazinansicht: ${visibleSections} Bereiche sichtbar, ${openDailySections} Archiv-Iterationen und ${openResourceSections} Ressourcen geoeffnet.`;
+          }
+          if (resetButton) {
+            resetButton.disabled = isClean;
+            resetButton.textContent = isClean ? "Dashboard ist aufgeraeumt" : "Dashboard aufraeumen";
+            resetButton.title = isClean
+              ? "Dashboard ist bereits kompakt"
+              : "Archiv, Ressourcen, Details, Suche und Filter wieder kompakt setzen";
+            resetButton.setAttribute("aria-label", resetButton.title);
+          }
         }
 
         async function copyDashboardCompactness() {
@@ -5258,6 +5275,7 @@
           dailyDetailsOpen = Boolean(open);
           localStorage.setItem(dailyDetailsKey, String(dailyDetailsOpen));
           renderDailyIdea();
+          renderDashboardCompactness();
         }
 
         function addDailyIdeaToBoard() {
@@ -6349,6 +6367,7 @@
               [key]: detail.open
             };
             localStorage.setItem(toolDetailsKey, JSON.stringify(savedToolDetails));
+            renderDashboardCompactness();
           });
         });
         qs("#toolRouter")?.addEventListener("change", (event) => setQuickTask(event.target.value));
