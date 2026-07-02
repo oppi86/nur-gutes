@@ -4944,6 +4944,8 @@
           renderAll();
           const status = qs("#focusModeStatus");
           if (status) status.textContent = "Dashboard aufgeraeumt: Board kompakt, Suche und Filter zurueckgesetzt, nur Workspace sichtbar.";
+          const actionStatus = qs("#nextActionStatus");
+          if (actionStatus) actionStatus.textContent = "Dashboard aufgeraeumt: Board ist aktiv, alte Bereiche sind versteckt, naechste Aktion neu berechnet.";
           renderResumeWorkspaceButton();
           requestAnimationFrame(() => qs("#app")?.scrollIntoView({ behavior: "smooth", block: "start" }));
         }
