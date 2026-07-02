@@ -1336,6 +1336,7 @@
                 <button type="button" id="startDailyFocusButton" disabled>Fokus starten</button>
                 <button type="button" id="copyDailyFocusButton" disabled>Brief kopieren</button>
                 <button type="button" id="completeDailyFocusButton" disabled>Fertig markieren</button>
+                <button type="button" id="undoDailyFocusButton" disabled>Rueckgaengig</button>
                 <button type="button" id="clearDailyFocusButton" disabled>Fokus loesen</button>
               </div>
             </div>
@@ -4656,6 +4657,7 @@
         const removedItemsKey = "nurGutesRemovedDone";
         const dashboardFirstKey = "nurGutesDashboardFirst";
         const dailyFocusKey = "nurGutesDailyFocusItem";
+        const dailyFocusUndoKey = "nurGutesDailyFocusUndo";
         const quickTaskKey = "nurGutesQuickTask";
         const boardFilterKey = "nurGutesBoardFilter";
         const boardStatKey = "nurGutesBoardStat";
@@ -4696,18 +4698,18 @@
           }
         ];
         const dailyProductIdea = {
-          id: "daily-2026-07-03-focus-complete",
+          id: "daily-2026-07-03-focus-undo",
           date: "3. Juli 2026",
-          title: "Daily Focus Complete",
+          title: "Daily Focus Undo",
           category: "Business Idee",
-          amount: 35,
-          next: "Den Tagesfokus direkt im Dashboard als erledigt markieren",
-          text: "Die Website schliesst den Fokus-Workflow im ersten Screen: ein gespeicherter Fokus kann als fertig markiert werden, aktualisiert Metriken und verschwindet aus dem aktiven Fokus.",
-          revenueStream: "35-Euro Focus Workflow Setup",
-          dailyRevenue: "Ziel: erster 35-Euro Setup-Kauf fuer schnelleren Tagesabschluss",
-          userGrowth: "+1 Abschluss-Signal durch weniger Wechsel zwischen Tools",
+          amount: 29,
+          next: "Einen versehentlich erledigten Tagesfokus direkt wiederherstellen",
+          text: "Die Website macht den Fokusabschluss fehlertolerant: Nach Fertig markieren kann der letzte Fokus direkt im Dashboard zurueckgeholt werden.",
+          revenueStream: "29-Euro Focus Recovery Setup",
+          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer sichere Tagesfokus-Workflows",
+          userGrowth: "+1 Rueckkehrsignal durch weniger Angst vor Fehlklicks",
           socialStatus: "Postingtexte im Social-Tool vorbereitet; keine externen Connectoren autorisiert",
-          implementedFunction: "Tagesfokus als erledigt markieren, Board speichern, Metriken aktualisieren und Fokus loesen.",
+          implementedFunction: "Letzten abgeschlossenen Tagesfokus rueckgaengig machen und wieder als Fokus setzen.",
           reinvestment: "40% gute Taten, 25% bessere Fokus- und Workspace-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
         };
         const paymentLabels = {
@@ -4749,6 +4751,7 @@
         let selectedArchivePreviewTitle = "";
         let dashboardFirst = localStorage.getItem(dashboardFirstKey) !== "false";
         let dailyFocusItemId = localStorage.getItem(dailyFocusKey) || "";
+        let lastCompletedFocus = loadJson(dailyFocusUndoKey, null);
         if (localStorage.getItem(archiveOpenKey) === "true") localStorage.setItem(archiveOpenKey, "false");
         let quickTask = localStorage.getItem(quickTaskKey) || "auto";
         let currentFilter = ["all", "planned", "active", "done"].includes(localStorage.getItem(boardFilterKey)) ? localStorage.getItem(boardFilterKey) : "all";
@@ -5155,8 +5158,10 @@
           boardFocusLimitEnabled = true;
           boardCompact = true;
           dailyFocusItemId = "";
+          lastCompletedFocus = null;
           localStorage.setItem(boardFocusLimitKey, String(boardFocusLimitEnabled));
           localStorage.removeItem(dailyFocusKey);
+          localStorage.removeItem(dailyFocusUndoKey);
           dailyDetailsOpen = false;
           localStorage.setItem(compactBoardKey, String(boardCompact));
           localStorage.setItem(dailyDetailsKey, String(dailyDetailsOpen));
@@ -5397,6 +5402,7 @@
           const startButton = qs("#startDailyFocusButton");
           const copyButton = qs("#copyDailyFocusButton");
           const completeButton = qs("#completeDailyFocusButton");
+          const undoButton = qs("#undoDailyFocusButton");
           const clearButton = qs("#clearDailyFocusButton");
           const hasFocus = Boolean(item);
           if (title) title.textContent = item?.title || "Kein Fokus gesetzt";
@@ -5416,6 +5422,11 @@
           if (completeButton) {
             completeButton.disabled = !hasFocus || item.status === "done";
             completeButton.title = !hasFocus ? "Noch kein Tagesfokus gesetzt" : item.status === "done" ? "Tagesfokus ist bereits fertig" : "Tagesfokus als fertig markieren";
+          }
+          if (undoButton) {
+            const canUndo = Boolean(lastCompletedFocus?.id) && items.some((entry) => entry.id === lastCompletedFocus.id && entry.status === "done");
+            undoButton.disabled = !canUndo;
+            undoButton.title = canUndo ? "Letzten Fokusabschluss rueckgaengig machen" : "Kein abgeschlossener Tagesfokus zum Wiederherstellen";
           }
           if (clearButton) {
             clearButton.disabled = !hasFocus;
@@ -5469,13 +5480,35 @@
           const item = dailyFocusItem();
           const status = qs("#dailyFocusStatus");
           if (!item || item.status === "done") return;
+          lastCompletedFocus = { id: item.id, status: item.status || "planned", title: item.title || "Tagesfokus" };
           items = items.map((entry) => entry.id === item.id ? { ...entry, status: "done" } : entry);
           dailyFocusItemId = "";
           localStorage.removeItem(dailyFocusKey);
+          localStorage.setItem(dailyFocusUndoKey, JSON.stringify(lastCompletedFocus));
           resetEmptyCurrentFilter();
           saveItems();
           renderAll();
           if (status) status.textContent = `${item.title} wurde als fertig markiert.`;
+        }
+
+        function undoDailyFocusComplete() {
+          const status = qs("#dailyFocusStatus");
+          const undo = lastCompletedFocus;
+          if (!undo?.id) return;
+          const item = items.find((entry) => entry.id === undo.id);
+          if (!item || item.status !== "done") return;
+          const restoredStatus = ["planned", "active"].includes(undo.status) ? undo.status : "active";
+          items = items.map((entry) => entry.id === undo.id ? { ...entry, status: restoredStatus } : entry);
+          dailyFocusItemId = undo.id;
+          lastCompletedFocus = null;
+          localStorage.setItem(dailyFocusKey, dailyFocusItemId);
+          localStorage.removeItem(dailyFocusUndoKey);
+          currentFilter = "all";
+          currentStatKey = "revenue";
+          saveBoardView();
+          saveItems();
+          renderAll();
+          if (status) status.textContent = `${item.title} wurde wieder als Tagesfokus hergestellt.`;
         }
 
         function addDailyIdeaToBoard() {
@@ -6605,6 +6638,7 @@
         qs("#startDailyFocusButton")?.addEventListener("click", startDailyFocus);
         qs("#copyDailyFocusButton")?.addEventListener("click", copyDailyFocusBrief);
         qs("#completeDailyFocusButton")?.addEventListener("click", completeDailyFocus);
+        qs("#undoDailyFocusButton")?.addEventListener("click", undoDailyFocusComplete);
         qs("#clearDailyFocusButton")?.addEventListener("click", () => setDailyFocus(""));
         qs("#addDailyIdeaButton")?.addEventListener("click", addDailyIdeaToBoard);
         qs("#toggleDailyDetails")?.addEventListener("click", () => setDailyDetailsOpen(!dailyDetailsOpen));
