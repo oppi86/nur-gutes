@@ -4822,18 +4822,18 @@
           }
         ];
         const dailyProductIdea = {
-          id: "daily-2026-07-03-smart-preset",
+          id: "daily-2026-07-03-smart-reset",
           date: "3. Juli 2026",
-          title: "Smart Board Preset",
+          title: "Smart Board Reset",
           category: "Business Idee",
           amount: 29,
-          next: "Board-Preset-Verwaltung nur bei angepasster Ansicht anzeigen",
-          text: "Die Board-Preset-Verwaltung bleibt im Standard-Board verborgen und erscheint erst, wenn Suche, Filter, Sortierung oder Ansicht angepasst wurden oder bereits ein Preset gespeichert ist.",
-          revenueStream: "29-Euro Board Preset Setup",
-          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer schnellere Board-Arbeitsansichten",
-          userGrowth: "+1 Klarheits-Signal durch weniger Standard-Bedienelemente im Board",
+          next: "Board-Reset nur anzeigen, wenn die Ansicht angepasst ist",
+          text: "Der Reset-Button neben der Board-Suche ist im Standardzustand verborgen und erscheint erst, wenn Suche, Filter, Sortierung oder Listenmodus angepasst wurden.",
+          revenueStream: "29-Euro Board Reset Setup",
+          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer klarere Board-Suchflows",
+          userGrowth: "+1 Klarheits-Signal durch weniger deaktivierte Standard-Buttons",
           socialStatus: "Postingtexte im Social-Tool vorbereitet; keine externen Connectoren autorisiert",
-          implementedFunction: "Aktuelle Board-Ansicht auswerten, Preset-Drawer zustandsbasiert verstecken, speichern, laden und loeschen weiterhin unterstuetzen.",
+          implementedFunction: "Aktuelle Board-Ansicht auswerten, Reset-Button zustandsbasiert einblenden und die bestehende Reset-Aktion weiter ausloesen.",
           reinvestment: "40% gute Taten, 25% bessere Fokus- und Workspace-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
         };
         const paymentLabels = {
@@ -6081,6 +6081,7 @@
           const clearBoardSearch = qs("#clearBoardSearch");
           if (clearBoardSearch) {
             const boardViewIsDefault = query.length === 0 && currentFilter === "all" && currentBoardSort === "manual" && boardFocusLimitEnabled;
+            clearBoardSearch.hidden = boardViewIsDefault;
             clearBoardSearch.disabled = boardViewIsDefault;
             clearBoardSearch.title = boardViewIsDefault ? "Board-Ansicht ist bereits zurueckgesetzt" : "Suche, Filter, Sortierung und Listenmodus zuruecksetzen";
             clearBoardSearch.setAttribute("aria-label", clearBoardSearch.title);
