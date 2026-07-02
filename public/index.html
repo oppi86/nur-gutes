@@ -4564,6 +4564,7 @@
         const boardFilterKey = "nurGutesBoardFilter";
         const boardSearchKey = "nurGutesBoardSearch";
         const lastCopyKey = "nurGutesLastCopy";
+        const lastExportKey = "nurGutesLastExport";
         const seedItems = [
           {
             id: "seed-proof-1",
@@ -4678,7 +4679,7 @@
 
         function renderLastCopyStatus(copyState = loadJson(lastCopyKey, null)) {
           const status = qs("#exportBoardStatus");
-          if (!status || !copyState?.label || !copyState?.time) return;
+          if (!status || !copyState?.label || !copyState?.time) return false;
           const label = copyState.label;
           const time = copyState.time;
           const succeeded = Boolean(copyState.succeeded);
@@ -4687,6 +4688,23 @@
               ? `Zuletzt kopiert: ${label} um ${time}.`
               : `${label} konnte nicht automatisch kopiert werden; Text ist markiert.`;
           }
+          return true;
+        }
+
+        function rememberExport(label, count) {
+          const now = new Date();
+          const time = now.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
+          const exportState = { label, count: Number(count) || 0, time, createdAt: now.toISOString() };
+          localStorage.setItem(lastExportKey, JSON.stringify(exportState));
+          renderLastExportStatus(exportState);
+        }
+
+        function renderLastExportStatus(exportState = loadJson(lastExportKey, null)) {
+          const status = qs("#exportBoardStatus");
+          if (!status || !exportState?.label || !exportState?.time) return false;
+          const count = Number(exportState.count) || 0;
+          status.textContent = `Zuletzt exportiert: ${exportState.label} (${count} Eintraege) um ${exportState.time}.`;
+          return true;
         }
 
         function setupCopyButton(buttonSelector, outputSelector, copiedLabel, fallbackLabel, resetLabel) {
@@ -4909,7 +4927,7 @@
           link.click();
           link.remove();
           URL.revokeObjectURL(url);
-          if (status) status.textContent = `${visibleItems.length} sichtbare Eintraege als CSV vorbereitet.`;
+          rememberExport(scope === "alle" ? "Board CSV alle" : "Board CSV sichtbar", visibleItems.length);
         }
 
         async function copyBoardReport() {
@@ -5634,7 +5652,7 @@
 
         function renderAll() {
           renderStats();
-          renderLastCopyStatus();
+          if (!renderLastExportStatus()) renderLastCopyStatus();
           renderDailyIdea();
           renderNextAction();
           renderBoard();
