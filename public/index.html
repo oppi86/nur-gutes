@@ -1320,6 +1320,7 @@
             <div class="tool-router">
               <label>Was willst du jetzt tun?
                 <select id="toolRouter">
+                  <option value="auto">Empfohlene naechste Aktion</option>
                   <option value="board">Gute Tat oder Idee erfassen</option>
                   <option value="payments">Payment Links verbinden</option>
                   <option value="pitch">Pitch und Landing-Text bauen</option>
@@ -4630,7 +4631,7 @@
         let boardFormCollapsed = localStorage.getItem(boardFormCollapsedKey) !== "false";
         let dailyDetailsOpen = localStorage.getItem(dailyDetailsKey) === "true";
         let savedArchiveSearch = localStorage.getItem(archiveSearchKey) || "";
-        let quickTask = localStorage.getItem(quickTaskKey) || activeTool || "board";
+        let quickTask = localStorage.getItem(quickTaskKey) || "auto";
         let currentFilter = ["all", "planned", "active", "done"].includes(localStorage.getItem(boardFilterKey)) ? localStorage.getItem(boardFilterKey) : "all";
         let currentBoardSearch = localStorage.getItem(boardSearchKey) || "";
         let editingItemId = "";
@@ -5611,6 +5612,7 @@
         }
 
         const toolHints = {
+          auto: "Waehlt aus dem Board automatisch den sinnvollsten naechsten Arbeitsschritt.",
           board: "Erfasse oder priorisiere gute Taten, Business-Ideen und Selbstfindungsimpulse.",
           payments: "Verbinde echte Payment Links, damit gute Taten finanzierbar werden.",
           pitch: "Erstelle einen kurzen Pitch mit Ziel, Preis, Wirkung und naechstem Schritt.",
@@ -5621,19 +5623,32 @@
           share: "Bereite kurze Posting-Texte fuer externe Kanaele vor."
         };
         function setQuickTask(name, shouldPersist = true) {
-          const selectedName = qsa("[data-app-panel]").some((panel) => panel.dataset.appPanel === name) ? name : "board";
+          const selectedName = name === "auto" || qsa("[data-app-panel]").some((panel) => panel.dataset.appPanel === name) ? name : "auto";
           quickTask = selectedName;
           const router = qs("#toolRouter");
           const hint = qs("#toolRouterHint");
           if (router) router.value = selectedName;
-          if (hint) hint.textContent = `${toolHints[selectedName] || toolHints.board} Mit Starten oeffnest du den passenden Workspace.`;
+          if (hint) {
+            const action = selectedName === "auto" ? recommendNextAction() : null;
+            hint.textContent = action?.item
+              ? `Empfohlen: ${action.label} fuer "${action.item.title}". Mit Starten oeffnest du den passenden Workspace.`
+              : `${toolHints[selectedName] || toolHints.auto} Mit Starten oeffnest du den passenden Workspace.`;
+          }
           if (shouldPersist) localStorage.setItem(quickTaskKey, selectedName);
         }
         function startQuickTask() {
           setQuickTask(qs("#toolRouter")?.value || quickTask);
           setFocusMode(true);
           const action = recommendNextAction();
-          if (quickTask === "board") {
+          if (quickTask === "auto") {
+            if (action?.item) startAction(action);
+            else {
+              setActiveTool("board");
+              setBoardFormCollapsed(false);
+              renderAll();
+              requestAnimationFrame(() => qs("#impactTitle")?.focus());
+            }
+          } else if (quickTask === "board") {
             setActiveTool("board");
             setBoardFormCollapsed(false);
             renderAll();
@@ -5646,7 +5661,9 @@
             requestAnimationFrame(() => qs(`[data-app-panel="${quickTask}"]`)?.scrollIntoView({ behavior: "smooth", block: "start" }));
           }
           const hint = qs("#toolRouterHint");
-          if (hint) hint.textContent = `${toolHints[quickTask] || toolHints.board} Schnellstart gespeichert.`;
+          if (hint) hint.textContent = quickTask === "auto" && action?.item
+            ? `Empfohlen gestartet: ${action.label} fuer "${action.item.title}".`
+            : `${toolHints[quickTask] || toolHints.auto} Schnellstart gespeichert.`;
         }
         function setActiveTool(name, shouldPersist = true) {
           const selectedName = qsa("[data-app-panel]").some((panel) => panel.dataset.appPanel === name) ? name : "board";
