@@ -4577,6 +4577,7 @@
         const trustSettingsKey = "nurGutesTrustSettings";
         const monthlySettingsKey = "nurGutesMonthlySettings";
         const proofSettingsKey = "nurGutesProofSettings";
+        const secondSettingsKey = "nurGutesSecondGiftSettings";
         const seedItems = [
           {
             id: "seed-proof-1",
@@ -4652,6 +4653,7 @@
         let savedTrustSettings = loadJson(trustSettingsKey, {});
         let savedMonthlySettings = loadJson(monthlySettingsKey, {});
         let savedProofSettings = loadJson(proofSettingsKey, {});
+        let savedSecondSettings = loadJson(secondSettingsKey, {});
         let editingItemId = "";
         let lastRemovedItems = loadJson(removedItemsKey, []);
 
@@ -5856,6 +5858,15 @@
           const field = qs(selector);
           if (field && savedMonthlySettings[key]) field.value = savedMonthlySettings[key];
         });
+        const secondSettingSelectors = {
+          firstGift: "#secondFirstGift",
+          signal: "#secondSignal",
+          channel: "#secondChannel"
+        };
+        Object.entries(secondSettingSelectors).forEach(([key, selector]) => {
+          const field = qs(selector);
+          if (field && savedSecondSettings[key]) field.value = savedSecondSettings[key];
+        });
         qsa("[data-top-tool]").forEach((button) => {
           button.addEventListener("click", () => {
             activateToolShortcut(button.dataset.topTool);
@@ -6088,8 +6099,17 @@
         });
 
         ["#secondItem", "#secondFirstGift", "#secondSignal", "#secondChannel"].forEach((selector) => {
-          qs(selector).addEventListener("input", renderSecondGift);
-          qs(selector).addEventListener("change", renderSecondGift);
+          const updateSecondGift = () => {
+            savedSecondSettings = {
+              firstGift: qs("#secondFirstGift").value,
+              signal: qs("#secondSignal").value,
+              channel: qs("#secondChannel").value
+            };
+            localStorage.setItem(secondSettingsKey, JSON.stringify(savedSecondSettings));
+            renderSecondGift();
+          };
+          qs(selector).addEventListener("input", updateSecondGift);
+          qs(selector).addEventListener("change", updateSecondGift);
         });
 
         [
