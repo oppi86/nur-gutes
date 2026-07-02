@@ -1227,7 +1227,12 @@
       .board-preset button:first-child { background: #17332f; border-color: #17332f; color: white; }
       .board-preset button:disabled { cursor: not-allowed; opacity: .48; }
       .board-preset p { margin: 0; color: #575952; font-size: 13px; }
-      .board-undo { margin: -6px 0 14px; font-size: 13px; color: #575952; }
+      .board-maintenance { border: 1px solid #e7e1d7; border-radius: 8px; background: #fff; margin: 0 0 14px; overflow: hidden; }
+      .board-maintenance summary { cursor: pointer; color: #17332f; font-size: 13px; font-weight: 900; list-style-position: inside; padding: 10px 12px; }
+      .board-maintenance[open] summary { border-bottom: 1px solid #e7e1d7; }
+      .board-maintenance-body { display: grid; gap: 8px; padding: 10px; }
+      .board-maintenance-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+      .board-undo { margin: 0; font-size: 13px; color: #575952; }
       .app-actions-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 16px 0; }
       .app-filter { background: #f7f4ef; color: #575952; border: 1px solid #e7e1d7; }
       .app-filter.active { background: #17332f; color: white; border-color: #17332f; }
@@ -1507,10 +1512,17 @@
                 <button class="app-filter" type="button" data-filter="done">Fertig</button>
                 <button class="app-filter" type="button" id="compactBoardButton" aria-pressed="false">Kompakt</button>
                 <button class="app-filter" type="button" id="focusListButton" aria-pressed="true">Fokusliste</button>
-                <button class="app-filter" type="button" id="clearDoneButton" disabled>Fertige entfernen</button>
-                <button class="app-filter" type="button" id="restoreDoneButton" disabled>Entfernte wiederherstellen</button>
               </div>
-              <p class="board-undo" id="boardUndoStatus" aria-live="polite">Keine entfernten Eintraege.</p>
+              <details class="board-maintenance" id="boardMaintenanceMore">
+                <summary>Board-Pflege</summary>
+                <div class="board-maintenance-body">
+                  <div class="board-maintenance-actions">
+                    <button class="app-filter" type="button" id="clearDoneButton" disabled>Fertige entfernen</button>
+                    <button class="app-filter" type="button" id="restoreDoneButton" disabled>Entfernte wiederherstellen</button>
+                  </div>
+                  <p class="board-undo" id="boardUndoStatus" aria-live="polite">Keine entfernten Eintraege.</p>
+                </div>
+              </details>
               <div class="app-list" id="impactList"></div>
             </div>
 
@@ -4722,6 +4734,7 @@
         const boardSearchKey = "nurGutesBoardSearch";
         const boardSortKey = "nurGutesBoardSort";
         const boardFocusLimitKey = "nurGutesBoardFocusLimit";
+        const boardMaintenanceMoreKey = "nurGutesBoardMaintenanceMoreOpen";
         const boardPresetKey = "nurGutesBoardPreset";
         const boardPresetMoreKey = "nurGutesBoardPresetMoreOpen";
         const boardOutputMoreKey = "nurGutesBoardOutputMoreOpen";
@@ -4759,18 +4772,18 @@
           }
         ];
         const dailyProductIdea = {
-          id: "daily-2026-07-03-board-preset-drawer",
+          id: "daily-2026-07-03-board-maintenance-drawer",
           date: "3. Juli 2026",
-          title: "Board Preset Drawer",
+          title: "Board Maintenance Drawer",
           category: "Business Idee",
           amount: 29,
-          next: "Board-Ansichtspresets in ein gespeichertes Menue verlegen",
-          text: "Die Website haelt Suche, Sortierung und Status sichtbar, legt aber Ansicht merken, Laden und Loeschen in ein gespeichertes Board-Preset-Menue.",
-          revenueStream: "29-Euro Board Workflow Setup",
-          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer wiederverwendbare Board-Ansichten",
-          userGrowth: "+1 Wiederkehrsignal durch gespeicherte Board-Arbeitsansicht",
+          next: "Board-Pflegeaktionen aus der Filterleiste in ein gespeichertes Menue verlegen",
+          text: "Die Website haelt Statusfilter, Kompaktmodus und Fokusliste direkt sichtbar, legt aber Fertige entfernen und Wiederherstellen in ein gespeichertes Board-Pflege-Menue.",
+          revenueStream: "29-Euro Board Cleanup Setup",
+          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer sauberere Board-Pflege",
+          userGrowth: "+1 Arbeitsfluss-Signal durch weniger Filterleisten-Komplexitaet",
           socialStatus: "Postingtexte im Social-Tool vorbereitet; keine externen Connectoren autorisiert",
-          implementedFunction: "Board-Preset-Menue einklappen, oeffnen, speichern und nach Reload wiederherstellen.",
+          implementedFunction: "Board-Pflege-Menue einklappen, oeffnen, speichern und nach Reload wiederherstellen.",
           reinvestment: "40% gute Taten, 25% bessere Fokus- und Workspace-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
         };
         const paymentLabels = {
@@ -4826,6 +4839,7 @@
         let currentBoardSearch = localStorage.getItem(boardSearchKey) || "";
         let currentBoardSort = boardSortOptions.includes(localStorage.getItem(boardSortKey)) ? localStorage.getItem(boardSortKey) : "manual";
         let boardFocusLimitEnabled = localStorage.getItem(boardFocusLimitKey) !== "false";
+        let boardMaintenanceMoreOpen = localStorage.getItem(boardMaintenanceMoreKey) === "true";
         let boardPresetMoreOpen = localStorage.getItem(boardPresetMoreKey) === "true";
         let boardOutputMoreOpen = localStorage.getItem(boardOutputMoreKey) === "true";
         let dashboardActionsMoreOpen = localStorage.getItem(dashboardActionsMoreKey) === "true";
@@ -5628,6 +5642,11 @@
           localStorage.setItem(boardPresetMoreKey, String(boardPresetMoreOpen));
         }
 
+        function setBoardMaintenanceMoreOpen(open) {
+          boardMaintenanceMoreOpen = Boolean(open);
+          localStorage.setItem(boardMaintenanceMoreKey, String(boardMaintenanceMoreOpen));
+        }
+
         function setDashboardActionsMoreOpen(open) {
           dashboardActionsMoreOpen = Boolean(open);
           localStorage.setItem(dashboardActionsMoreKey, String(dashboardActionsMoreOpen));
@@ -5874,6 +5893,8 @@
           const sort = qs("#boardSort");
           if (sort && sort.value !== currentBoardSort) sort.value = currentBoardSort;
           const doneCount = items.filter((item) => item.status === "done").length;
+          const boardMaintenanceMore = qs("#boardMaintenanceMore");
+          if (boardMaintenanceMore && boardMaintenanceMore.open !== boardMaintenanceMoreOpen) boardMaintenanceMore.open = boardMaintenanceMoreOpen;
           const clearDoneButton = qs("#clearDoneButton");
           if (clearDoneButton) {
             clearDoneButton.disabled = doneCount === 0;
@@ -6974,6 +6995,7 @@
         qsa("[data-stat-filter]").forEach((button) => {
           button.addEventListener("click", () => applyBoardFilter(button.dataset.statFilter, true, button.dataset.statKey));
         });
+        qs("#boardMaintenanceMore")?.addEventListener("toggle", (event) => setBoardMaintenanceMoreOpen(event.target.open));
         qs("#clearDoneButton")?.addEventListener("click", () => {
           const before = items.length;
           lastRemovedItems = items.filter((item) => item.status === "done");
