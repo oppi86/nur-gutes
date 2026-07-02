@@ -5043,21 +5043,20 @@
         }
 
         function visibleBoardReport() {
-          const { query, visibleItems } = getVisibleBoardItems();
-          const revenue = visibleItems.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+          const { outputItems, scope } = getBoardOutputItems();
+          const revenue = outputItems.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
           const impact = revenue * 0.4;
-          const scope = currentFilter === "all" && !query ? "Gesamtes Board" : `Aktuelle Ansicht: ${currentFilter}${query ? ` / Suche "${currentBoardSearch.trim()}"` : ""}`;
           return [
             `Nur Gutes Board-Report - ${scope}`,
             "",
-            `Eintraege: ${visibleItems.length}`,
+            `Eintraege: ${outputItems.length}`,
             `Revenue-Ziel: ${money(revenue)}`,
             `Impact-Anteil 40%: ${money(impact)}`,
             "",
             "Naechste Schritte:",
-            ...(visibleItems.length ? visibleItems.map((item, index) => (
+            ...(outputItems.length ? outputItems.map((item, index) => (
               `${index + 1}. ${item.title} [${item.status}] - ${money(item.amount)} - ${item.next || "Naechsten Schritt klaeren"}`
-            )) : ["Keine sichtbaren Board-Eintraege."]),
+            )) : ["Keine Board-Eintraege in diesem Ausgabeumfang."]),
             "",
             "Reinvestition: 40% gute Taten, 25% bessere Algorithmen und Automatisierung, 20% Growth/Marketing, 15% Betrieb und Qualitaet."
           ].join("\n");
@@ -5065,13 +5064,13 @@
 
         function exportBoardCsv() {
           const status = qs("#exportBoardStatus");
-          const { query, visibleItems } = getVisibleBoardItems();
-          if (!visibleItems.length) {
-            if (status) status.textContent = "Keine sichtbaren Board-Eintraege zum Exportieren.";
+          const { query, outputItems, hiddenFocusCount } = getBoardOutputItems();
+          if (!outputItems.length) {
+            if (status) status.textContent = "Keine Board-Eintraege in diesem Ausgabeumfang zum Exportieren.";
             return;
           }
           const header = ["Titel", "Kategorie", "Status", "Revenue EUR", "Impact EUR", "Naechster Schritt", "Beschreibung", "Erstellt am"];
-          const rows = visibleItems.map((item) => [
+          const rows = outputItems.map((item) => [
             item.title,
             item.category,
             item.status,
@@ -5086,25 +5085,25 @@
           const url = URL.createObjectURL(blob);
           const link = document.createElement("a");
           link.href = url;
-          const scope = currentFilter === "all" && !query ? "alle" : "sichtbar";
+          const scope = hiddenFocusCount ? "fokus" : currentFilter === "all" && !query ? "alle" : "sichtbar";
           link.download = `nur-gutes-board-${scope}-${new Date().toISOString().slice(0, 10)}.csv`;
           document.body.appendChild(link);
           link.click();
           link.remove();
           URL.revokeObjectURL(url);
-          rememberExport(scope === "alle" ? "Board CSV alle" : "Board CSV sichtbar", visibleItems.length);
+          rememberExport(scope === "fokus" ? "Board CSV Fokusliste" : scope === "alle" ? "Board CSV alle" : "Board CSV sichtbar", outputItems.length);
         }
 
         async function copyBoardReport() {
           const status = qs("#exportBoardStatus");
-          const { visibleItems } = getVisibleBoardItems();
-          if (!visibleItems.length) {
-            if (status) status.textContent = "Keine sichtbaren Board-Eintraege zum Kopieren.";
+          const { outputItems, hiddenFocusCount } = getBoardOutputItems();
+          if (!outputItems.length) {
+            if (status) status.textContent = "Keine Board-Eintraege in diesem Ausgabeumfang zum Kopieren.";
             return;
           }
           const copied = await copyText(visibleBoardReport());
-          rememberCopy("Board-Report", copied);
-          if (status) status.textContent = copied ? `${visibleItems.length} sichtbare Eintraege als Board-Report kopiert.` : "Board-Report markiert; manuelles Kopieren pruefen.";
+          rememberCopy(hiddenFocusCount ? "Board-Report Fokusliste" : "Board-Report", copied);
+          if (status) status.textContent = copied ? `${outputItems.length} ${hiddenFocusCount ? "Fokus-" : ""}Eintraege als Board-Report kopiert.` : "Board-Report markiert; manuelles Kopieren pruefen.";
         }
 
         function renderStats() {
@@ -5225,6 +5224,16 @@
           return { query, filteredItems, visibleItems };
         }
 
+        function getBoardOutputItems() {
+          const { query, filteredItems, visibleItems } = getVisibleBoardItems();
+          const outputItems = boardFocusLimitEnabled ? visibleItems.slice(0, boardFocusLimit) : visibleItems;
+          const hiddenFocusCount = Math.max(0, visibleItems.length - outputItems.length);
+          const scope = hiddenFocusCount
+            ? `Fokusliste: ${outputItems.length} von ${visibleItems.length} passenden Eintraegen`
+            : currentFilter === "all" && !query ? "Gesamtes Board" : `Aktuelle Ansicht: ${currentFilter}${query ? ` / Suche "${currentBoardSearch.trim()}"` : ""}`;
+          return { query, filteredItems, visibleItems, outputItems, hiddenFocusCount, scope };
+        }
+
         function renderBoard() {
           const list = qs("#impactList");
           const { query, filteredItems, visibleItems } = getVisibleBoardItems();
@@ -5294,17 +5303,18 @@
           }
           const exportBoardButton = qs("#exportBoardButton");
           const copyBoardReportButton = qs("#copyBoardReportButton");
+          const outputCount = boardFocusLimitEnabled ? displayedItems.length : visibleItems.length;
           [exportBoardButton, copyBoardReportButton].filter(Boolean).forEach((button) => {
-            button.disabled = visibleItems.length === 0;
+            button.disabled = outputCount === 0;
             const action = button.id === "exportBoardButton" ? "Export" : "Board-Report";
-            button.title = visibleItems.length ? `${action} fuer ${visibleItems.length} sichtbare Eintraege` : `${action} nicht verfuegbar: keine sichtbaren Eintraege`;
+            button.title = outputCount ? `${action} fuer ${outputCount} ${hiddenFocusCount ? "Fokus-" : ""}Eintraege` : `${action} nicht verfuegbar: keine Eintraege in diesem Ausgabeumfang`;
             button.setAttribute("aria-label", button.title);
           });
           const exportStatus = qs("#exportBoardStatus");
           if (exportStatus) {
-            exportStatus.textContent = visibleItems.length
-              ? `${visibleItems.length} sichtbare Eintraege bereit fuer Export oder Board-Report.`
-              : "Keine sichtbaren Board-Eintraege fuer Export oder Board-Report.";
+            exportStatus.textContent = outputCount
+              ? `${outputCount} ${hiddenFocusCount ? `Fokus-Eintraege von ${visibleItems.length} passenden` : "Eintraege"} bereit fuer Export oder Board-Report.`
+              : "Keine Board-Eintraege in diesem Ausgabeumfang fuer Export oder Board-Report.";
           }
           const clearBoardSearch = qs("#clearBoardSearch");
           if (clearBoardSearch) {
