@@ -4897,6 +4897,7 @@
             `Geoeffnete Archiv-Iterationen: ${openDailySections}`,
             `Ressourcen eingeklappt: ${Math.max(0, resourceSections - openResourceSections)} von ${resourceSections}`,
             `Board-Ansicht angepasst: ${hasBoardDrift ? "ja" : "nein"}`,
+            `Schnellstart: ${quickTask === "auto" ? "Empfohlene naechste Aktion" : activeToolLabel(quickTask)}`,
             "Ziel: erster Screen bleibt Workspace, maximal 3 Top-Tools sichtbar, Daily-Idee kompakt, Archiv statt endloser Feed."
           ].join("\n");
           const copied = await copyText(text);
@@ -6190,6 +6191,7 @@
           if (selectedName === "auto") syncAutoRouterHint();
           else if (hint) hint.textContent = `${toolHints[selectedName] || toolHints.auto} Mit Starten oeffnest du den passenden Workspace.`;
           if (shouldPersist) localStorage.setItem(quickTaskKey, selectedName);
+          renderDashboardCompactness();
         }
         function startQuickTask() {
           setQuickTask(qs("#toolRouter")?.value || quickTask);
