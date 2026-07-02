@@ -1112,7 +1112,8 @@
       .app-shell { display: grid; grid-template-columns: .82fr 1.18fr; gap: 24px; align-items: start; }
       .app-intro { background: #17332f; color: white; border: 1px solid rgba(255,255,255,.18); box-shadow: none; padding: 28px; }
       .app-intro .muted { color: rgba(255,255,255,.78); }
-      .app-status { display: inline-flex; border-radius: 999px; background: #f9d65c; color: #20211d; padding: 8px 12px; font-size: 12px; font-weight: 900; text-transform: uppercase; }
+      .app-status { display: inline-flex; border: 0; border-radius: 999px; background: #f9d65c; color: #20211d; cursor: pointer; font: inherit; padding: 8px 12px; font-size: 12px; font-weight: 900; text-transform: uppercase; }
+      .app-status:hover, .app-status:focus-visible { outline: 2px solid rgba(249,214,92,.85); outline-offset: 3px; }
       .app-stats { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; margin-top: 20px; }
       .app-stats button { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); border-radius: 8px; color: white; cursor: pointer; font: inherit; padding: 16px; text-align: left; }
       .app-stats button:hover, .app-stats button:focus-visible { background: rgba(255,255,255,.16); outline: 2px solid rgba(249,214,92,.8); outline-offset: 2px; }
@@ -1355,7 +1356,7 @@
         </div>
         <div class="wrap app-shell">
           <article class="app-intro">
-            <p class="app-status" id="stripeStatus">Stripe Payment Links nicht verbunden</p>
+            <button class="app-status" type="button" id="stripeStatus">Stripe Payment Links nicht verbunden</button>
             <h2>Impact Workspace</h2>
             <p class="muted">Plane gute Taten, mache daraus bezahlbare Angebote, speichere den Fortschritt im Browser und teile sofort klare naechste Schritte.</p>
             <div class="app-stats">
@@ -4789,18 +4790,18 @@
           }
         ];
         const dailyProductIdea = {
-          id: "daily-2026-07-03-reinvestment-drawer",
+          id: "daily-2026-07-03-stripe-status-shortcut",
           date: "3. Juli 2026",
-          title: "Reinvestment Drawer",
+          title: "Stripe Status Shortcut",
           category: "Business Idee",
           amount: 29,
-          next: "Reinvestitionshinweis als gespeichertes Menue anzeigen",
-          text: "Die Website dokumentiert Reinvestition weiterhin sichtbar, reduziert aber den permanenten Textblock im Dashboard auf ein gespeichertes Reinvestitionsmenue.",
-          revenueStream: "29-Euro Dashboard Clarity Setup",
-          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer klarere Impact-Kommunikation",
-          userGrowth: "+1 Verstaendnis-Signal durch weniger Textflaeche im ersten Screen",
+          next: "Stripe-Status als direkten Payment-Link-Shortcut nutzen",
+          text: "Die Website verwandelt den Stripe-Status im Dashboard von statischem Hinweis in einen klickbaren Shortcut zum Payment-Link-Tool.",
+          revenueStream: "29-Euro Payment Setup Shortcut",
+          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf durch schnelleren Payment-Link-Start",
+          userGrowth: "+1 Monetarisierungs-Signal durch weniger Suchweg zum Zahlungssetup",
           socialStatus: "Postingtexte im Social-Tool vorbereitet; keine externen Connectoren autorisiert",
-          implementedFunction: "Reinvestitionsmenue einklappen, oeffnen, speichern und nach Reload wiederherstellen.",
+          implementedFunction: "Stripe-Status klickbar machen und direkt das Payment-Link-Tool starten.",
           reinvestment: "40% gute Taten, 25% bessere Fokus- und Workspace-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
         };
         const paymentLabels = {
@@ -6802,6 +6803,7 @@
         setFocusMode(focusMode);
         setBoardFormCollapsed(boardFormCollapsed, false);
         qs("#focusModeToggle")?.addEventListener("click", () => setFocusMode(!focusMode, true));
+        qs("#stripeStatus")?.addEventListener("click", () => activateToolShortcut("payments"));
         qs("#dashboardFirstToggle")?.addEventListener("click", () => setDashboardFirst(!dashboardFirst));
         qs("#dashboardActionsMore")?.addEventListener("toggle", (event) => setDashboardActionsMoreOpen(event.target.open));
         qs("#resumeWorkspaceButton")?.addEventListener("click", resumeLastWorkspace);
