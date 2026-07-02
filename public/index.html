@@ -1142,8 +1142,13 @@
       .app-focus-secondary button { flex: 1 1 140px; }
       .app-export { display: grid; gap: 8px; margin-top: 18px; }
       .app-export button { width: 100%; border: 1px solid rgba(255,255,255,.3); border-radius: 8px; background: rgba(255,255,255,.1); color: white; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 12px 14px; }
+      .app-export > button:first-child { background: #f9d65c; border-color: #f9d65c; color: #20211d; }
       .app-export button:disabled { cursor: not-allowed; opacity: .5; }
       .app-export p { margin: 0; font-size: 13px; color: rgba(255,255,255,.8); }
+      .app-export-more { border: 1px solid rgba(255,255,255,.18); border-radius: 8px; overflow: hidden; }
+      .app-export-more summary { cursor: pointer; color: rgba(255,255,255,.88); font-size: 13px; font-weight: 900; list-style-position: inside; padding: 10px 12px; }
+      .app-export-more[open] summary { border-bottom: 1px solid rgba(255,255,255,.14); }
+      .app-export-secondary { padding: 10px; }
       .app-daily { border: 1px solid rgba(255,255,255,.2); border-radius: 8px; background: rgba(255,255,255,.1); margin-top: 18px; padding: 16px; }
       .app-daily h3 { color: white; font-size: 20px; margin: 4px 0 8px; }
       .app-daily p { color: rgba(255,255,255,.82); font-size: 13px; margin: 0; }
@@ -1362,7 +1367,12 @@
             </div>
             <div class="app-export">
               <button type="button" id="exportBoardButton">Board als CSV exportieren</button>
-              <button type="button" id="copyBoardReportButton">Board-Report kopieren</button>
+              <details class="app-export-more" id="boardOutputMore">
+                <summary>Weitere Ausgabe</summary>
+                <div class="app-export-secondary">
+                  <button type="button" id="copyBoardReportButton">Board-Report kopieren</button>
+                </div>
+              </details>
               <p id="exportBoardStatus" aria-live="polite">Export fuer Sheets, CRM oder Partner-Reporting.</p>
             </div>
             <article class="app-daily" id="dailyIdeaCard" aria-labelledby="dailyIdeaTitle">
@@ -4687,6 +4697,7 @@
         const boardSortKey = "nurGutesBoardSort";
         const boardFocusLimitKey = "nurGutesBoardFocusLimit";
         const boardPresetKey = "nurGutesBoardPreset";
+        const boardOutputMoreKey = "nurGutesBoardOutputMoreOpen";
         const toolDetailsKey = "nurGutesToolDetails";
         const lastCopyKey = "nurGutesLastCopy";
         const lastExportKey = "nurGutesLastExport";
@@ -4720,18 +4731,18 @@
           }
         ];
         const dailyProductIdea = {
-          id: "daily-2026-07-03-focus-action-drawer",
+          id: "daily-2026-07-03-output-action-drawer",
           date: "3. Juli 2026",
-          title: "Daily Focus Action Drawer",
+          title: "Board Output Action Drawer",
           category: "Business Idee",
           amount: 29,
-          next: "Sekundaere Fokusaktionen einklappen und den Aktionszustand speichern",
-          text: "Die Website zeigt im Tagesfokus nur noch die wichtigste Handlung sofort und legt Brief, Abschluss, Rueckgaengig und Loesen in ein gespeichertes Aktionsmenue.",
-          revenueStream: "29-Euro Focus Workflow Setup",
-          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer einen klareren Tagesworkflow",
-          userGrowth: "+1 Rueckkehrsignal durch weniger sichtbare Komplexitaet",
+          next: "Board-Ausgaben in Primaerexport und gespeichertes Zusatzmenue aufteilen",
+          text: "Die Website zeigt im Dashboard nur noch den wichtigsten Board-Export direkt und legt den Board-Report in ein gespeichertes Ausgabemenue.",
+          revenueStream: "29-Euro Board Output Setup",
+          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer klarere Reporting-Ausgaben",
+          userGrowth: "+1 Export- oder Reporting-Signal durch weniger sichtbare Komplexitaet",
           socialStatus: "Postingtexte im Social-Tool vorbereitet; keine externen Connectoren autorisiert",
-          implementedFunction: "Fokus-Aktionsmenue einklappen, oeffnen, speichern und nach Reload wiederherstellen.",
+          implementedFunction: "Board-Ausgabemenue einklappen, oeffnen, speichern und nach Reload wiederherstellen.",
           reinvestment: "40% gute Taten, 25% bessere Fokus- und Workspace-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
         };
         const paymentLabels = {
@@ -4786,6 +4797,7 @@
         let currentBoardSearch = localStorage.getItem(boardSearchKey) || "";
         let currentBoardSort = boardSortOptions.includes(localStorage.getItem(boardSortKey)) ? localStorage.getItem(boardSortKey) : "manual";
         let boardFocusLimitEnabled = localStorage.getItem(boardFocusLimitKey) !== "false";
+        let boardOutputMoreOpen = localStorage.getItem(boardOutputMoreKey) === "true";
         let savedBoardPreset = loadJson(boardPresetKey, null);
         let savedToolDetails = loadJson(toolDetailsKey, {});
         let savedPitchChannel = localStorage.getItem(pitchChannelKey) || "daily-growth";
@@ -5566,6 +5578,11 @@
           localStorage.setItem(dailyFocusActionsOpenKey, String(dailyFocusActionsOpen));
         }
 
+        function setBoardOutputMoreOpen(open) {
+          boardOutputMoreOpen = Boolean(open);
+          localStorage.setItem(boardOutputMoreKey, String(boardOutputMoreOpen));
+        }
+
         function addDailyIdeaToBoard() {
           const existing = items.some((item) => item.id === dailyProductIdea.id);
           if (!existing) {
@@ -5778,7 +5795,9 @@
           renderBoardPreset();
           const exportBoardButton = qs("#exportBoardButton");
           const copyBoardReportButton = qs("#copyBoardReportButton");
+          const boardOutputMore = qs("#boardOutputMore");
           const outputCount = boardFocusLimitEnabled ? displayedItems.length : visibleItems.length;
+          if (boardOutputMore && boardOutputMore.open !== boardOutputMoreOpen) boardOutputMore.open = boardOutputMoreOpen;
           [exportBoardButton, copyBoardReportButton].filter(Boolean).forEach((button) => {
             button.disabled = outputCount === 0;
             const action = button.id === "exportBoardButton" ? "Export" : "Board-Report";
@@ -6701,6 +6720,7 @@
         qs("#toggleDailyDetails")?.addEventListener("click", () => setDailyDetailsOpen(!dailyDetailsOpen));
         qs("#exportBoardButton")?.addEventListener("click", exportBoardCsv);
         qs("#copyBoardReportButton")?.addEventListener("click", copyBoardReport);
+        qs("#boardOutputMore")?.addEventListener("toggle", (event) => setBoardOutputMoreOpen(event.target.open));
         setActiveTool(activeTool, false);
         setQuickTask(quickTask, false);
         const pitchChannelInput = qs("#pitchChannel");
