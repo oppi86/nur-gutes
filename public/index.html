@@ -5039,18 +5039,18 @@
                 <button type="button" data-status="active" aria-pressed="${item.status === "active"}" class="${item.status === "active" ? "current-status" : ""}" ${item.status === "active" ? "disabled" : ""}>Aktiv</button>
                 <button type="button" data-status="done" aria-pressed="${item.status === "done"}" class="${item.status === "done" ? "current-status" : ""}" ${item.status === "done" ? "disabled" : ""}>Fertig</button>
                 <button type="button" data-start-item="true" ${item.status === "done" ? "disabled" : ""}>Starten</button>
-                <button type="button" data-edit="true">Bearbeiten</button>
-                <button type="button" data-delete="true">Loeschen</button>
               </div>
               <details class="app-card-actions">
                 <summary>Weitere Aktionen</summary>
                 <div class="app-card-action-menu">
+                  <button type="button" data-edit="true">Bearbeiten</button>
                   <button type="button" data-open-tool="pitch">Pitch</button>
                   <button type="button" data-open-tool="proof">Proof</button>
                   <button type="button" data-open-tool="monthly">Monthly</button>
                   <button type="button" data-copy-item="true">Kopieren</button>
                   <button type="button" data-move="up" ${index === 0 ? "disabled" : ""}>Hoch</button>
                   <button type="button" data-move="down" ${index === visibleItems.length - 1 ? "disabled" : ""}>Runter</button>
+                  <button type="button" data-delete="true">Loeschen</button>
                 </div>
               </details>
             </article>
