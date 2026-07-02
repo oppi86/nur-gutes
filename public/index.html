@@ -1127,6 +1127,12 @@
       .app-next-action { display: grid; gap: 8px; margin-top: 18px; }
       .app-next-action button { width: 100%; border: 0; border-radius: 8px; background: #fff; color: #17332f; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 12px 14px; }
       .app-next-action p { margin: 0; font-size: 13px; color: rgba(255,255,255,.8); }
+      .app-next-more { border: 1px solid rgba(255,255,255,.18); border-radius: 8px; overflow: hidden; }
+      .app-next-more summary { cursor: pointer; color: rgba(255,255,255,.88); font-size: 13px; font-weight: 900; list-style-position: inside; padding: 10px 12px; }
+      .app-next-more[open] summary { border-bottom: 1px solid rgba(255,255,255,.14); }
+      .app-next-secondary { padding: 10px; }
+      .app-next-secondary button { background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.28); color: white; }
+      .app-next-secondary button:disabled { cursor: not-allowed; opacity: .55; }
       .app-focus-card { border: 1px solid rgba(255,255,255,.2); border-radius: 8px; background: rgba(255,255,255,.1); display: grid; gap: 10px; margin-top: 18px; padding: 14px; }
       .app-focus-card strong { color: #f9d65c; display: block; font-size: 17px; line-height: 1.2; }
       .app-focus-card p { color: rgba(255,255,255,.82); font-size: 13px; margin: 0; }
@@ -1376,6 +1382,12 @@
             </details>
             <div class="app-next-action">
               <button type="button" id="nextActionButton">Naechste Aktion starten</button>
+              <details class="app-next-more" id="nextActionMore">
+                <summary>Aktionsbriefing</summary>
+                <div class="app-next-secondary">
+                  <button type="button" id="copyNextActionButton">Naechste Aktion kopieren</button>
+                </div>
+              </details>
               <p id="nextActionStatus" aria-live="polite">Der Launcher waehlt den sinnvollsten naechsten Tool-Schritt.</p>
             </div>
             <div class="app-focus-card" aria-label="Tagesfokus">
@@ -4765,6 +4777,7 @@
         const boardOutputMoreKey = "nurGutesBoardOutputMoreOpen";
         const dashboardActionsMoreKey = "nurGutesDashboardActionsMoreOpen";
         const statsMoreKey = "nurGutesStatsMoreOpen";
+        const nextActionMoreKey = "nurGutesNextActionMoreOpen";
         const toolAccessMoreKey = "nurGutesToolAccessMoreOpen";
         const reinvestmentMoreKey = "nurGutesReinvestmentMoreOpen";
         const toolDetailsKey = "nurGutesToolDetails";
@@ -4800,18 +4813,18 @@
           }
         ];
         const dailyProductIdea = {
-          id: "daily-2026-07-03-stats-drawer",
+          id: "daily-2026-07-03-next-action-copy",
           date: "3. Juli 2026",
-          title: "Dashboard Stats Drawer",
+          title: "Next Action Copy",
           category: "Business Idee",
           amount: 29,
-          next: "Dashboard-Kennzahlen auf eine Primaerkachel reduzieren",
-          text: "Die Website zeigt im Dashboard nur die aktive Arbeitslast direkt und legt Revenue, Impact und abgeschlossene Eintraege in ein gespeichertes Kennzahlenmenue.",
-          revenueStream: "29-Euro Dashboard Metrics Setup",
-          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer klarere Kennzahlenfuehrung",
-          userGrowth: "+1 Fokus-Signal durch weniger Kennzahlenflaeche im ersten Screen",
+          next: "Empfohlene naechste Aktion als kurzes Briefing kopieren",
+          text: "Der Action-Launcher kann die aktuell empfohlene Board-Aktion als kompaktes Arbeitsbriefing kopieren, ohne eine neue Startseiten-Sektion zu erzeugen.",
+          revenueStream: "29-Euro Action Brief Setup",
+          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer schnellere Team-Uebergaben",
+          userGrowth: "+1 Share-Signal durch kopierbare Next-Action-Briefs",
           socialStatus: "Postingtexte im Social-Tool vorbereitet; keine externen Connectoren autorisiert",
-          implementedFunction: "Kennzahlenmenue einklappen, oeffnen, speichern und Filterklicks weiter unterstuetzen.",
+          implementedFunction: "Empfohlene naechste Aktion berechnen, als Briefing kopieren, Kopierstatus speichern und Drawer-Zustand merken.",
           reinvestment: "40% gute Taten, 25% bessere Fokus- und Workspace-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
         };
         const paymentLabels = {
@@ -4872,6 +4885,7 @@
         let boardOutputMoreOpen = localStorage.getItem(boardOutputMoreKey) === "true";
         let dashboardActionsMoreOpen = localStorage.getItem(dashboardActionsMoreKey) === "true";
         let statsMoreOpen = localStorage.getItem(statsMoreKey) === "true";
+        let nextActionMoreOpen = localStorage.getItem(nextActionMoreKey) === "true";
         let toolAccessMoreOpen = localStorage.getItem(toolAccessMoreKey) === "true";
         let reinvestmentMoreOpen = localStorage.getItem(reinvestmentMoreKey) === "true";
         let savedBoardPreset = loadJson(boardPresetKey, null);
@@ -5043,6 +5057,7 @@
           const hasOpenChrome = document.body.classList.contains("show-legacy")
             || document.body.classList.contains("show-resources")
             || dailyDetailsOpen
+            || nextActionMoreOpen
             || toolAccessMoreOpen
             || Boolean(savedToolDetails.router)
             || Boolean(savedToolDetails.tabs);
@@ -5118,13 +5133,16 @@
           archiveSearchMode = false;
           selectedArchivePreviewTitle = "";
           dailyDetailsOpen = false;
+          nextActionMoreOpen = false;
           savedToolDetails = { router: false, tabs: false };
           document.body.classList.remove("show-legacy");
           document.body.classList.remove("show-resources");
           qsa(".legacy-daily-section.archive-visible").forEach((section) => section.classList.remove("archive-visible"));
           localStorage.setItem(archiveOpenKey, String(archiveOpen));
           localStorage.setItem(dailyDetailsKey, String(dailyDetailsOpen));
+          localStorage.setItem(nextActionMoreKey, String(nextActionMoreOpen));
           localStorage.setItem(toolDetailsKey, JSON.stringify(savedToolDetails));
+          qs("#nextActionMore")?.removeAttribute("open");
           qs(".tool-router-details")?.removeAttribute("open");
           qs(".tool-tabs")?.removeAttribute("open");
           qs("#dailyIdeaCard")?.classList.add("daily-details-collapsed");
@@ -5194,12 +5212,25 @@
           const action = recommendNextAction();
           const button = qs("#nextActionButton");
           const status = qs("#nextActionStatus");
+          const actionsMore = qs("#nextActionMore");
+          const copyButton = qs("#copyNextActionButton");
+          if (actionsMore && actionsMore.open !== nextActionMoreOpen) actionsMore.open = nextActionMoreOpen;
           if (!button || !status) return;
           if (!action) {
             button.disabled = true;
             button.textContent = "Erst Eintrag anlegen";
             status.textContent = "Noch kein Board-Eintrag vorhanden.";
+            if (copyButton) {
+              copyButton.disabled = true;
+              copyButton.title = "Noch kein Board-Eintrag vorhanden";
+            }
             return;
+          }
+          if (copyButton) {
+            copyButton.disabled = false;
+            copyButton.title = action.empty
+              ? "Aktuelle Board-Ansicht als Korrekturbriefing kopieren"
+              : `Briefing fuer ${action.item.title || "naechste Aktion"} kopieren`;
           }
           if (action.empty) {
             button.disabled = false;
@@ -5214,6 +5245,62 @@
           button.textContent = `${action.label} starten`;
           status.textContent = `${action.focused ? "Aus Fokusliste: " : action.scoped ? "Aus aktueller Ansicht: " : ""}${action.item.title}: ${action.reason}`;
           syncAutoRouterHint(action);
+        }
+
+        function nextActionBriefText(action = recommendNextAction()) {
+          if (!action) {
+            return [
+              "Nur Gutes Next Action",
+              "",
+              "Status: Noch kein Board-Eintrag vorhanden.",
+              "Naechster Schritt: Erste gute Tat, Business-Idee oder Selbstfindungsaktion im Board erfassen."
+            ].join("\n");
+          }
+          if (action.empty) {
+            return [
+              "Nur Gutes Next Action",
+              "",
+              `Status: ${action.revealFocus ? "Startbarer Eintrag liegt ausserhalb der Fokusliste" : "Aktuelle Board-Ansicht zeigt keinen startbaren Eintrag"}`,
+              `Naechster Schritt: ${action.revealFocus ? "Fokusliste erweitern und sichtbaren Eintrag starten" : "Suche oder Filter zuruecksetzen"}`,
+              action.item ? `Verdeckter Eintrag: ${action.item.title}` : "",
+              "",
+              "Ziel: Dashboard bleibt kurz; die naechste Aktion wird aus vorhandenen Board-Daten abgeleitet."
+            ].filter(Boolean).join("\n");
+          }
+          const item = action.item || {};
+          const amount = Number(item.amount) || 0;
+          return [
+            `Nur Gutes Next Action: ${action.label || "Naechste Aktion"}`,
+            "",
+            `Board-Eintrag: ${item.title || "Ohne Titel"}`,
+            `Kategorie: ${item.category || "Board"}`,
+            `Status: ${item.status || "planned"}`,
+            `Empfohlenes Tool: ${activeToolLabel(action.tool || "board")}`,
+            `Revenue-Ziel: ${money(amount)}`,
+            `Impact-Anteil 40%: ${money(amount * 0.4)}`,
+            "",
+            `Warum diese Aktion: ${action.reason || "Sie ist der sinnvollste naechste Schritt aus dem Board."}`,
+            `Naechster Schritt: ${item.next || "Naechsten Schritt klaeren"}`,
+            `Kontext: ${item.text || "Kurz, konkret, mit sichtbarem Nutzen."}`,
+            "",
+            "Heute erledigen:",
+            "1. passenden Workspace oeffnen",
+            "2. Proof, Pitch oder Share-Text fertigstellen",
+            "3. Ergebnis im Board aktualisieren",
+            "",
+            "Reinvestition: 40% gute Taten, 25% bessere Fokus- und Workspace-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
+          ].join("\n");
+        }
+
+        async function copyNextActionBrief() {
+          const action = recommendNextAction();
+          const copied = await copyText(nextActionBriefText(action));
+          const label = action?.item?.title ? `Next Action: ${action.item.title}` : "Next Action";
+          rememberCopy(label, copied);
+          const status = qs("#nextActionStatus");
+          if (status) status.textContent = copied
+            ? "Next-Action-Briefing kopiert."
+            : "Next-Action-Briefing konnte nicht automatisch kopiert werden.";
         }
 
         function startRecommendedAction() {
@@ -5693,6 +5780,12 @@
         function setStatsMoreOpen(open) {
           statsMoreOpen = Boolean(open);
           localStorage.setItem(statsMoreKey, String(statsMoreOpen));
+        }
+
+        function setNextActionMoreOpen(open) {
+          nextActionMoreOpen = Boolean(open);
+          localStorage.setItem(nextActionMoreKey, String(nextActionMoreOpen));
+          renderDashboardCompactness();
         }
 
         function setToolAccessMoreOpen(open) {
@@ -6838,6 +6931,8 @@
           focusArchiveSearch();
         }));
         qs("#nextActionButton")?.addEventListener("click", startRecommendedAction);
+        qs("#copyNextActionButton")?.addEventListener("click", copyNextActionBrief);
+        qs("#nextActionMore")?.addEventListener("toggle", (event) => setNextActionMoreOpen(event.target.open));
         qs("#startDailyFocusButton")?.addEventListener("click", startDailyFocus);
         qs("#copyDailyFocusButton")?.addEventListener("click", copyDailyFocusBrief);
         qs("#completeDailyFocusButton")?.addEventListener("click", completeDailyFocus);
