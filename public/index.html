@@ -4806,7 +4806,7 @@
           qs(".tool-router-details")?.removeAttribute("open");
           qs(".tool-tabs")?.removeAttribute("open");
           const archiveToggle = qs("#toggleArchive");
-          if (archiveToggle) archiveToggle.textContent = "Archiv anzeigen";
+          if (archiveToggle) archiveToggle.textContent = archiveToggle.dataset.closedLabel || "Archiv anzeigen";
         }
 
         function setFocusMode(enabled, shouldScroll = false, shouldPersist = true) {
@@ -5601,6 +5601,7 @@
             return { id: section.id, title, label, searchText };
           });
           const closedLabel = `Archiv anzeigen (${legacyItems.length})`;
+          toggle.dataset.closedLabel = closedLabel;
           toggle.textContent = closedLabel;
           archiveSearch.value = savedArchiveSearch;
           let visibleArchiveIds = [];
@@ -5707,7 +5708,7 @@
           localStorage.setItem(archiveOpenKey, String(archiveOpen));
           document.body.classList.remove("show-legacy");
           const toggle = qs("#toggleArchive");
-          if (toggle && toggle.textContent === "Archiv ausblenden") toggle.textContent = "Archiv anzeigen";
+          if (toggle && toggle.textContent === "Archiv ausblenden") toggle.textContent = toggle.dataset.closedLabel || "Archiv anzeigen";
           setFocusMode(false, false, false);
           const section = qs("#daily-archive");
           const search = qs("#archiveSearch");
