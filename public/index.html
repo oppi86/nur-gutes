@@ -1281,10 +1281,10 @@
             <h2>Impact Workspace</h2>
             <p class="muted">Plane gute Taten, mache daraus bezahlbare Angebote, speichere den Fortschritt im Browser und teile sofort klare naechste Schritte.</p>
             <div class="app-stats">
-              <button type="button" data-stat-filter="active"><strong id="metricActions">0</strong><span>aktive Eintraege</span></button>
-              <button type="button" data-stat-filter="all"><strong id="metricRevenue">0 EUR</strong><span>Revenue-Ziel</span></button>
-              <button type="button" data-stat-filter="all"><strong id="metricImpact">0 EUR</strong><span>Impact-Anteil 40%</span></button>
-              <button type="button" data-stat-filter="done"><strong id="metricDone">0</strong><span>abgeschlossen</span></button>
+              <button type="button" data-stat-filter="active" data-stat-key="active"><strong id="metricActions">0</strong><span>aktive Eintraege</span></button>
+              <button type="button" data-stat-filter="all" data-stat-key="revenue"><strong id="metricRevenue">0 EUR</strong><span>Revenue-Ziel</span></button>
+              <button type="button" data-stat-filter="all" data-stat-key="impact"><strong id="metricImpact">0 EUR</strong><span>Impact-Anteil 40%</span></button>
+              <button type="button" data-stat-filter="done" data-stat-key="done"><strong id="metricDone">0</strong><span>abgeschlossen</span></button>
             </div>
             <div class="app-next-action">
               <button type="button" id="nextActionButton">Naechste Aktion starten</button>
@@ -4670,6 +4670,7 @@
         if (localStorage.getItem(archiveOpenKey) === "true") localStorage.setItem(archiveOpenKey, "false");
         let quickTask = localStorage.getItem(quickTaskKey) || "auto";
         let currentFilter = ["all", "planned", "active", "done"].includes(localStorage.getItem(boardFilterKey)) ? localStorage.getItem(boardFilterKey) : "all";
+        let currentStatKey = currentFilter === "active" ? "active" : currentFilter === "done" ? "done" : "revenue";
         let currentBoardSearch = localStorage.getItem(boardSearchKey) || "";
         let savedToolDetails = loadJson(toolDetailsKey, {});
         let savedPitchChannel = localStorage.getItem(pitchChannelKey) || "daily-growth";
@@ -4902,6 +4903,7 @@
 
         function startDashboardMode() {
           currentFilter = "all";
+          currentStatKey = "revenue";
           currentBoardSearch = "";
           boardCompact = true;
           localStorage.setItem(compactBoardKey, String(boardCompact));
@@ -4934,6 +4936,7 @@
 
         function resetDashboardMode() {
           currentFilter = "all";
+          currentStatKey = "revenue";
           currentBoardSearch = "";
           boardCompact = true;
           dailyDetailsOpen = false;
@@ -5071,14 +5074,14 @@
         }
 
         function renderStats() {
-          const activeItems = items.filter((item) => item.status !== "done");
+          const activeItems = items.filter((item) => item.status === "active");
           const revenue = items.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
           qs("#metricActions").textContent = activeItems.length;
           qs("#metricRevenue").textContent = money(revenue);
           qs("#metricImpact").textContent = money(revenue * 0.4);
           qs("#metricDone").textContent = items.filter((item) => item.status === "done").length;
           qsa("[data-stat-filter]").forEach((button) => {
-            button.setAttribute("aria-pressed", String(button.dataset.statFilter === currentFilter));
+            button.setAttribute("aria-pressed", String(button.dataset.statKey === currentStatKey));
           });
           const connected = Object.values(stripeLinks).some(Boolean);
           qs("#stripeStatus").textContent = connected ? "Stripe Payment Links verbunden" : "Stripe Payment Links nicht verbunden";
@@ -5267,6 +5270,7 @@
 
         function resetBoardView() {
           currentFilter = "all";
+          currentStatKey = "revenue";
           currentBoardSearch = "";
           saveBoardView();
           const search = qs("#boardSearch");
@@ -5288,6 +5292,7 @@
 
         function revealSavedBoardItem() {
           currentFilter = "all";
+          currentStatKey = "revenue";
           currentBoardSearch = "";
           saveBoardView();
           const search = qs("#boardSearch");
@@ -5298,11 +5303,15 @@
           if (currentFilter === "all") return;
           if (items.some((item) => item.status === currentFilter)) return;
           currentFilter = "all";
+          currentStatKey = "revenue";
           saveBoardView();
         }
 
-        function applyBoardFilter(filter, shouldClearSearch = false) {
+        function applyBoardFilter(filter, shouldClearSearch = false, statKey = "") {
           currentFilter = ["all", "planned", "active", "done"].includes(filter) ? filter : "all";
+          currentStatKey = ["active", "revenue", "impact", "done"].includes(statKey)
+            ? statKey
+            : currentFilter === "active" ? "active" : currentFilter === "done" ? "done" : "revenue";
           if (shouldClearSearch) currentBoardSearch = "";
           saveBoardView();
           const search = qs("#boardSearch");
@@ -6217,7 +6226,7 @@
           });
         });
         qsa("[data-stat-filter]").forEach((button) => {
-          button.addEventListener("click", () => applyBoardFilter(button.dataset.statFilter, true));
+          button.addEventListener("click", () => applyBoardFilter(button.dataset.statFilter, true, button.dataset.statKey));
         });
         qs("#clearDoneButton")?.addEventListener("click", () => {
           const before = items.length;
@@ -6226,6 +6235,7 @@
           if (before === items.length) return;
           saveRemovedItems();
           currentFilter = "all";
+          currentStatKey = "revenue";
           saveBoardView();
           saveItems();
           renderAll();
