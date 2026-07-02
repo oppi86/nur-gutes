@@ -5912,6 +5912,18 @@
             if (archiveOpen) setFocusMode(false, false, false);
             renderDashboardCompactness();
           };
+          const selectArchivePreview = (targetId) => {
+            const item = legacyItems.find((entry) => entry.id === targetId);
+            if (!item) return;
+            archiveOpen = false;
+            archiveSearchMode = true;
+            setVisibleLegacySections([]);
+            document.body.classList.remove("show-legacy");
+            localStorage.setItem(archiveOpenKey, "false");
+            toggle.textContent = closedLabel;
+            archiveCount.textContent = `Vorschau gewaehlt: ${item.title}. Alte Iterationen bleiben geschlossen; mit "Archiv anzeigen" laedst du bewusst die Treffer.`;
+            renderDashboardCompactness();
+          };
           const openArchive = (targetId) => {
             archiveSearchMode = false;
             visibleArchiveIds = targetId ? [targetId] : visibleArchiveIds;
@@ -5971,7 +5983,7 @@
               archiveCount.textContent = "Kein Archivtreffer startbar.";
               return;
             }
-            openArchive(firstResult.dataset.archiveTarget);
+            selectArchivePreview(firstResult.dataset.archiveTarget);
           });
           clearArchiveSearch.addEventListener("click", () => {
             savedArchiveSearch = "";
@@ -5992,7 +6004,7 @@
             const link = event.target.closest("[data-archive-target]");
             if (!link) return;
             event.preventDefault();
-            openArchive(link.dataset.archiveTarget);
+            selectArchivePreview(link.dataset.archiveTarget);
           });
           toggle.addEventListener("click", () => {
             setArchiveOpen(!archiveOpen);
