@@ -5671,7 +5671,7 @@
           document.body.classList.remove("show-legacy");
           const toggle = qs("#toggleArchive");
           if (toggle && toggle.textContent === "Archiv ausblenden") toggle.textContent = "Archiv anzeigen";
-          setFocusMode(false);
+          setFocusMode(false, false, false);
           const section = qs("#daily-archive");
           const search = qs("#archiveSearch");
           const count = qs("#archiveCount");
