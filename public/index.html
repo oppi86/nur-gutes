@@ -4686,7 +4686,7 @@
         const savedFocusMode = localStorage.getItem(focusKey);
         let focusMode = savedFocusMode === null ? true : savedFocusMode === "true";
         let activeTool = localStorage.getItem(activeToolKey) || "board";
-        let boardCompact = localStorage.getItem(compactBoardKey) === "true";
+        let boardCompact = localStorage.getItem(compactBoardKey) !== "false";
         let boardFormCollapsed = localStorage.getItem(boardFormCollapsedKey) !== "false";
         let dailyDetailsOpen = localStorage.getItem(dailyDetailsKey) === "true";
         let savedArchiveSearch = localStorage.getItem(archiveSearchKey) || "";
@@ -4853,17 +4853,27 @@
             || dailyDetailsOpen
             || Boolean(savedToolDetails.router)
             || Boolean(savedToolDetails.tabs);
-          const isClean = focusMode && visibleSections <= 2 && openDailySections === 0 && openResourceSections === 0 && !hasOpenChrome;
-          return { visibleSections, archivedDailySections, openDailySections, resourceSections, openResourceSections, isClean };
+          const hasBoardDrift = activeTool !== "board"
+            || quickTask !== "auto"
+            || currentFilter !== "all"
+            || currentStatKey !== "revenue"
+            || currentBoardSearch.trim().length > 0
+            || currentBoardSort !== "manual"
+            || !boardFocusLimitEnabled
+            || !boardCompact
+            || !boardFormCollapsed
+            || Boolean(editingItemId);
+          const isClean = focusMode && visibleSections <= 2 && openDailySections === 0 && openResourceSections === 0 && !hasOpenChrome && !hasBoardDrift;
+          return { visibleSections, archivedDailySections, openDailySections, resourceSections, openResourceSections, hasBoardDrift, isClean };
         }
 
         function renderDashboardCompactness() {
           const status = qs("#dashboardCompactnessStatus");
           const resetButton = qs("#resetDashboardButton");
-          const { visibleSections, archivedDailySections, openDailySections, resourceSections, openResourceSections, isClean } = getDashboardCompactness();
+          const { visibleSections, archivedDailySections, openDailySections, resourceSections, openResourceSections, hasBoardDrift, isClean } = getDashboardCompactness();
           if (status) {
             status.textContent = focusMode
-              ? `Kompakt: ${visibleSections} sichtbare Bereiche, ${archivedDailySections} Daily-Iterationen im Archiv, ${resourceSections} Ressourcen eingeklappt.`
+              ? `Kompakt: ${visibleSections} sichtbare Bereiche, ${archivedDailySections} Daily-Iterationen im Archiv, ${resourceSections} Ressourcen eingeklappt${hasBoardDrift ? ", Board-Ansicht angepasst" : ""}.`
               : `Magazinansicht: ${visibleSections} Bereiche sichtbar, ${openDailySections} Archiv-Iterationen und ${openResourceSections} Ressourcen geoeffnet.`;
           }
           if (resetButton) {
@@ -4877,7 +4887,7 @@
         }
 
         async function copyDashboardCompactness() {
-          const { visibleSections, archivedDailySections, openDailySections, resourceSections, openResourceSections } = getDashboardCompactness();
+          const { visibleSections, archivedDailySections, openDailySections, resourceSections, openResourceSections, hasBoardDrift } = getDashboardCompactness();
           const text = [
             "Nur Gutes Dashboard-Check",
             `Modus: ${focusMode ? "Arbeitsmodus" : "Magazinmodus"}`,
@@ -4886,6 +4896,7 @@
             `Archivierte Daily-Iterationen: ${archivedDailySections}`,
             `Geoeffnete Archiv-Iterationen: ${openDailySections}`,
             `Ressourcen eingeklappt: ${Math.max(0, resourceSections - openResourceSections)} von ${resourceSections}`,
+            `Board-Ansicht angepasst: ${hasBoardDrift ? "ja" : "nein"}`,
             "Ziel: erster Screen bleibt Workspace, maximal 3 Top-Tools sichtbar, Daily-Idee kompakt, Archiv statt endloser Feed."
           ].join("\n");
           const copied = await copyText(text);
@@ -5457,6 +5468,7 @@
               ? `${lastRemovedItems.length} entfernte Eintraege sind bereit zum Wiederherstellen.`
               : "Keine entfernten Eintraege.";
           }
+          renderDashboardCompactness();
           if (!visibleItems.length) {
             list.innerHTML = '<article class="app-card"><p class="muted">Keine passenden Eintraege. Suche oder Statusfilter anpassen.</p><button type="button" data-reset-board-view="true">Ansicht zuruecksetzen</button></article>';
             return;
