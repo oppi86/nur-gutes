@@ -1184,6 +1184,7 @@
       .board-sort { display: grid; gap: 6px; margin-top: 10px; color: #575952; font-size: 12px; font-weight: 900; text-transform: uppercase; }
       .board-sort select { width: 100%; border: 1px solid #d9d1c4; border-radius: 8px; background: #fff; color: #20211d; font: inherit; padding: 12px; min-width: 0; }
       .board-count { margin: 10px 0 0; font-size: 13px; color: #575952; }
+      .board-view-status { border: 1px solid #e7e1d7; border-radius: 8px; background: #f7f4ef; color: #17332f; font-size: 13px; font-weight: 900; margin: 10px 0 0; padding: 10px 12px; }
       .board-undo { margin: -6px 0 14px; font-size: 13px; color: #575952; }
       .app-actions-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 16px 0; }
       .app-filter { background: #f7f4ef; color: #575952; border: 1px solid #e7e1d7; }
@@ -1388,6 +1389,7 @@
                 </select>
               </label>
               <p class="board-count" id="boardCount" aria-live="polite">Eintraege werden geladen.</p>
+              <p class="board-view-status" id="boardViewStatus" aria-live="polite">Aktuelle Board-Ansicht wird berechnet.</p>
               <div class="app-actions-row" aria-label="Board Filter">
                 <button class="app-filter active" type="button" data-filter="all">Alle</button>
                 <button class="app-filter" type="button" data-filter="planned">Geplant</button>
@@ -5222,6 +5224,14 @@
             active: "Aktiv",
             done: "Fertig"
           };
+          const sortLabels = {
+            manual: "Manuelle Reihenfolge",
+            priority: "Prioritaet zuerst",
+            revenue: "Revenue-Ziel zuerst",
+            newest: "Neueste zuerst"
+          };
+          const visibleRevenue = visibleItems.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+          const visibleImpact = visibleRevenue * 0.4;
           const filterCounts = items.reduce((counts, item) => {
             counts[item.status] = (counts[item.status] || 0) + 1;
             return counts;
@@ -5242,6 +5252,12 @@
           }
           const count = qs("#boardCount");
           if (count) count.textContent = query ? `${visibleItems.length} Treffer in ${filteredItems.length} gefilterten Eintraegen` : `${visibleItems.length} von ${items.length} Eintraegen sichtbar`;
+          const viewStatus = qs("#boardViewStatus");
+          if (viewStatus) {
+            const filterLabel = filterLabels[currentFilter] || "Alle";
+            const searchLabel = query ? ` · Suche: "${currentBoardSearch.trim()}"` : "";
+            viewStatus.textContent = `${filterLabel} · ${sortLabels[currentBoardSort] || sortLabels.manual}${searchLabel} · Revenue ${money(visibleRevenue)} · Impact ${money(visibleImpact)}`;
+          }
           const exportBoardButton = qs("#exportBoardButton");
           const copyBoardReportButton = qs("#copyBoardReportButton");
           [exportBoardButton, copyBoardReportButton].filter(Boolean).forEach((button) => {
@@ -6366,8 +6382,8 @@
           saveBoardView();
           renderBoard();
           renderNextAction();
-          const status = qs("#boardCount");
-          if (status) status.textContent = `${status.textContent} Sortierung gespeichert.`;
+          const status = qs("#boardViewStatus");
+          if (status) status.textContent = `${status.textContent} · Sortierung gespeichert`;
         });
 
         qs("#stripeForm").addEventListener("submit", (event) => {
