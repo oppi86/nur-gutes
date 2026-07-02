@@ -4573,6 +4573,7 @@
         const boardSearchKey = "nurGutesBoardSearch";
         const lastCopyKey = "nurGutesLastCopy";
         const lastExportKey = "nurGutesLastExport";
+        const pitchChannelKey = "nurGutesPitchChannel";
         const seedItems = [
           {
             id: "seed-proof-1",
@@ -4644,6 +4645,7 @@
         let quickTask = localStorage.getItem(quickTaskKey) || "auto";
         let currentFilter = ["all", "planned", "active", "done"].includes(localStorage.getItem(boardFilterKey)) ? localStorage.getItem(boardFilterKey) : "all";
         let currentBoardSearch = localStorage.getItem(boardSearchKey) || "";
+        let savedPitchChannel = localStorage.getItem(pitchChannelKey) || "daily-growth";
         let editingItemId = "";
         let lastRemovedItems = loadJson(removedItemsKey, []);
 
@@ -5820,6 +5822,8 @@
         qs("#copyBoardReportButton")?.addEventListener("click", copyBoardReport);
         setActiveTool(activeTool, false);
         setQuickTask(quickTask, false);
+        const pitchChannelInput = qs("#pitchChannel");
+        if (pitchChannelInput) pitchChannelInput.value = savedPitchChannel;
         qsa("[data-top-tool]").forEach((button) => {
           button.addEventListener("click", () => {
             activateToolShortcut(button.dataset.topTool);
@@ -6000,7 +6004,13 @@
         });
 
         ["#pitchItem", "#pitchPartner", "#pitchChannel"].forEach((selector) => {
-          qs(selector).addEventListener("input", renderPitch);
+          qs(selector).addEventListener("input", () => {
+            if (selector === "#pitchChannel") {
+              savedPitchChannel = qs(selector).value.trim() || "daily-growth";
+              localStorage.setItem(pitchChannelKey, savedPitchChannel);
+            }
+            renderPitch();
+          });
           qs(selector).addEventListener("change", renderPitch);
         });
 
