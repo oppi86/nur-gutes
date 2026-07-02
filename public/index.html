@@ -1281,6 +1281,7 @@
             </div>
             <div class="app-export">
               <button type="button" id="exportBoardButton">Board als CSV exportieren</button>
+              <button type="button" id="copyBoardReportButton">Board-Report kopieren</button>
               <p id="exportBoardStatus">Export fuer Sheets, CRM oder Partner-Reporting.</p>
             </div>
             <article class="app-daily" id="dailyIdeaCard" aria-labelledby="dailyIdeaTitle">
@@ -4823,6 +4824,27 @@
           startBoardItem(item.id);
         }
 
+        function visibleBoardReport() {
+          const { query, visibleItems } = getVisibleBoardItems();
+          const revenue = visibleItems.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+          const impact = revenue * 0.4;
+          const scope = currentFilter === "all" && !query ? "Gesamtes Board" : `Aktuelle Ansicht: ${currentFilter}${query ? ` / Suche "${currentBoardSearch.trim()}"` : ""}`;
+          return [
+            `Nur Gutes Board-Report - ${scope}`,
+            "",
+            `Eintraege: ${visibleItems.length}`,
+            `Revenue-Ziel: ${money(revenue)}`,
+            `Impact-Anteil 40%: ${money(impact)}`,
+            "",
+            "Naechste Schritte:",
+            ...(visibleItems.length ? visibleItems.map((item, index) => (
+              `${index + 1}. ${item.title} [${item.status}] - ${money(item.amount)} - ${item.next || "Naechsten Schritt klaeren"}`
+            )) : ["Keine sichtbaren Board-Eintraege."]),
+            "",
+            "Reinvestition: 40% gute Taten, 25% bessere Algorithmen und Automatisierung, 20% Growth/Marketing, 15% Betrieb und Qualitaet."
+          ].join("\n");
+        }
+
         function exportBoardCsv() {
           const status = qs("#exportBoardStatus");
           const { query, visibleItems } = getVisibleBoardItems();
@@ -4853,6 +4875,17 @@
           link.remove();
           URL.revokeObjectURL(url);
           if (status) status.textContent = `${visibleItems.length} sichtbare Eintraege als CSV vorbereitet.`;
+        }
+
+        async function copyBoardReport() {
+          const status = qs("#exportBoardStatus");
+          const { visibleItems } = getVisibleBoardItems();
+          if (!visibleItems.length) {
+            if (status) status.textContent = "Keine sichtbaren Board-Eintraege zum Kopieren.";
+            return;
+          }
+          const copied = await copyText(visibleBoardReport());
+          if (status) status.textContent = copied ? `${visibleItems.length} sichtbare Eintraege als Board-Report kopiert.` : "Board-Report markiert; manuelles Kopieren pruefen.";
         }
 
         function renderStats() {
@@ -5652,6 +5685,7 @@
         qs("#addDailyIdeaButton")?.addEventListener("click", addDailyIdeaToBoard);
         qs("#toggleDailyDetails")?.addEventListener("click", () => setDailyDetailsOpen(!dailyDetailsOpen));
         qs("#exportBoardButton")?.addEventListener("click", exportBoardCsv);
+        qs("#copyBoardReportButton")?.addEventListener("click", copyBoardReport);
         setActiveTool(activeTool, false);
         setQuickTask(quickTask, false);
         qsa("[data-top-tool]").forEach((button) => {
