@@ -10,14 +10,14 @@
       * { box-sizing: border-box; }
       body { margin: 0; background: #f7f4ef; color: #20211d; font-family: Arial, Helvetica, sans-serif; }
       a { color: inherit; text-decoration: none; }
-      .hero { min-height: 88vh; position: relative; overflow: hidden; padding: 20px 48px; color: white; }
+      .hero { min-height: 54vh; position: relative; overflow: hidden; padding: 20px 48px; color: white; }
       .hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
       .shade { position: absolute; inset: 0; background: rgba(18,24,18,.48); }
       nav, .hero-content { position: relative; z-index: 1; }
       nav { display: flex; align-items: center; justify-content: space-between; font-weight: 700; }
       nav div { display: flex; gap: 28px; font-size: 14px; }
       .brand { font-size: 20px; }
-      .hero-content { min-height: 72vh; max-width: 900px; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 48px; }
+      .hero-content { min-height: 38vh; max-width: 900px; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 28px; }
       .pill { width: fit-content; border-radius: 999px; background: rgba(255,255,255,.18); padding: 10px 16px; font-size: 14px; font-weight: 800; }
       h1 { margin: 28px 0 0; font-size: clamp(52px, 8vw, 88px); line-height: 1; letter-spacing: 0; }
       h2 { margin: 8px 0 0; font-size: clamp(34px, 5vw, 56px); line-height: 1.08; letter-spacing: 0; }
@@ -1136,6 +1136,11 @@
       .tool-router label { display: grid; gap: 6px; color: #575952; font-size: 12px; font-weight: 900; text-transform: uppercase; }
       .tool-router select { width: 100%; border: 1px solid #d9d1c4; border-radius: 8px; background: #fff; color: #20211d; font: inherit; padding: 12px; min-width: 0; }
       .tool-router p { margin: 0; font-size: 13px; color: #575952; }
+      .top-tools { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; margin-bottom: 14px; }
+      .top-tool { border: 1px solid #d9d1c4; border-radius: 8px; background: #fff; color: #17332f; cursor: pointer; font: inherit; padding: 13px; text-align: left; }
+      .top-tool strong { display: block; font-size: 15px; line-height: 1.2; }
+      .top-tool span { display: block; color: #575952; font-size: 12px; line-height: 1.35; margin-top: 5px; }
+      .top-tool[aria-pressed="true"] { background: #e6efe1; border-color: #9db990; }
       .tool-tabs { border: 1px solid #e7e1d7; border-radius: 8px; background: #fff; margin-bottom: 18px; }
       .tool-tabs summary { cursor: pointer; color: #17332f; font-size: 13px; font-weight: 900; list-style-position: inside; padding: 12px 14px; }
       .tool-tabs[open] summary { border-bottom: 1px solid #e7e1d7; }
@@ -1220,7 +1225,7 @@
       .focus-mode .impact-app { min-height: calc(100vh - 56px); padding-top: 32px; }
       footer { background: #20211d; color: white; padding: 40px 48px; }
       @media (max-width: 860px) {
-        .app-shell, .tool-router, .resource-list, .app-form, .stripe-grid, .pay-grid, .pitch-grid, .pitch-preview, .trust-grid, .trust-plan, .proof-grid, .proof-ledger, .monthly-grid, .monthly-tiers, .second-grid, .second-score { grid-template-columns: 1fr; }
+        .app-shell, .tool-router, .top-tools, .resource-list, .app-form, .stripe-grid, .pay-grid, .pitch-grid, .pitch-preview, .trust-grid, .trust-plan, .proof-grid, .proof-ledger, .monthly-grid, .monthly-tiers, .second-grid, .second-score { grid-template-columns: 1fr; }
         .app-intro { margin-bottom: 20px; }
         .app-card-head { display: block; }
       }
@@ -1238,12 +1243,12 @@
       <section class="hero" id="start">
         <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1800&q=85" alt="Eine offene Strasse fuehrt durch eine weite Felslandschaft" />
         <div class="shade"></div>
-        <nav><a class="brand" href="#start">Nur Gutes</a><div><a href="#app">App</a><a href="#news">News</a><a href="#ideen">Ideen</a><a href="#taten">Taten</a><a href="#finden">Selbstfindung</a></div></nav>
+        <nav><a class="brand" href="#start">Nur Gutes</a><div><a href="#app">Dashboard</a><a href="#app">Tools</a><a href="#daily-archive">Archiv</a></div></nav>
         <div class="hero-content">
           <p class="pill">Positive Impulse fuer Menschen, die etwas aufbauen wollen</p>
           <h1>Nur Gutes</h1>
-          <p class="hero-copy">Ein digitales Magazin fuer gute Nachrichten, sinnvolle Business Ideen, wirksame Taten und klare Wege, sich selbst wieder naeher zu kommen.</p>
-          <div class="buttons"><a class="button yellow" href="#app">Workspace oeffnen</a><a class="button outline" href="#news">Ausgabe lesen</a></div>
+          <p class="hero-copy">Ein kompaktes Dashboard fuer gute Taten, positive Artikel, finanzierbare Ideen und klare naechste Schritte.</p>
+          <div class="buttons"><a class="button yellow" href="#app" data-dashboard-start="true">Dashboard starten</a><a class="button outline" href="#daily-archive">Archiv durchsuchen</a></div>
         </div>
       </section>
 
@@ -1291,6 +1296,11 @@
             </div>
           </article>
           <article class="app-workbench">
+            <div class="top-tools" aria-label="Wichtigste Tools">
+              <button class="top-tool" type="button" data-top-tool="board" aria-pressed="true"><strong>Board</strong><span>Aufgaben speichern und starten</span></button>
+              <button class="top-tool" type="button" data-top-tool="pitch" aria-pressed="false"><strong>Pitch</strong><span>Partner-Ask erzeugen</span></button>
+              <button class="top-tool" type="button" data-top-tool="proof" aria-pressed="false"><strong>Proof</strong><span>Wirkungsbeleg bauen</span></button>
+            </div>
             <div class="tool-router">
               <label>Was willst du jetzt tun?
                 <select id="toolRouter">
@@ -4711,6 +4721,17 @@
           startAction(action);
         }
 
+        function startDashboardMode() {
+          boardCompact = true;
+          localStorage.setItem(compactBoardKey, String(boardCompact));
+          setBoardFormCollapsed(true);
+          setActiveTool("board");
+          setFocusMode(true, true);
+          renderAll();
+          const status = qs("#nextActionStatus");
+          if (status) status.textContent = "Dashboard-Modus gespeichert: Board kompakt, Formular geschlossen, Arbeitsmodus aktiv.";
+        }
+
         function startAction(action) {
           if (!action) return;
           const wasPlanned = action.item.status === "planned";
@@ -5417,6 +5438,7 @@
           const selectedName = qsa("[data-app-panel]").some((panel) => panel.dataset.appPanel === name) ? name : "board";
           activeTool = selectedName;
           qsa("[data-app-tab]").forEach((button) => button.setAttribute("aria-selected", button.dataset.appTab === selectedName ? "true" : "false"));
+          qsa("[data-top-tool]").forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.topTool === selectedName)));
           qsa("[data-app-panel]").forEach((panel) => panel.classList.toggle("active", panel.dataset.appPanel === selectedName));
           const router = qs("#toolRouter");
           const hint = qs("#toolRouterHint");
@@ -5441,10 +5463,20 @@
         setFocusMode(focusMode);
         setBoardFormCollapsed(boardFormCollapsed, false);
         qs("#focusModeToggle")?.addEventListener("click", () => setFocusMode(!focusMode, true));
+        qsa("[data-dashboard-start]").forEach((button) => button.addEventListener("click", (event) => {
+          event.preventDefault();
+          startDashboardMode();
+        }));
         qs("#nextActionButton")?.addEventListener("click", startRecommendedAction);
         qs("#addDailyIdeaButton")?.addEventListener("click", addDailyIdeaToBoard);
         qs("#exportBoardButton")?.addEventListener("click", exportBoardCsv);
         setActiveTool(activeTool, false);
+        qsa("[data-top-tool]").forEach((button) => {
+          button.addEventListener("click", () => {
+            setActiveTool(button.dataset.topTool);
+            setFocusMode(true, true);
+          });
+        });
         qsa("[data-app-tab]").forEach((tab) => {
           tab.addEventListener("click", () => setActiveTool(tab.dataset.appTab));
         });
