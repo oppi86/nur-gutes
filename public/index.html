@@ -5280,6 +5280,7 @@
           saveBoardView();
           const search = qs("#boardSearch");
           if (search) search.value = "";
+          renderStats();
           renderBoard();
           renderNextAction();
           search?.focus();
