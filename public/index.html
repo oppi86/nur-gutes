@@ -4692,6 +4692,7 @@
         let savedArchiveSearch = localStorage.getItem(archiveSearchKey) || "";
         let archiveOpen = false;
         let archiveSearchMode = false;
+        let selectedArchivePreviewTitle = "";
         if (localStorage.getItem(archiveOpenKey) === "true") localStorage.setItem(archiveOpenKey, "false");
         let quickTask = localStorage.getItem(quickTaskKey) || "auto";
         let currentFilter = ["all", "planned", "active", "done"].includes(localStorage.getItem(boardFilterKey)) ? localStorage.getItem(boardFilterKey) : "all";
@@ -4850,6 +4851,7 @@
           const resourceSections = qsa(".resource-section").length;
           const openResourceSections = qsa(".resource-section").filter((section) => getComputedStyle(section).display !== "none").length;
           const archiveSearchActive = !focusMode && !archiveOpen && archiveSearchMode;
+          const archivePreviewActive = archiveSearchActive && Boolean(selectedArchivePreviewTitle);
           const hasOpenChrome = document.body.classList.contains("show-legacy")
             || document.body.classList.contains("show-resources")
             || dailyDetailsOpen
@@ -4866,17 +4868,17 @@
             || !boardFormCollapsed
             || Boolean(editingItemId);
           const isClean = focusMode && visibleSections <= 2 && openDailySections === 0 && openResourceSections === 0 && !hasOpenChrome && !hasBoardDrift;
-          return { visibleSections, archivedDailySections, openDailySections, resourceSections, openResourceSections, archiveSearchActive, hasBoardDrift, isClean };
+          return { visibleSections, archivedDailySections, openDailySections, resourceSections, openResourceSections, archiveSearchActive, archivePreviewActive, hasBoardDrift, isClean };
         }
 
         function renderDashboardCompactness() {
           const status = qs("#dashboardCompactnessStatus");
           const resetButton = qs("#resetDashboardButton");
-          const { visibleSections, archivedDailySections, openDailySections, resourceSections, openResourceSections, archiveSearchActive, hasBoardDrift, isClean } = getDashboardCompactness();
+          const { visibleSections, archivedDailySections, openDailySections, resourceSections, openResourceSections, archiveSearchActive, archivePreviewActive, hasBoardDrift, isClean } = getDashboardCompactness();
           if (status) {
             status.textContent = focusMode
               ? `Kompakt: ${visibleSections} sichtbare Bereiche, ${archivedDailySections} Daily-Iterationen im Archiv, ${resourceSections} Ressourcen eingeklappt${hasBoardDrift ? ", Board-Ansicht angepasst" : ""}.`
-              : `Magazinansicht: ${visibleSections} Bereiche sichtbar, ${openDailySections} Archiv-Iterationen und ${openResourceSections} Ressourcen geoeffnet${archiveSearchActive ? ", Archiv-Suche aktiv" : ""}.`;
+              : `Magazinansicht: ${visibleSections} Bereiche sichtbar, ${openDailySections} Archiv-Iterationen und ${openResourceSections} Ressourcen geoeffnet${archiveSearchActive ? ", Archiv-Suche aktiv" : ""}${archivePreviewActive ? `: ${selectedArchivePreviewTitle}` : ""}.`;
           }
           if (resetButton) {
             resetButton.disabled = isClean;
@@ -4889,7 +4891,7 @@
         }
 
         async function copyDashboardCompactness() {
-          const { visibleSections, archivedDailySections, openDailySections, resourceSections, openResourceSections, archiveSearchActive, hasBoardDrift } = getDashboardCompactness();
+          const { visibleSections, archivedDailySections, openDailySections, resourceSections, openResourceSections, archiveSearchActive, archivePreviewActive, hasBoardDrift } = getDashboardCompactness();
           const text = [
             "Nur Gutes Dashboard-Check",
             `Modus: ${focusMode ? "Arbeitsmodus" : "Magazinmodus"}`,
@@ -4898,6 +4900,7 @@
             `Archivierte Daily-Iterationen: ${archivedDailySections}`,
             `Geoeffnete Archiv-Iterationen: ${openDailySections}`,
             `Archiv-Suche aktiv: ${archiveSearchActive ? "ja" : "nein"}`,
+            `Archiv-Vorschau: ${archivePreviewActive ? selectedArchivePreviewTitle : "keine"}`,
             `Ressourcen eingeklappt: ${Math.max(0, resourceSections - openResourceSections)} von ${resourceSections}`,
             `Board-Ansicht angepasst: ${hasBoardDrift ? "ja" : "nein"}`,
             `Schnellstart: ${quickTask === "auto" ? "Empfohlene naechste Aktion" : activeToolLabel(quickTask)}`,
@@ -4921,6 +4924,7 @@
         function collapseWorkspaceChrome() {
           archiveOpen = false;
           archiveSearchMode = false;
+          selectedArchivePreviewTitle = "";
           dailyDetailsOpen = false;
           savedToolDetails = { router: false, tabs: false };
           document.body.classList.remove("show-legacy");
@@ -5904,6 +5908,7 @@
           const setArchiveOpen = (open, shouldPersist = true) => {
             archiveOpen = Boolean(open);
             archiveSearchMode = false;
+            selectedArchivePreviewTitle = "";
             setVisibleLegacySections(archiveOpen ? visibleArchiveIds : []);
             document.body.classList.toggle("show-legacy", archiveOpen);
             toggle.textContent = archiveOpen ? "Archiv ausblenden" : closedLabel;
@@ -5917,6 +5922,7 @@
             if (!item) return;
             archiveOpen = false;
             archiveSearchMode = true;
+            selectedArchivePreviewTitle = item.title;
             setVisibleLegacySections([]);
             document.body.classList.remove("show-legacy");
             localStorage.setItem(archiveOpenKey, "false");
@@ -5953,6 +5959,7 @@
           };
           archiveSearch.addEventListener("input", () => {
             savedArchiveSearch = archiveSearch.value;
+            selectedArchivePreviewTitle = "";
             visibleArchiveCount = archivePageSize;
             localStorage.setItem(archiveSearchKey, savedArchiveSearch);
             renderArchive();
@@ -5971,6 +5978,7 @@
               }
               setArchiveOpen(false);
               archiveSearchMode = false;
+              selectedArchivePreviewTitle = "";
               setFocusMode(true, true, true);
               const status = qs("#focusModeStatus");
               if (status) status.textContent = "Archiv verlassen. Kompakter Workspace ist wieder aktiv.";
@@ -5988,6 +5996,7 @@
           clearArchiveSearch.addEventListener("click", () => {
             savedArchiveSearch = "";
             archiveSearch.value = "";
+            selectedArchivePreviewTitle = "";
             visibleArchiveCount = archivePageSize;
             localStorage.removeItem(archiveSearchKey);
             renderArchive();
