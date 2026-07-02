@@ -4863,8 +4863,13 @@
         }
 
         function startDashboardMode() {
+          currentFilter = "all";
+          currentBoardSearch = "";
           boardCompact = true;
           localStorage.setItem(compactBoardKey, String(boardCompact));
+          saveBoardView();
+          const boardSearch = qs("#boardSearch");
+          if (boardSearch) boardSearch.value = "";
           setBoardFormCollapsed(true);
           setQuickTask("auto");
           const action = recommendNextAction();
