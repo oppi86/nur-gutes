@@ -1144,6 +1144,11 @@
       .tool-router select { width: 100%; border: 1px solid #d9d1c4; border-radius: 8px; background: #fff; color: #20211d; font: inherit; padding: 12px; min-width: 0; }
       .tool-router button { border: 0; border-radius: 8px; background: #17332f; color: white; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 13px 15px; }
       .tool-router p { grid-column: 1 / -1; margin: 0; font-size: 13px; color: #575952; }
+      .tool-router-details { border: 1px solid #e7e1d7; border-radius: 8px; background: #fff; margin-bottom: 14px; }
+      .tool-router-details summary { cursor: pointer; color: #17332f; font-size: 13px; font-weight: 900; list-style-position: inside; padding: 12px 14px; }
+      .tool-router-details[open] summary { border-bottom: 1px solid #e7e1d7; }
+      .tool-router-details:not([open]) .tool-router { display: none; }
+      .tool-router-details .tool-router { border: 0; border-radius: 0; margin-bottom: 0; }
       .top-tools { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; margin-bottom: 14px; }
       .top-tool { border: 1px solid #d9d1c4; border-radius: 8px; background: #fff; color: #17332f; cursor: pointer; font: inherit; padding: 13px; text-align: left; }
       .top-tool strong { display: block; font-size: 15px; line-height: 1.2; }
@@ -1317,23 +1322,26 @@
               <button class="top-tool" type="button" data-top-tool="pitch" aria-pressed="false"><strong>Pitch</strong><span>Partner-Ask erzeugen</span></button>
               <button class="top-tool" type="button" data-top-tool="proof" aria-pressed="false"><strong>Proof</strong><span>Wirkungsbeleg bauen</span></button>
             </div>
-            <div class="tool-router">
-              <label>Was willst du jetzt tun?
-                <select id="toolRouter">
-                  <option value="auto">Empfohlene naechste Aktion</option>
-                  <option value="board">Gute Tat oder Idee erfassen</option>
-                  <option value="payments">Payment Links verbinden</option>
-                  <option value="pitch">Pitch und Landing-Text bauen</option>
-                  <option value="trust">Vertrauensargumente klaeren</option>
-                  <option value="proof">Proof-Update erstellen</option>
-                  <option value="monthly">Monatsbeitrag planen</option>
-                  <option value="second">Zweite Gabe timen</option>
-                  <option value="share">Social-Post vorbereiten</option>
-                </select>
-              </label>
-              <button type="button" id="toolRouterStart">Starten</button>
-              <p id="toolRouterHint">Waehle eine Aufgabe; der passende Workspace oeffnet sich direkt.</p>
-            </div>
+            <details class="tool-router-details">
+              <summary>Weitere Aufgabe starten</summary>
+              <div class="tool-router">
+                <label>Was willst du jetzt tun?
+                  <select id="toolRouter">
+                    <option value="auto">Empfohlene naechste Aktion</option>
+                    <option value="board">Gute Tat oder Idee erfassen</option>
+                    <option value="payments">Payment Links verbinden</option>
+                    <option value="pitch">Pitch und Landing-Text bauen</option>
+                    <option value="trust">Vertrauensargumente klaeren</option>
+                    <option value="proof">Proof-Update erstellen</option>
+                    <option value="monthly">Monatsbeitrag planen</option>
+                    <option value="second">Zweite Gabe timen</option>
+                    <option value="share">Social-Post vorbereiten</option>
+                  </select>
+                </label>
+                <button type="button" id="toolRouterStart">Starten</button>
+                <p id="toolRouterHint">Waehle eine Aufgabe; der passende Workspace oeffnet sich direkt.</p>
+              </div>
+            </details>
             <details class="tool-tabs">
               <summary>Direktzugriff auf alle Tools</summary>
               <div class="app-tabs" role="tablist" aria-label="Impact Workspace">
