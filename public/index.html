@@ -1218,7 +1218,10 @@
       .board-sort select { width: 100%; border: 1px solid #d9d1c4; border-radius: 8px; background: #fff; color: #20211d; font: inherit; padding: 12px; min-width: 0; }
       .board-count { margin: 10px 0 0; font-size: 13px; color: #575952; }
       .board-view-status { border: 1px solid #e7e1d7; border-radius: 8px; background: #f7f4ef; color: #17332f; font-size: 13px; font-weight: 900; margin: 10px 0 0; padding: 10px 12px; }
-      .board-preset { border: 1px solid #e7e1d7; border-radius: 8px; background: #fff; display: grid; gap: 8px; margin-top: 10px; padding: 10px; }
+      .board-preset { border: 1px solid #e7e1d7; border-radius: 8px; background: #fff; margin-top: 10px; overflow: hidden; }
+      .board-preset summary { cursor: pointer; color: #17332f; font-size: 13px; font-weight: 900; list-style-position: inside; padding: 10px 12px; }
+      .board-preset[open] summary { border-bottom: 1px solid #e7e1d7; }
+      .board-preset-body { display: grid; gap: 8px; padding: 10px; }
       .board-preset-actions { display: flex; flex-wrap: wrap; gap: 8px; }
       .board-preset button { border: 1px solid #e7e1d7; border-radius: 8px; background: #f7f4ef; color: #20211d; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 10px 12px; }
       .board-preset button:first-child { background: #17332f; border-color: #17332f; color: white; }
@@ -1486,14 +1489,17 @@
               </label>
               <p class="board-count" id="boardCount" aria-live="polite">Eintraege werden geladen.</p>
               <p class="board-view-status" id="boardViewStatus" aria-live="polite">Aktuelle Board-Ansicht wird berechnet.</p>
-              <div class="board-preset" aria-label="Board Ansichtspreset">
-                <div class="board-preset-actions">
-                  <button type="button" id="saveBoardPresetButton">Ansicht merken</button>
-                  <button type="button" id="applyBoardPresetButton" disabled>Gemerkte Ansicht laden</button>
-                  <button type="button" id="clearBoardPresetButton" disabled>Preset loeschen</button>
+              <details class="board-preset" id="boardPresetMore" aria-label="Board Ansichtspreset">
+                <summary>Ansicht speichern</summary>
+                <div class="board-preset-body">
+                  <div class="board-preset-actions">
+                    <button type="button" id="saveBoardPresetButton">Ansicht merken</button>
+                    <button type="button" id="applyBoardPresetButton" disabled>Gemerkte Ansicht laden</button>
+                    <button type="button" id="clearBoardPresetButton" disabled>Preset loeschen</button>
+                  </div>
+                  <p id="boardPresetStatus" aria-live="polite">Kein Board-Preset gespeichert.</p>
                 </div>
-                <p id="boardPresetStatus" aria-live="polite">Kein Board-Preset gespeichert.</p>
-              </div>
+              </details>
               <div class="app-actions-row" aria-label="Board Filter">
                 <button class="app-filter active" type="button" data-filter="all">Alle</button>
                 <button class="app-filter" type="button" data-filter="planned">Geplant</button>
@@ -4717,6 +4723,7 @@
         const boardSortKey = "nurGutesBoardSort";
         const boardFocusLimitKey = "nurGutesBoardFocusLimit";
         const boardPresetKey = "nurGutesBoardPreset";
+        const boardPresetMoreKey = "nurGutesBoardPresetMoreOpen";
         const boardOutputMoreKey = "nurGutesBoardOutputMoreOpen";
         const dashboardActionsMoreKey = "nurGutesDashboardActionsMoreOpen";
         const toolDetailsKey = "nurGutesToolDetails";
@@ -4752,18 +4759,18 @@
           }
         ];
         const dailyProductIdea = {
-          id: "daily-2026-07-03-daily-action-drawer",
+          id: "daily-2026-07-03-board-preset-drawer",
           date: "3. Juli 2026",
-          title: "Daily Action Drawer",
+          title: "Board Preset Drawer",
           category: "Business Idee",
           amount: 29,
-          next: "Daily-Karte auf eine Primaeraktion reduzieren und Zusatzaktionen speichern",
-          text: "Die Website zeigt in der Daily-Karte nur noch die Board-Uebernahme direkt und legt Metriken sowie Archiv in ein gespeichertes Daily-Aktionsmenue.",
-          revenueStream: "29-Euro Daily Workflow Setup",
-          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer klarere Daily-Umsetzung",
-          userGrowth: "+1 Board-Startsignal durch weniger sichtbare Daily-Komplexitaet",
+          next: "Board-Ansichtspresets in ein gespeichertes Menue verlegen",
+          text: "Die Website haelt Suche, Sortierung und Status sichtbar, legt aber Ansicht merken, Laden und Loeschen in ein gespeichertes Board-Preset-Menue.",
+          revenueStream: "29-Euro Board Workflow Setup",
+          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer wiederverwendbare Board-Ansichten",
+          userGrowth: "+1 Wiederkehrsignal durch gespeicherte Board-Arbeitsansicht",
           socialStatus: "Postingtexte im Social-Tool vorbereitet; keine externen Connectoren autorisiert",
-          implementedFunction: "Daily-Aktionsmenue einklappen, oeffnen, speichern und nach Reload wiederherstellen.",
+          implementedFunction: "Board-Preset-Menue einklappen, oeffnen, speichern und nach Reload wiederherstellen.",
           reinvestment: "40% gute Taten, 25% bessere Fokus- und Workspace-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
         };
         const paymentLabels = {
@@ -4819,6 +4826,7 @@
         let currentBoardSearch = localStorage.getItem(boardSearchKey) || "";
         let currentBoardSort = boardSortOptions.includes(localStorage.getItem(boardSortKey)) ? localStorage.getItem(boardSortKey) : "manual";
         let boardFocusLimitEnabled = localStorage.getItem(boardFocusLimitKey) !== "false";
+        let boardPresetMoreOpen = localStorage.getItem(boardPresetMoreKey) === "true";
         let boardOutputMoreOpen = localStorage.getItem(boardOutputMoreKey) === "true";
         let dashboardActionsMoreOpen = localStorage.getItem(dashboardActionsMoreKey) === "true";
         let savedBoardPreset = loadJson(boardPresetKey, null);
@@ -5615,6 +5623,11 @@
           localStorage.setItem(boardOutputMoreKey, String(boardOutputMoreOpen));
         }
 
+        function setBoardPresetMoreOpen(open) {
+          boardPresetMoreOpen = Boolean(open);
+          localStorage.setItem(boardPresetMoreKey, String(boardPresetMoreOpen));
+        }
+
         function setDashboardActionsMoreOpen(open) {
           dashboardActionsMoreOpen = Boolean(open);
           localStorage.setItem(dashboardActionsMoreKey, String(dashboardActionsMoreOpen));
@@ -5713,9 +5726,11 @@
 
         function renderBoardPreset() {
           const hasPreset = boardPresetIsValid(savedBoardPreset);
+          const presetMore = qs("#boardPresetMore");
           const status = qs("#boardPresetStatus");
           const applyButton = qs("#applyBoardPresetButton");
           const clearButton = qs("#clearBoardPresetButton");
+          if (presetMore && presetMore.open !== boardPresetMoreOpen) presetMore.open = boardPresetMoreOpen;
           if (status) status.textContent = boardPresetLabel();
           [applyButton, clearButton].filter(Boolean).forEach((button) => {
             button.disabled = !hasPreset;
@@ -6993,6 +7008,7 @@
           localStorage.setItem(compactBoardKey, String(boardCompact));
           renderBoard();
         });
+        qs("#boardPresetMore")?.addEventListener("toggle", (event) => setBoardPresetMoreOpen(event.target.open));
         qs("#saveBoardPresetButton")?.addEventListener("click", saveBoardPreset);
         qs("#applyBoardPresetButton")?.addEventListener("click", applyBoardPreset);
         qs("#clearBoardPresetButton")?.addEventListener("click", clearBoardPreset);
