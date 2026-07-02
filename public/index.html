@@ -4735,17 +4735,29 @@
           ].join("\n");
         }
 
+        function activeToolLabel(toolName = activeTool) {
+          const tab = qs(`[data-app-tab="${toolName}"]`);
+          return tab?.textContent?.trim() || "Board";
+        }
+
+        function renderWorkspaceStatus() {
+          const status = qs("#focusModeStatus");
+          if (!status) return;
+          const mode = focusMode ? "Arbeitsmodus" : "Magazinmodus";
+          const visibility = focusMode ? "nur Workspace sichtbar" : "Magazinbereiche sichtbar";
+          status.textContent = `${mode}: ${activeToolLabel()} aktiv, ${visibility}.`;
+        }
+
         function setFocusMode(enabled, shouldScroll = false, shouldPersist = true) {
           focusMode = Boolean(enabled);
           document.body.classList.toggle("focus-mode", focusMode);
           if (shouldPersist) localStorage.setItem(focusKey, String(focusMode));
           const button = qs("#focusModeToggle");
-          const status = qs("#focusModeStatus");
           if (button) {
             button.setAttribute("aria-pressed", String(focusMode));
             button.textContent = focusMode ? "Magazinmodus anzeigen" : "Arbeitsmodus aktivieren";
           }
-          if (status) status.textContent = focusMode ? "Nur Workspace und Navigation sind sichtbar." : "Magazinbereiche bleiben sichtbar.";
+          renderWorkspaceStatus();
           if (shouldScroll) requestAnimationFrame(() => qs("#app")?.scrollIntoView({ behavior: "smooth", block: "start" }));
         }
 
@@ -5754,6 +5766,7 @@
           if (router) router.value = quickTask === "auto" ? "auto" : selectedName;
           if (hint) hint.textContent = toolHints[selectedName] || toolHints.board;
           if (shouldPersist) localStorage.setItem(activeToolKey, selectedName);
+          renderWorkspaceStatus();
         }
         function openItemTool(itemId, toolName, syncQuickTask = true) {
           const select = qs(`#${toolName}Item`);
