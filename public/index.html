@@ -5094,8 +5094,13 @@
           qs("#metricDone").textContent = doneItems.length;
           qsa("[data-stat-filter]").forEach((button) => {
             const count = button.dataset.statKey === "active" ? activeItems.length : button.dataset.statKey === "done" ? doneItems.length : items.length;
-            button.disabled = ["active", "done"].includes(button.dataset.statKey) && count === 0 && button.dataset.statKey !== currentStatKey;
+            const isStatusStat = ["active", "done"].includes(button.dataset.statKey);
+            const isUnavailable = isStatusStat && count === 0 && button.dataset.statKey !== currentStatKey;
+            const label = button.querySelector("span")?.textContent?.trim() || "Kennzahl";
+            button.disabled = isUnavailable;
             button.setAttribute("aria-pressed", String(button.dataset.statKey === currentStatKey));
+            button.setAttribute("aria-label", isUnavailable ? `${label}: 0 Eintraege, Filter nicht verfuegbar` : `${label}: ${count} Eintraege anzeigen`);
+            button.title = isUnavailable ? `${label}: keine passenden Eintraege` : `${label}: Board danach filtern`;
           });
           const connected = Object.values(stripeLinks).some(Boolean);
           qs("#stripeStatus").textContent = connected ? "Stripe Payment Links verbunden" : "Stripe Payment Links nicht verbunden";
