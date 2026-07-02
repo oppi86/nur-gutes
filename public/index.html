@@ -5096,10 +5096,14 @@
 
         function openToolHub() {
           setFocusMode(true);
-          setActiveTool(activeTool || "board");
+          const hubTool = ["board", "pitch", "proof"].includes(activeTool) ? activeTool : "board";
+          setActiveTool(hubTool);
+          setQuickTask(hubTool);
           const hub = qs("#tools");
           const status = qs("#toolRouterHint");
           if (status) status.textContent = "Tool-Hub aktiv: Waehle Board, Pitch oder Proof als schnellsten Arbeitsweg.";
+          const actionStatus = qs("#nextActionStatus");
+          if (actionStatus) actionStatus.textContent = "Tool-Hub aktiv: Board, Pitch und Proof sind die drei sichtbaren Hauptwerkzeuge.";
           if (!hub) return;
           hub.classList.add("tool-hub-active");
           requestAnimationFrame(() => hub.scrollIntoView({ behavior: "smooth", block: "center" }));
