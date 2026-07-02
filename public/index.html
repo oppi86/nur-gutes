@@ -1334,6 +1334,7 @@
               <p id="dailyFocusStatus">Waehle einen Board-Eintrag als Fokus, damit der naechste Besuch direkt klar startet.</p>
               <div class="app-focus-actions">
                 <button type="button" id="startDailyFocusButton" disabled>Fokus starten</button>
+                <button type="button" id="copyDailyFocusButton" disabled>Brief kopieren</button>
                 <button type="button" id="clearDailyFocusButton" disabled>Fokus loesen</button>
               </div>
             </div>
@@ -4694,18 +4695,18 @@
           }
         ];
         const dailyProductIdea = {
-          id: "daily-2026-07-03-daily-focus-pin",
+          id: "daily-2026-07-03-focus-brief",
           date: "3. Juli 2026",
-          title: "Daily Focus Pin",
+          title: "Daily Focus Brief",
           category: "Business Idee",
-          amount: 39,
-          next: "Einen Board-Eintrag als Tagesfokus speichern und direkt starten",
-          text: "Die Website macht aus dem Board eine klare Tagesansicht: ein Eintrag wird als Fokus gespeichert, oben angezeigt und kann sofort gestartet werden.",
-          revenueStream: "39-Euro Focus Setup",
-          dailyRevenue: "Ziel: erster 39-Euro Setup-Kauf fuer einen klaren Tagesfokus",
-          userGrowth: "+1 Rueckkehrsignal durch weniger Entscheidungslast",
+          amount: 45,
+          next: "Aus dem Tagesfokus einen kopierbaren Umsetzungsbrief erzeugen",
+          text: "Die Website verwandelt den gespeicherten Tagesfokus in einen kurzen Arbeitsbrief mit naechstem Schritt, Revenue-Ziel, Impact-Anteil und Reinvestitionslogik.",
+          revenueStream: "45-Euro Focus Brief Setup",
+          dailyRevenue: "Ziel: erster 45-Euro Setup-Kauf fuer einen klaren Tagesbrief",
+          userGrowth: "+1 Share- oder Team-Signal durch kopierbaren Fokusplan",
           socialStatus: "Postingtexte im Social-Tool vorbereitet; keine externen Connectoren autorisiert",
-          implementedFunction: "Board-Eintrag als Tagesfokus speichern, anzeigen, starten und loesen.",
+          implementedFunction: "Tagesfokus als strukturierten Brief kopieren.",
           reinvestment: "40% gute Taten, 25% bessere Fokus- und Workspace-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
         };
         const paymentLabels = {
@@ -5393,6 +5394,7 @@
           const title = qs("#dailyFocusTitle");
           const status = qs("#dailyFocusStatus");
           const startButton = qs("#startDailyFocusButton");
+          const copyButton = qs("#copyDailyFocusButton");
           const clearButton = qs("#clearDailyFocusButton");
           const hasFocus = Boolean(item);
           if (title) title.textContent = item?.title || "Kein Fokus gesetzt";
@@ -5405,10 +5407,50 @@
             startButton.disabled = !hasFocus || item.status === "done";
             startButton.title = !hasFocus ? "Noch kein Tagesfokus gesetzt" : item.status === "done" ? "Fertige Eintraege koennen nicht gestartet werden" : "Tagesfokus mit passendem Tool starten";
           }
+          if (copyButton) {
+            copyButton.disabled = !hasFocus;
+            copyButton.title = hasFocus ? "Kopierbaren Tagesbrief aus Fokus erzeugen" : "Noch kein Tagesfokus gesetzt";
+          }
           if (clearButton) {
             clearButton.disabled = !hasFocus;
             clearButton.title = hasFocus ? "Tagesfokus loesen" : "Noch kein Tagesfokus gesetzt";
           }
+        }
+
+        function dailyFocusBriefText(item) {
+          const amount = Number(item?.amount) || 0;
+          return [
+            `Nur Gutes Tagesfokus: ${item?.title || "Ohne Titel"}`,
+            "",
+            `Status: ${item?.status || "planned"}`,
+            `Kategorie: ${item?.category || "Board"}`,
+            `Revenue-Ziel: ${money(amount)}`,
+            `Impact-Anteil 40%: ${money(amount * 0.4)}`,
+            "",
+            `Naechster Schritt: ${item?.next || "Naechsten Schritt klaeren"}`,
+            `Warum es wichtig ist: ${item?.text || "Ein konkreter Schritt mit sichtbarem Nutzen."}`,
+            "",
+            "Heute erledigen:",
+            "1. Fokus kurz pruefen",
+            "2. passenden Kontakt oder Proof vorbereiten",
+            "3. Ergebnis im Board aktualisieren",
+            "",
+            "Reinvestition: 40% gute Taten, 25% bessere Fokus-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
+          ].join("\n");
+        }
+
+        async function copyDailyFocusBrief() {
+          const item = dailyFocusItem();
+          const status = qs("#dailyFocusStatus");
+          if (!item) {
+            if (status) status.textContent = "Kein Tagesfokus fuer einen Brief gesetzt.";
+            return;
+          }
+          const copied = await copyText(dailyFocusBriefText(item));
+          rememberCopy(`Tagesfokus-Brief: ${item.title || "Ohne Titel"}`, copied);
+          if (status) status.textContent = copied
+            ? "Tagesfokus-Brief kopiert."
+            : "Tagesfokus-Brief konnte nicht automatisch kopiert werden.";
         }
 
         function startDailyFocus() {
@@ -6542,6 +6584,7 @@
         }));
         qs("#nextActionButton")?.addEventListener("click", startRecommendedAction);
         qs("#startDailyFocusButton")?.addEventListener("click", startDailyFocus);
+        qs("#copyDailyFocusButton")?.addEventListener("click", copyDailyFocusBrief);
         qs("#clearDailyFocusButton")?.addEventListener("click", () => setDailyFocus(""));
         qs("#addDailyIdeaButton")?.addEventListener("click", addDailyIdeaToBoard);
         qs("#toggleDailyDetails")?.addEventListener("click", () => setDailyDetailsOpen(!dailyDetailsOpen));
