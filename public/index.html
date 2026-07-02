@@ -5235,11 +5235,15 @@
           if (clearDoneButton) {
             clearDoneButton.disabled = doneCount === 0;
             clearDoneButton.textContent = doneCount ? `Fertige entfernen (${doneCount})` : "Fertige entfernen";
+            clearDoneButton.title = doneCount ? `${doneCount} fertige Eintraege aus dem Board entfernen` : "Keine fertigen Eintraege zum Entfernen";
+            clearDoneButton.setAttribute("aria-label", clearDoneButton.title);
           }
           const restoreDoneButton = qs("#restoreDoneButton");
           if (restoreDoneButton) {
             restoreDoneButton.disabled = lastRemovedItems.length === 0;
             restoreDoneButton.textContent = lastRemovedItems.length ? `Entfernte wiederherstellen (${lastRemovedItems.length})` : "Entfernte wiederherstellen";
+            restoreDoneButton.title = lastRemovedItems.length ? `${lastRemovedItems.length} entfernte Eintraege wiederherstellen` : "Keine entfernten Eintraege zum Wiederherstellen";
+            restoreDoneButton.setAttribute("aria-label", restoreDoneButton.title);
           }
           const undoStatus = qs("#boardUndoStatus");
           if (undoStatus) {
