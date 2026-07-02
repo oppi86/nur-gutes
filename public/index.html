@@ -1160,6 +1160,13 @@
       .app-export-more summary { cursor: pointer; color: rgba(255,255,255,.88); font-size: 13px; font-weight: 900; list-style-position: inside; padding: 10px 12px; }
       .app-export-more[open] summary { border-bottom: 1px solid rgba(255,255,255,.14); }
       .app-export-secondary { padding: 10px; }
+      .app-panel .app-export { border: 1px solid #d8e2dc; border-radius: 8px; background: #f8fbf8; margin: 12px 0; padding: 12px; }
+      .app-panel .app-export button { border-color: #c9dad2; background: white; color: #17332f; }
+      .app-panel .app-export > button:first-child { background: #17332f; border-color: #17332f; color: white; }
+      .app-panel .app-export p { color: #58716a; }
+      .app-panel .app-export-more { border-color: #d8e2dc; }
+      .app-panel .app-export-more summary { color: #36524a; }
+      .app-panel .app-export-more[open] summary { border-bottom-color: #d8e2dc; }
       .app-daily { border: 1px solid rgba(255,255,255,.2); border-radius: 8px; background: rgba(255,255,255,.1); margin-top: 18px; padding: 16px; }
       .app-daily h3 { color: white; font-size: 20px; margin: 4px 0 8px; }
       .app-daily p { color: rgba(255,255,255,.82); font-size: 13px; margin: 0; }
@@ -1411,16 +1418,6 @@
                 </div>
               </details>
             </div>
-            <div class="app-export">
-              <button type="button" id="exportBoardButton">Board als CSV exportieren</button>
-              <details class="app-export-more" id="boardOutputMore">
-                <summary>Weitere Ausgabe</summary>
-                <div class="app-export-secondary">
-                  <button type="button" id="copyBoardReportButton">Board-Report kopieren</button>
-                </div>
-              </details>
-              <p id="exportBoardStatus" aria-live="polite">Export fuer Sheets, CRM oder Partner-Reporting.</p>
-            </div>
             <article class="app-daily" id="dailyIdeaCard" aria-labelledby="dailyIdeaTitle">
               <p class="tag" id="dailyIdeaDate">Daily Product Cycle</p>
               <h3 id="dailyIdeaTitle">Daily-Idee wird geladen</h3>
@@ -1531,6 +1528,16 @@
               </label>
               <p class="board-count" id="boardCount" aria-live="polite">Eintraege werden geladen.</p>
               <p class="board-view-status" id="boardViewStatus" aria-live="polite">Aktuelle Board-Ansicht wird berechnet.</p>
+              <div class="app-export">
+                <button type="button" id="exportBoardButton">Board als CSV exportieren</button>
+                <details class="app-export-more" id="boardOutputMore">
+                  <summary>Weitere Ausgabe</summary>
+                  <div class="app-export-secondary">
+                    <button type="button" id="copyBoardReportButton">Board-Report kopieren</button>
+                  </div>
+                </details>
+                <p id="exportBoardStatus" aria-live="polite">Export fuer Sheets, CRM oder Partner-Reporting.</p>
+              </div>
               <details class="board-preset" id="boardPresetMore" aria-label="Board Ansichtspreset">
                 <summary>Ansicht speichern</summary>
                 <div class="board-preset-body">
@@ -4813,18 +4820,18 @@
           }
         ];
         const dailyProductIdea = {
-          id: "daily-2026-07-03-next-action-copy",
+          id: "daily-2026-07-03-board-export-ia",
           date: "3. Juli 2026",
-          title: "Next Action Copy",
+          title: "Board Export IA",
           category: "Business Idee",
           amount: 29,
-          next: "Empfohlene naechste Aktion als kurzes Briefing kopieren",
-          text: "Der Action-Launcher kann die aktuell empfohlene Board-Aktion als kompaktes Arbeitsbriefing kopieren, ohne eine neue Startseiten-Sektion zu erzeugen.",
-          revenueStream: "29-Euro Action Brief Setup",
-          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer schnellere Team-Uebergaben",
-          userGrowth: "+1 Share-Signal durch kopierbare Next-Action-Briefs",
+          next: "Board-Export aus dem Dashboard-Intro in den Board-Workspace verschieben",
+          text: "Der Export sitzt jetzt direkt bei Suche, Sortierung und Board-Ansicht. Das Dashboard-Intro bleibt ruhiger, und der ausgegebene Datenausschnitt ist klarer nachvollziehbar.",
+          revenueStream: "29-Euro Board Export Setup",
+          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer bessere Board-Ausgaben",
+          userGrowth: "+1 Nutzbarkeits-Signal durch kontextnahen Export im Board",
           socialStatus: "Postingtexte im Social-Tool vorbereitet; keine externen Connectoren autorisiert",
-          implementedFunction: "Empfohlene naechste Aktion berechnen, als Briefing kopieren, Kopierstatus speichern und Drawer-Zustand merken.",
+          implementedFunction: "Gefilterte Board-Daten weiter als CSV exportieren oder als Report kopieren, jetzt direkt im Board-Kontext.",
           reinvestment: "40% gute Taten, 25% bessere Fokus- und Workspace-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
         };
         const paymentLabels = {
