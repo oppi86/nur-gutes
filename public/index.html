@@ -1116,6 +1116,7 @@
       .app-stats { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; margin-top: 20px; }
       .app-stats button { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); border-radius: 8px; color: white; cursor: pointer; font: inherit; padding: 16px; text-align: left; }
       .app-stats button:hover, .app-stats button:focus-visible { background: rgba(255,255,255,.16); outline: 2px solid rgba(249,214,92,.8); outline-offset: 2px; }
+      .app-stats button[aria-pressed="true"] { background: rgba(249,214,92,.22); border-color: #f9d65c; }
       .app-stats strong { display: block; color: #f9d65c; font-size: 28px; line-height: 1; margin-bottom: 6px; }
       .app-next-action { display: grid; gap: 8px; margin-top: 18px; }
       .app-next-action button { width: 100%; border: 0; border-radius: 8px; background: #fff; color: #17332f; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 12px 14px; }
@@ -5076,6 +5077,9 @@
           qs("#metricRevenue").textContent = money(revenue);
           qs("#metricImpact").textContent = money(revenue * 0.4);
           qs("#metricDone").textContent = items.filter((item) => item.status === "done").length;
+          qsa("[data-stat-filter]").forEach((button) => {
+            button.setAttribute("aria-pressed", String(button.dataset.statFilter === currentFilter));
+          });
           const connected = Object.values(stripeLinks).some(Boolean);
           qs("#stripeStatus").textContent = connected ? "Stripe Payment Links verbunden" : "Stripe Payment Links nicht verbunden";
         }
@@ -5307,6 +5311,7 @@
           setActiveTool("board");
           setQuickTask("board");
           setBoardFormCollapsed(true);
+          renderStats();
           renderBoard();
           renderNextAction();
           requestAnimationFrame(() => qs("#impactList")?.scrollIntoView({ behavior: "smooth", block: "start" }));
