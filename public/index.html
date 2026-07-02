@@ -4729,7 +4729,12 @@
         }
 
         function recommendNextAction() {
-          return recommendActionForItem(items.find((entry) => entry.status !== "done") || items[0]);
+          const boardViewIsScoped = currentFilter !== "all" || currentBoardSearch.trim().length > 0;
+          const scopedItem = boardViewIsScoped ? getVisibleBoardItems().visibleItems.find((entry) => entry.status !== "done") : null;
+          if (boardViewIsScoped && !scopedItem) return { scoped: true, empty: true };
+          const fallbackItem = items.find((entry) => entry.status !== "done") || items[0];
+          const action = recommendActionForItem(scopedItem || fallbackItem);
+          return action ? { ...action, scoped: Boolean(scopedItem) } : null;
         }
 
         function renderNextAction() {
@@ -4743,9 +4748,15 @@
             status.textContent = "Noch kein Board-Eintrag vorhanden.";
             return;
           }
+          if (action.empty) {
+            button.disabled = true;
+            button.textContent = "Kein sichtbarer Start";
+            status.textContent = "Aktuelle Board-Suche oder Filter zeigt keinen startbaren Eintrag.";
+            return;
+          }
           button.disabled = false;
           button.textContent = `${action.label} starten`;
-          status.textContent = `${action.item.title}: ${action.reason}`;
+          status.textContent = `${action.scoped ? "Aus aktueller Ansicht: " : ""}${action.item.title}: ${action.reason}`;
         }
 
         function startRecommendedAction() {
@@ -5032,6 +5043,7 @@
           const search = qs("#boardSearch");
           if (search) search.value = "";
           renderBoard();
+          renderNextAction();
           search?.focus();
         }
 
@@ -5041,6 +5053,7 @@
           const search = qs("#boardSearch");
           if (search) search.value = "";
           renderBoard();
+          renderNextAction();
           if (shouldFocus) search?.focus();
         }
 
@@ -5736,6 +5749,7 @@
             currentFilter = button.dataset.filter;
             saveBoardView();
             renderBoard();
+            renderNextAction();
           });
         });
         qs("#clearDoneButton")?.addEventListener("click", () => {
@@ -5768,6 +5782,7 @@
           currentBoardSearch = event.target.value;
           saveBoardView();
           renderBoard();
+          renderNextAction();
         });
         qs("#boardSearch")?.addEventListener("keydown", (event) => {
           if (event.isComposing) return;
