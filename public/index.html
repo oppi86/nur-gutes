@@ -4571,6 +4571,7 @@
         const quickTaskKey = "nurGutesQuickTask";
         const boardFilterKey = "nurGutesBoardFilter";
         const boardSearchKey = "nurGutesBoardSearch";
+        const toolDetailsKey = "nurGutesToolDetails";
         const lastCopyKey = "nurGutesLastCopy";
         const lastExportKey = "nurGutesLastExport";
         const pitchChannelKey = "nurGutesPitchChannel";
@@ -4649,6 +4650,7 @@
         let quickTask = localStorage.getItem(quickTaskKey) || "auto";
         let currentFilter = ["all", "planned", "active", "done"].includes(localStorage.getItem(boardFilterKey)) ? localStorage.getItem(boardFilterKey) : "all";
         let currentBoardSearch = localStorage.getItem(boardSearchKey) || "";
+        let savedToolDetails = loadJson(toolDetailsKey, {});
         let savedPitchChannel = localStorage.getItem(pitchChannelKey) || "daily-growth";
         let savedTrustSettings = loadJson(trustSettingsKey, {});
         let savedMonthlySettings = loadJson(monthlySettingsKey, {});
@@ -5832,6 +5834,14 @@
         setQuickTask(quickTask, false);
         const pitchChannelInput = qs("#pitchChannel");
         if (pitchChannelInput) pitchChannelInput.value = savedPitchChannel;
+        const toolDetailSelectors = {
+          router: ".tool-router-details",
+          tabs: ".tool-tabs"
+        };
+        Object.entries(toolDetailSelectors).forEach(([key, selector]) => {
+          const detail = qs(selector);
+          if (detail && savedToolDetails[key] === true) detail.open = true;
+        });
         const trustSettingSelectors = {
           supporter: "#trustSupporter",
           action: "#trustAction",
@@ -5875,6 +5885,17 @@
         qsa("[data-app-tab]").forEach((tab) => {
           tab.addEventListener("click", () => {
             activateToolShortcut(tab.dataset.appTab);
+          });
+        });
+        Object.entries(toolDetailSelectors).forEach(([key, selector]) => {
+          const detail = qs(selector);
+          if (!detail) return;
+          detail.addEventListener("toggle", () => {
+            savedToolDetails = {
+              ...savedToolDetails,
+              [key]: detail.open
+            };
+            localStorage.setItem(toolDetailsKey, JSON.stringify(savedToolDetails));
           });
         });
         qs("#toolRouter")?.addEventListener("change", (event) => setQuickTask(event.target.value));
