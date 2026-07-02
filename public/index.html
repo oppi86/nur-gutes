@@ -5083,6 +5083,11 @@
           const activeItems = items.filter((item) => item.status === "active");
           const doneItems = items.filter((item) => item.status === "done");
           const revenue = items.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+          if ((currentStatKey === "active" && activeItems.length === 0) || (currentStatKey === "done" && doneItems.length === 0)) {
+            currentStatKey = "revenue";
+            if (["active", "done"].includes(currentFilter)) currentFilter = "all";
+            saveBoardView();
+          }
           qs("#metricActions").textContent = activeItems.length;
           qs("#metricRevenue").textContent = money(revenue);
           qs("#metricImpact").textContent = money(revenue * 0.4);
