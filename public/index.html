@@ -1228,7 +1228,7 @@
       .second-score { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; margin: 16px 0; }
       .second-score article { border: 1px solid #e7e1d7; box-shadow: none; padding: 16px; }
       .second-score strong { display: block; color: #17332f; font-size: 26px; line-height: 1.05; margin-top: 4px; }
-      .focus-mode main > section:not(.hero):not(.impact-app):not(.archive-control), .focus-mode footer { display: none; }
+      .focus-mode main > section:not(.hero):not(.impact-app), .focus-mode footer { display: none; }
       .focus-mode .hero { min-height: auto; padding-top: 14px; padding-bottom: 14px; background: #17332f; }
       .focus-mode .hero img, .focus-mode .shade, .focus-mode .hero-content { display: none; }
       .focus-mode nav div a[href="#app"] { display: none; }
@@ -5543,7 +5543,7 @@
         }
 
         function focusArchiveSearch() {
-          setFocusMode(true);
+          setFocusMode(false);
           const section = qs("#daily-archive");
           const search = qs("#archiveSearch");
           if (!section || !search) return;
