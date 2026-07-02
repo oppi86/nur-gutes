@@ -5776,6 +5776,13 @@
           if (shouldPersist) localStorage.setItem(activeToolKey, selectedName);
           renderWorkspaceStatus();
         }
+        function activateTopTool(toolName) {
+          setActiveTool(toolName);
+          setQuickTask(toolName);
+          setFocusMode(true, false, true);
+          const panel = qs(`[data-app-panel="${activeTool}"]`);
+          requestAnimationFrame(() => panel?.scrollIntoView({ behavior: "smooth", block: "start" }));
+        }
         function openItemTool(itemId, toolName, syncQuickTask = true) {
           const select = qs(`#${toolName}Item`);
           if (select && items.some((item) => item.id === itemId)) select.value = itemId;
@@ -5815,9 +5822,7 @@
         setQuickTask(quickTask, false);
         qsa("[data-top-tool]").forEach((button) => {
           button.addEventListener("click", () => {
-            setActiveTool(button.dataset.topTool);
-            setQuickTask(button.dataset.topTool);
-            setFocusMode(true, true);
+            activateTopTool(button.dataset.topTool);
           });
         });
         qsa("[data-app-tab]").forEach((tab) => {
