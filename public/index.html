@@ -5220,6 +5220,12 @@
             button.title = visibleItems.length ? `${action} fuer ${visibleItems.length} sichtbare Eintraege` : `${action} nicht verfuegbar: keine sichtbaren Eintraege`;
             button.setAttribute("aria-label", button.title);
           });
+          const exportStatus = qs("#exportBoardStatus");
+          if (exportStatus) {
+            exportStatus.textContent = visibleItems.length
+              ? `${visibleItems.length} sichtbare Eintraege bereit fuer Export oder Board-Report.`
+              : "Keine sichtbaren Board-Eintraege fuer Export oder Board-Report.";
+          }
           const clearBoardSearch = qs("#clearBoardSearch");
           if (clearBoardSearch) clearBoardSearch.disabled = query.length === 0 && currentFilter === "all";
           const search = qs("#boardSearch");
