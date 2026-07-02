@@ -5776,7 +5776,7 @@
           if (shouldPersist) localStorage.setItem(activeToolKey, selectedName);
           renderWorkspaceStatus();
         }
-        function activateTopTool(toolName) {
+        function activateToolShortcut(toolName) {
           setActiveTool(toolName);
           setQuickTask(toolName);
           setFocusMode(true, false, true);
@@ -5822,13 +5822,12 @@
         setQuickTask(quickTask, false);
         qsa("[data-top-tool]").forEach((button) => {
           button.addEventListener("click", () => {
-            activateTopTool(button.dataset.topTool);
+            activateToolShortcut(button.dataset.topTool);
           });
         });
         qsa("[data-app-tab]").forEach((tab) => {
           tab.addEventListener("click", () => {
-            setActiveTool(tab.dataset.appTab);
-            setQuickTask(tab.dataset.appTab);
+            activateToolShortcut(tab.dataset.appTab);
           });
         });
         qs("#toolRouter")?.addEventListener("change", (event) => setQuickTask(event.target.value));
