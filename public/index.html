@@ -1255,9 +1255,18 @@
       .focus-mode .hero img, .focus-mode .shade, .focus-mode .hero-content { display: none; }
       .focus-mode nav div a[href="#app"] { display: none; }
       .focus-mode .impact-app { min-height: calc(100vh - 56px); padding-top: 32px; }
+      .dashboard-first.focus-mode .hero { display: none; }
+      .dashboard-first.focus-mode .impact-app { min-height: 100vh; padding-top: 20px; }
+      .app-nav { display: none; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+      .app-nav strong { color: #17332f; font-size: 20px; }
+      .app-nav div { display: flex; flex-wrap: wrap; gap: 8px; }
+      .app-nav a, .app-nav button { border: 1px solid #d9d1c4; border-radius: 8px; background: #fff; color: #17332f; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 10px 12px; }
+      .app-nav button[aria-pressed="true"] { background: #17332f; border-color: #17332f; color: white; }
+      .focus-mode .app-nav { display: flex; }
       footer { background: #20211d; color: white; padding: 40px 48px; }
       @media (max-width: 860px) {
         .app-shell, .tool-router, .top-tools, .resource-list, .app-form, .stripe-grid, .pay-grid, .pitch-grid, .pitch-preview, .trust-grid, .trust-plan, .proof-grid, .proof-ledger, .monthly-grid, .monthly-tiers, .second-grid, .second-score { grid-template-columns: 1fr; }
+        .app-nav { align-items: flex-start; flex-direction: column; }
         .app-intro { margin-bottom: 20px; }
         .app-card-head { display: block; }
       }
@@ -1287,6 +1296,16 @@
       </section>
 
       <section class="impact-app" id="app">
+        <div class="wrap">
+          <div class="app-nav" aria-label="Kompakte App Navigation">
+            <strong>Nur Gutes</strong>
+            <div>
+              <a href="#tools" data-tool-hub="true">Tools</a>
+              <a href="#daily-archive" data-archive-search="true">Archiv</a>
+              <button type="button" id="dashboardFirstToggle" aria-pressed="true">Dashboard zuerst</button>
+            </div>
+          </div>
+        </div>
         <div class="wrap app-shell">
           <article class="app-intro">
             <p class="app-status" id="stripeStatus">Stripe Payment Links nicht verbunden</p>
@@ -4617,6 +4636,7 @@
         const archiveSearchKey = "nurGutesArchiveSearch";
         const archiveOpenKey = "nurGutesArchiveOpen";
         const removedItemsKey = "nurGutesRemovedDone";
+        const dashboardFirstKey = "nurGutesDashboardFirst";
         const quickTaskKey = "nurGutesQuickTask";
         const boardFilterKey = "nurGutesBoardFilter";
         const boardStatKey = "nurGutesBoardStat";
@@ -4657,19 +4677,19 @@
           }
         ];
         const dailyProductIdea = {
-          id: "daily-2026-07-02-board-view-preset",
-          date: "2. Juli 2026",
-          title: "Board View Preset",
+          id: "daily-2026-07-03-dashboard-first",
+          date: "3. Juli 2026",
+          title: "Dashboard First Switch",
           category: "Business Idee",
-          amount: 49,
-          next: "Eine hilfreiche Board-Ansicht speichern und als Arbeitsmodus wiederverwenden",
-          text: "Die Website merkt eine gefilterte, sortierte und kompakte Board-Ansicht, damit wiederkehrende Nutzer sofort in ihren wichtigsten Arbeitsmodus zurueckkehren.",
-          revenueStream: "49-Euro Workspace Setup",
-          dailyRevenue: "Ziel: erster 49-Euro Setup-Kauf fuer ein gespeichertes Impact-Board",
-          userGrowth: "+1 wiederkehrender Nutzer durch schnelleren Einstieg",
+          amount: 59,
+          next: "Die Startansicht als echtes Dashboard statt Hero-Seite speichern",
+          text: "Die Website kann im Arbeitsmodus direkt mit dem Impact Workspace starten und die Hero-Flaeche nur bei Bedarf anzeigen.",
+          revenueStream: "59-Euro Dashboard Setup",
+          dailyRevenue: "Ziel: erster 59-Euro Setup-Kauf fuer eine klare Dashboard-Startseite",
+          userGrowth: "+1 wiederkehrender Nutzer durch weniger Einstiegshuerde",
           socialStatus: "Postingtexte im Social-Tool vorbereitet; keine externen Connectoren autorisiert",
-          implementedFunction: "Board-Ansicht speichern, laden und loeschen.",
-          reinvestment: "40% gute Taten, 25% bessere Workspace-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
+          implementedFunction: "Dashboard-zuerst-Modus speichern und Hero im Arbeitsmodus optional ausblenden.",
+          reinvestment: "40% gute Taten, 25% bessere Navigations- und Workspace-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
         };
         const paymentLabels = {
           quick: "Quick Sponsor",
@@ -4708,6 +4728,7 @@
         let archiveOpen = false;
         let archiveSearchMode = false;
         let selectedArchivePreviewTitle = "";
+        let dashboardFirst = localStorage.getItem(dashboardFirstKey) !== "false";
         if (localStorage.getItem(archiveOpenKey) === "true") localStorage.setItem(archiveOpenKey, "false");
         let quickTask = localStorage.getItem(quickTaskKey) || "auto";
         let currentFilter = ["all", "planned", "active", "done"].includes(localStorage.getItem(boardFilterKey)) ? localStorage.getItem(boardFilterKey) : "all";
@@ -4857,9 +4878,22 @@
           const status = qs("#focusModeStatus");
           if (!status) return;
           const mode = focusMode ? "Arbeitsmodus" : "Magazinmodus";
-          const visibility = focusMode ? "nur Workspace sichtbar" : "Magazinbereiche sichtbar";
+          const visibility = focusMode ? (dashboardFirst ? "Dashboard ist erster Screen" : "kompakte Navigation sichtbar") : "Magazinbereiche sichtbar";
           status.textContent = `${mode}: ${activeToolLabel()} aktiv, ${visibility}.`;
           renderDashboardCompactness();
+        }
+
+        function setDashboardFirst(enabled, shouldPersist = true) {
+          dashboardFirst = Boolean(enabled);
+          document.body.classList.toggle("dashboard-first", dashboardFirst);
+          const button = qs("#dashboardFirstToggle");
+          if (button) {
+            button.setAttribute("aria-pressed", String(dashboardFirst));
+            button.textContent = dashboardFirst ? "Dashboard zuerst" : "Dashboard zuerst aktivieren";
+            button.title = dashboardFirst ? "Arbeitsmodus startet direkt im Dashboard" : "Hero im Arbeitsmodus sichtbar; hier zur Dashboard-Startansicht wechseln";
+          }
+          if (shouldPersist) localStorage.setItem(dashboardFirstKey, String(dashboardFirst));
+          renderWorkspaceStatus();
         }
 
         function getDashboardCompactness() {
@@ -6415,9 +6449,11 @@
         setupIdeaExplorer();
         setupResourcePanel();
         setupCommonsFeed();
+        setDashboardFirst(dashboardFirst, false);
         setFocusMode(focusMode);
         setBoardFormCollapsed(boardFormCollapsed, false);
         qs("#focusModeToggle")?.addEventListener("click", () => setFocusMode(!focusMode, true));
+        qs("#dashboardFirstToggle")?.addEventListener("click", () => setDashboardFirst(!dashboardFirst));
         qs("#resumeWorkspaceButton")?.addEventListener("click", resumeLastWorkspace);
         qs("#resetDashboardButton")?.addEventListener("click", resetDashboardMode);
         qs("#copyCompactnessButton")?.addEventListener("click", copyDashboardCompactness);
