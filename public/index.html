@@ -1396,6 +1396,7 @@
                 <button class="app-filter" type="button" data-filter="active">Aktiv</button>
                 <button class="app-filter" type="button" data-filter="done">Fertig</button>
                 <button class="app-filter" type="button" id="compactBoardButton" aria-pressed="false">Kompakt</button>
+                <button class="app-filter" type="button" id="focusListButton" aria-pressed="true">Fokusliste</button>
                 <button class="app-filter" type="button" id="clearDoneButton" disabled>Fertige entfernen</button>
                 <button class="app-filter" type="button" id="restoreDoneButton" disabled>Entfernte wiederherstellen</button>
               </div>
@@ -4604,6 +4605,7 @@
         const boardStatKey = "nurGutesBoardStat";
         const boardSearchKey = "nurGutesBoardSearch";
         const boardSortKey = "nurGutesBoardSort";
+        const boardFocusLimitKey = "nurGutesBoardFocusLimit";
         const toolDetailsKey = "nurGutesToolDetails";
         const lastCopyKey = "nurGutesLastCopy";
         const lastExportKey = "nurGutesLastExport";
@@ -4659,6 +4661,7 @@
         };
         const money = (value) => `${Math.round(Number(value) || 0)} EUR`;
         const boardSortOptions = ["manual", "priority", "revenue", "newest"];
+        const boardFocusLimit = 3;
         const statusPriority = { active: 0, planned: 1, done: 2 };
         const escapeHtml = (value) => String(value || "").replace(/[&<>"']/g, (char) => ({
           "&": "&amp;",
@@ -4694,6 +4697,7 @@
           : currentFilter === "active" ? "active" : currentFilter === "done" ? "done" : "revenue";
         let currentBoardSearch = localStorage.getItem(boardSearchKey) || "";
         let currentBoardSort = boardSortOptions.includes(localStorage.getItem(boardSortKey)) ? localStorage.getItem(boardSortKey) : "manual";
+        let boardFocusLimitEnabled = localStorage.getItem(boardFocusLimitKey) !== "false";
         let savedToolDetails = loadJson(toolDetailsKey, {});
         let savedPitchChannel = localStorage.getItem(pitchChannelKey) || "daily-growth";
         let savedTrustSettings = loadJson(trustSettingsKey, {});
@@ -4929,7 +4933,10 @@
           currentFilter = "all";
           currentStatKey = "revenue";
           currentBoardSearch = "";
+          currentBoardSort = "manual";
+          boardFocusLimitEnabled = true;
           boardCompact = true;
+          localStorage.setItem(boardFocusLimitKey, String(boardFocusLimitEnabled));
           localStorage.setItem(compactBoardKey, String(boardCompact));
           collapseWorkspaceChrome();
           saveBoardView();
@@ -4962,7 +4969,10 @@
           currentFilter = "all";
           currentStatKey = "revenue";
           currentBoardSearch = "";
+          currentBoardSort = "manual";
+          boardFocusLimitEnabled = true;
           boardCompact = true;
+          localStorage.setItem(boardFocusLimitKey, String(boardFocusLimitEnabled));
           dailyDetailsOpen = false;
           localStorage.setItem(compactBoardKey, String(boardCompact));
           localStorage.setItem(dailyDetailsKey, String(dailyDetailsOpen));
@@ -5218,6 +5228,8 @@
         function renderBoard() {
           const list = qs("#impactList");
           const { query, filteredItems, visibleItems } = getVisibleBoardItems();
+          const displayedItems = boardFocusLimitEnabled ? visibleItems.slice(0, boardFocusLimit) : visibleItems;
+          const hiddenFocusCount = Math.max(0, visibleItems.length - displayedItems.length);
           const filterLabels = {
             all: "Alle",
             planned: "Geplant",
@@ -5250,13 +5262,35 @@
             compactBoardButton.setAttribute("aria-pressed", String(boardCompact));
             compactBoardButton.textContent = boardCompact ? "Normalansicht" : "Kompakt";
           }
+          const focusListButton = qs("#focusListButton");
+          if (focusListButton) {
+            focusListButton.classList.toggle("active", boardFocusLimitEnabled);
+            focusListButton.setAttribute("aria-pressed", String(boardFocusLimitEnabled));
+            focusListButton.textContent = boardFocusLimitEnabled ? `Alle anzeigen (${visibleItems.length})` : `Fokusliste (${Math.min(boardFocusLimit, visibleItems.length)})`;
+            focusListButton.disabled = visibleItems.length <= boardFocusLimit && boardFocusLimitEnabled;
+            focusListButton.title = boardFocusLimitEnabled
+              ? `Alle ${visibleItems.length} passenden Board-Eintraege anzeigen`
+              : `Nur die ersten ${Math.min(boardFocusLimit, visibleItems.length)} passenden Board-Eintraege anzeigen`;
+            focusListButton.setAttribute("aria-label", focusListButton.title);
+          }
           const count = qs("#boardCount");
-          if (count) count.textContent = query ? `${visibleItems.length} Treffer in ${filteredItems.length} gefilterten Eintraegen` : `${visibleItems.length} von ${items.length} Eintraegen sichtbar`;
+          if (count) {
+            if (hiddenFocusCount) {
+              count.textContent = query
+                ? `${displayedItems.length} von ${visibleItems.length} Treffern im Fokus (${filteredItems.length} gefiltert)`
+                : `${displayedItems.length} von ${visibleItems.length} passenden Eintraegen im Fokus`;
+            } else {
+              count.textContent = query
+                ? `${visibleItems.length} Treffer in ${filteredItems.length} gefilterten Eintraegen`
+                : `${visibleItems.length} von ${items.length} Eintraegen sichtbar`;
+            }
+          }
           const viewStatus = qs("#boardViewStatus");
           if (viewStatus) {
             const filterLabel = filterLabels[currentFilter] || "Alle";
             const searchLabel = query ? ` · Suche: "${currentBoardSearch.trim()}"` : "";
-            viewStatus.textContent = `${filterLabel} · ${sortLabels[currentBoardSort] || sortLabels.manual}${searchLabel} · Revenue ${money(visibleRevenue)} · Impact ${money(visibleImpact)}`;
+            const focusLabel = hiddenFocusCount ? ` · Fokusliste zeigt ${displayedItems.length}, ${hiddenFocusCount} ausgeblendet` : "";
+            viewStatus.textContent = `${filterLabel} · ${sortLabels[currentBoardSort] || sortLabels.manual}${searchLabel}${focusLabel} · Revenue ${money(visibleRevenue)} · Impact ${money(visibleImpact)}`;
           }
           const exportBoardButton = qs("#exportBoardButton");
           const copyBoardReportButton = qs("#copyBoardReportButton");
@@ -5274,9 +5308,9 @@
           }
           const clearBoardSearch = qs("#clearBoardSearch");
           if (clearBoardSearch) {
-            const boardViewIsDefault = query.length === 0 && currentFilter === "all" && currentBoardSort === "manual";
+            const boardViewIsDefault = query.length === 0 && currentFilter === "all" && currentBoardSort === "manual" && boardFocusLimitEnabled;
             clearBoardSearch.disabled = boardViewIsDefault;
-            clearBoardSearch.title = boardViewIsDefault ? "Board-Ansicht ist bereits zurueckgesetzt" : "Suche, Filter und Sortierung zuruecksetzen";
+            clearBoardSearch.title = boardViewIsDefault ? "Board-Ansicht ist bereits zurueckgesetzt" : "Suche, Filter, Sortierung und Listenmodus zuruecksetzen";
             clearBoardSearch.setAttribute("aria-label", clearBoardSearch.title);
           }
           const search = qs("#boardSearch");
@@ -5308,7 +5342,7 @@
             list.innerHTML = '<article class="app-card"><p class="muted">Keine passenden Eintraege. Suche oder Statusfilter anpassen.</p><button type="button" data-reset-board-view="true">Ansicht zuruecksetzen</button></article>';
             return;
           }
-          list.innerHTML = visibleItems.map((item, index) => `
+          list.innerHTML = displayedItems.map((item, index) => `
             <article class="app-card" data-id="${escapeHtml(item.id)}">
               <div class="app-card-head">
                 <div>
@@ -5337,8 +5371,8 @@
                   <button type="button" data-open-tool="proof">Proof</button>
                   <button type="button" data-open-tool="monthly">Monthly</button>
                   <button type="button" data-copy-item="true" aria-label="Board-Eintrag ${escapeHtml(item.title)} kopieren" title="Board-Eintrag ${escapeHtml(item.title)} kopieren">Kopieren</button>
-                  <button type="button" data-move="up" title="${currentBoardSort === "manual" ? "Eintrag in manueller Reihenfolge nach oben verschieben" : "Hoch/Runter ist nur bei manueller Sortierung verfuegbar"}" ${currentBoardSort !== "manual" || index === 0 ? "disabled" : ""}>Hoch</button>
-                  <button type="button" data-move="down" title="${currentBoardSort === "manual" ? "Eintrag in manueller Reihenfolge nach unten verschieben" : "Hoch/Runter ist nur bei manueller Sortierung verfuegbar"}" ${currentBoardSort !== "manual" || index === visibleItems.length - 1 ? "disabled" : ""}>Runter</button>
+                  <button type="button" data-move="up" title="${currentBoardSort === "manual" && !boardFocusLimitEnabled ? "Eintrag in manueller Reihenfolge nach oben verschieben" : "Hoch/Runter ist nur in der vollstaendigen manuellen Ansicht verfuegbar"}" ${currentBoardSort !== "manual" || boardFocusLimitEnabled || index === 0 ? "disabled" : ""}>Hoch</button>
+                  <button type="button" data-move="down" title="${currentBoardSort === "manual" && !boardFocusLimitEnabled ? "Eintrag in manueller Reihenfolge nach unten verschieben" : "Hoch/Runter ist nur in der vollstaendigen manuellen Ansicht verfuegbar"}" ${currentBoardSort !== "manual" || boardFocusLimitEnabled || index === visibleItems.length - 1 ? "disabled" : ""}>Runter</button>
                   <button type="button" data-delete="true" aria-label="Board-Eintrag ${escapeHtml(item.title)} loeschen" title="Board-Eintrag ${escapeHtml(item.title)} loeschen">Loeschen</button>
                 </div>
               </details>
@@ -5364,6 +5398,8 @@
           currentStatKey = "revenue";
           currentBoardSearch = "";
           currentBoardSort = "manual";
+          boardFocusLimitEnabled = true;
+          localStorage.setItem(boardFocusLimitKey, String(boardFocusLimitEnabled));
           saveBoardView();
           const search = qs("#boardSearch");
           if (search) search.value = "";
@@ -5390,6 +5426,8 @@
           currentStatKey = "revenue";
           currentBoardSearch = "";
           currentBoardSort = "manual";
+          boardFocusLimitEnabled = true;
+          localStorage.setItem(boardFocusLimitKey, String(boardFocusLimitEnabled));
           saveBoardView();
           const search = qs("#boardSearch");
           if (search) search.value = "";
@@ -6359,6 +6397,14 @@
           boardCompact = !boardCompact;
           localStorage.setItem(compactBoardKey, String(boardCompact));
           renderBoard();
+        });
+        qs("#focusListButton")?.addEventListener("click", () => {
+          boardFocusLimitEnabled = !boardFocusLimitEnabled;
+          localStorage.setItem(boardFocusLimitKey, String(boardFocusLimitEnabled));
+          renderBoard();
+          renderNextAction();
+          const status = qs("#boardViewStatus");
+          if (status) status.textContent = `${status.textContent} · Listenmodus gespeichert`;
         });
         qs("#boardSearch")?.addEventListener("input", (event) => {
           currentBoardSearch = event.target.value;
