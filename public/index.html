@@ -1124,6 +1124,7 @@
       .app-next-action p { margin: 0; font-size: 13px; color: rgba(255,255,255,.8); }
       .app-export { display: grid; gap: 8px; margin-top: 18px; }
       .app-export button { width: 100%; border: 1px solid rgba(255,255,255,.3); border-radius: 8px; background: rgba(255,255,255,.1); color: white; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 12px 14px; }
+      .app-export button:disabled { cursor: not-allowed; opacity: .5; }
       .app-export p { margin: 0; font-size: 13px; color: rgba(255,255,255,.8); }
       .app-daily { border: 1px solid rgba(255,255,255,.2); border-radius: 8px; background: rgba(255,255,255,.1); margin-top: 18px; padding: 16px; }
       .app-daily h3 { color: white; font-size: 20px; margin: 4px 0 8px; }
@@ -5211,6 +5212,14 @@
           }
           const count = qs("#boardCount");
           if (count) count.textContent = query ? `${visibleItems.length} Treffer in ${filteredItems.length} gefilterten Eintraegen` : `${visibleItems.length} von ${items.length} Eintraegen sichtbar`;
+          const exportBoardButton = qs("#exportBoardButton");
+          const copyBoardReportButton = qs("#copyBoardReportButton");
+          [exportBoardButton, copyBoardReportButton].filter(Boolean).forEach((button) => {
+            button.disabled = visibleItems.length === 0;
+            const action = button.id === "exportBoardButton" ? "Export" : "Board-Report";
+            button.title = visibleItems.length ? `${action} fuer ${visibleItems.length} sichtbare Eintraege` : `${action} nicht verfuegbar: keine sichtbaren Eintraege`;
+            button.setAttribute("aria-label", button.title);
+          });
           const clearBoardSearch = qs("#clearBoardSearch");
           if (clearBoardSearch) clearBoardSearch.disabled = query.length === 0 && currentFilter === "all";
           const search = qs("#boardSearch");
