@@ -4779,6 +4779,23 @@
           return true;
         }
 
+        function lastBoardOutputActivityText() {
+          const exportState = loadJson(lastExportKey, null);
+          const copyState = loadJson(lastCopyKey, null);
+          const exportTime = exportState?.createdAt ? Date.parse(exportState.createdAt) : 0;
+          const copyTime = copyState?.createdAt ? Date.parse(copyState.createdAt) : 0;
+          if (copyTime > exportTime && copyState?.label && copyState?.time) {
+            return copyState.succeeded
+              ? ` Zuletzt kopiert: ${copyState.label} um ${copyState.time}.`
+              : ` ${copyState.label} konnte zuletzt nicht automatisch kopiert werden.`;
+          }
+          if (exportState?.label && exportState?.time) {
+            const count = Number(exportState.count) || 0;
+            return ` Zuletzt exportiert: ${exportState.label} (${count} Eintraege) um ${exportState.time}.`;
+          }
+          return "";
+        }
+
         function setupCopyButton(buttonSelector, outputSelector, copiedLabel, fallbackLabel, resetLabel) {
           const button = qs(buttonSelector);
           const output = qs(outputSelector);
@@ -5339,7 +5356,7 @@
           const exportStatus = qs("#exportBoardStatus");
           if (exportStatus) {
             exportStatus.textContent = outputCount
-              ? `${outputCount} ${hiddenFocusCount ? `Fokus-Eintraege von ${visibleItems.length} passenden` : "Eintraege"} bereit fuer Export oder Board-Report.`
+              ? `${outputCount} ${hiddenFocusCount ? `Fokus-Eintraege von ${visibleItems.length} passenden` : "Eintraege"} bereit fuer Export oder Board-Report.${lastBoardOutputActivityText()}`
               : "Keine Board-Eintraege in diesem Ausgabeumfang fuer Export oder Board-Report.";
           }
           const clearBoardSearch = qs("#clearBoardSearch");
