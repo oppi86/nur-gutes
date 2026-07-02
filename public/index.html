@@ -1137,6 +1137,7 @@
       .app-note { border: 1px solid rgba(255,255,255,.18); border-radius: 8px; padding: 14px; margin-top: 18px; font-size: 14px; color: rgba(255,255,255,.86); }
       .app-mode-control { display: grid; gap: 8px; margin-top: 18px; }
       .app-mode-toggle { width: 100%; border: 0; border-radius: 8px; background: #f9d65c; color: #20211d; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 12px 14px; }
+      .app-mode-reset { width: 100%; border: 1px solid rgba(255,255,255,.28); border-radius: 8px; background: rgba(255,255,255,.1); color: white; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 12px 14px; }
       .app-mode-status { margin: 0; font-size: 13px; color: rgba(255,255,255,.8); }
       .app-workbench { border: 1px solid #e7e1d7; box-shadow: none; padding: 20px; }
       .tool-router { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: end; border: 1px solid #e7e1d7; border-radius: 8px; background: #f7f4ef; padding: 14px; margin-bottom: 14px; }
@@ -1316,6 +1317,7 @@
             <p class="app-note">Revenue-Reinvestition: 40% gute Taten, 25% bessere Algorithmen und Automatisierung, 20% Growth/Marketing, 15% Betrieb und Qualitaet.</p>
             <div class="app-mode-control">
               <button class="app-mode-toggle" type="button" id="focusModeToggle" aria-pressed="false">Arbeitsmodus aktivieren</button>
+              <button class="app-mode-reset" type="button" id="resetDashboardButton">Dashboard aufraeumen</button>
               <p class="app-mode-status" id="focusModeStatus">Magazinbereiche bleiben sichtbar.</p>
             </div>
           </article>
@@ -4878,6 +4880,31 @@
           if (status && !action?.item) status.textContent = "Dashboard-Modus gespeichert: Board kompakt, Formular offen, Arbeitsmodus aktiv.";
         }
 
+        function resetDashboardMode() {
+          currentFilter = "all";
+          currentBoardSearch = "";
+          boardCompact = true;
+          dailyDetailsOpen = false;
+          savedToolDetails = { router: false, tabs: false };
+          localStorage.setItem(compactBoardKey, String(boardCompact));
+          localStorage.setItem(dailyDetailsKey, String(dailyDetailsOpen));
+          localStorage.setItem(toolDetailsKey, JSON.stringify(savedToolDetails));
+          saveBoardView();
+          setEditMode("");
+          setBoardFormCollapsed(true);
+          setQuickTask("auto");
+          setActiveTool("board");
+          setFocusMode(true, false);
+          qs(".tool-router-details")?.removeAttribute("open");
+          qs(".tool-tabs")?.removeAttribute("open");
+          const boardSearch = qs("#boardSearch");
+          if (boardSearch) boardSearch.value = "";
+          renderAll();
+          const status = qs("#focusModeStatus");
+          if (status) status.textContent = "Dashboard aufgeraeumt: Board kompakt, Suche und Filter zurueckgesetzt, nur Workspace sichtbar.";
+          requestAnimationFrame(() => qs("#app")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+        }
+
         function openToolHub() {
           setFocusMode(true);
           setActiveTool(activeTool || "board");
@@ -5868,6 +5895,7 @@
         setFocusMode(focusMode);
         setBoardFormCollapsed(boardFormCollapsed, false);
         qs("#focusModeToggle")?.addEventListener("click", () => setFocusMode(!focusMode, true));
+        qs("#resetDashboardButton")?.addEventListener("click", resetDashboardMode);
         qsa("[data-dashboard-start]").forEach((button) => button.addEventListener("click", (event) => {
           event.preventDefault();
           startDashboardMode();
