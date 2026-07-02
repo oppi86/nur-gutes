@@ -5130,6 +5130,8 @@
           if (search) search.value = currentBoardSearch;
           setFocusMode(true);
           setActiveTool("board");
+          setQuickTask("board");
+          setBoardFormCollapsed(true);
           renderBoard();
           renderNextAction();
           requestAnimationFrame(() => qs("#impactList")?.scrollIntoView({ behavior: "smooth", block: "start" }));
