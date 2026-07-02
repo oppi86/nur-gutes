@@ -4807,6 +4807,12 @@
             const archiveToggle = qs("#toggleArchive");
             if (archiveToggle) archiveToggle.textContent = "Archiv anzeigen";
           }
+          if (focusMode) {
+            savedToolDetails = { router: false, tabs: false };
+            localStorage.setItem(toolDetailsKey, JSON.stringify(savedToolDetails));
+            qs(".tool-router-details")?.removeAttribute("open");
+            qs(".tool-tabs")?.removeAttribute("open");
+          }
           if (shouldPersist) localStorage.setItem(focusKey, String(focusMode));
           const button = qs("#focusModeToggle");
           if (button) {
