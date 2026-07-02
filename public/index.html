@@ -1181,6 +1181,8 @@
       .board-search input { width: 100%; border: 1px solid #d9d1c4; border-radius: 8px; background: #fff; color: #20211d; font: inherit; padding: 12px; min-width: 0; }
       .board-search button { border: 1px solid #e7e1d7; border-radius: 8px; background: #f7f4ef; color: #20211d; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 0 13px; }
       .board-search button:disabled { cursor: not-allowed; opacity: .48; }
+      .board-sort { display: grid; gap: 6px; margin-top: 10px; color: #575952; font-size: 12px; font-weight: 900; text-transform: uppercase; }
+      .board-sort select { width: 100%; border: 1px solid #d9d1c4; border-radius: 8px; background: #fff; color: #20211d; font: inherit; padding: 12px; min-width: 0; }
       .board-count { margin: 10px 0 0; font-size: 13px; color: #575952; }
       .board-undo { margin: -6px 0 14px; font-size: 13px; color: #575952; }
       .app-actions-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 16px 0; }
@@ -1377,6 +1379,14 @@
                 <button class="app-filter app-wide" type="button" id="cancelEditButton" hidden>Bearbeitung abbrechen</button>
               </form>
               <label class="board-search">Board durchsuchen<span class="board-search-controls"><input id="boardSearch" type="search" placeholder="Titel, Kategorie, Schritt oder Beschreibung" autocomplete="off" /><button type="button" id="clearBoardSearch" disabled>Zuruecksetzen</button></span></label>
+              <label class="board-sort">Board sortieren
+                <select id="boardSort" aria-describedby="boardCount">
+                  <option value="manual">Manuelle Reihenfolge</option>
+                  <option value="priority">Prioritaet zuerst</option>
+                  <option value="revenue">Revenue-Ziel zuerst</option>
+                  <option value="newest">Neueste zuerst</option>
+                </select>
+              </label>
               <p class="board-count" id="boardCount" aria-live="polite">Eintraege werden geladen.</p>
               <div class="app-actions-row" aria-label="Board Filter">
                 <button class="app-filter active" type="button" data-filter="all">Alle</button>
@@ -4591,6 +4601,7 @@
         const boardFilterKey = "nurGutesBoardFilter";
         const boardStatKey = "nurGutesBoardStat";
         const boardSearchKey = "nurGutesBoardSearch";
+        const boardSortKey = "nurGutesBoardSort";
         const toolDetailsKey = "nurGutesToolDetails";
         const lastCopyKey = "nurGutesLastCopy";
         const lastExportKey = "nurGutesLastExport";
@@ -4645,6 +4656,8 @@
           monthly: "Monthly Circle"
         };
         const money = (value) => `${Math.round(Number(value) || 0)} EUR`;
+        const boardSortOptions = ["manual", "priority", "revenue", "newest"];
+        const statusPriority = { active: 0, planned: 1, done: 2 };
         const escapeHtml = (value) => String(value || "").replace(/[&<>"']/g, (char) => ({
           "&": "&amp;",
           "<": "&lt;",
@@ -4678,6 +4691,7 @@
           ? savedBoardStat
           : currentFilter === "active" ? "active" : currentFilter === "done" ? "done" : "revenue";
         let currentBoardSearch = localStorage.getItem(boardSearchKey) || "";
+        let currentBoardSort = boardSortOptions.includes(localStorage.getItem(boardSortKey)) ? localStorage.getItem(boardSortKey) : "manual";
         let savedToolDetails = loadJson(toolDetailsKey, {});
         let savedPitchChannel = localStorage.getItem(pitchChannelKey) || "daily-growth";
         let savedTrustSettings = loadJson(trustSettingsKey, {});
@@ -4699,6 +4713,7 @@
           localStorage.setItem(boardStatKey, currentStatKey);
           if (currentBoardSearch.trim()) localStorage.setItem(boardSearchKey, currentBoardSearch);
           else localStorage.removeItem(boardSearchKey);
+          localStorage.setItem(boardSortKey, currentBoardSort);
         };
         const csvCell = (value) => `"${String(value ?? "").replace(/"/g, '""')}"`;
 
@@ -5177,9 +5192,24 @@
         function getVisibleBoardItems() {
           const query = currentBoardSearch.trim().toLowerCase();
           const filteredItems = currentFilter === "all" ? items : items.filter((item) => item.status === currentFilter);
-          const visibleItems = query ? filteredItems.filter((item) => (
+          const matchingItems = query ? filteredItems.filter((item) => (
             `${item.title || ""} ${item.category || ""} ${item.status || ""} ${item.next || ""} ${item.text || ""}`.toLowerCase().includes(query)
           )) : filteredItems;
+          const visibleItems = [...matchingItems].sort((a, b) => {
+            if (currentBoardSort === "priority") {
+              return (statusPriority[a.status] ?? 3) - (statusPriority[b.status] ?? 3)
+                || (Number(b.amount) || 0) - (Number(a.amount) || 0)
+                || String(b.createdAt || "").localeCompare(String(a.createdAt || ""));
+            }
+            if (currentBoardSort === "revenue") {
+              return (Number(b.amount) || 0) - (Number(a.amount) || 0)
+                || (statusPriority[a.status] ?? 3) - (statusPriority[b.status] ?? 3);
+            }
+            if (currentBoardSort === "newest") {
+              return String(b.createdAt || "").localeCompare(String(a.createdAt || ""));
+            }
+            return 0;
+          });
           return { query, filteredItems, visibleItems };
         }
 
@@ -5227,9 +5257,16 @@
               : "Keine sichtbaren Board-Eintraege fuer Export oder Board-Report.";
           }
           const clearBoardSearch = qs("#clearBoardSearch");
-          if (clearBoardSearch) clearBoardSearch.disabled = query.length === 0 && currentFilter === "all";
+          if (clearBoardSearch) {
+            const boardViewIsDefault = query.length === 0 && currentFilter === "all" && currentBoardSort === "manual";
+            clearBoardSearch.disabled = boardViewIsDefault;
+            clearBoardSearch.title = boardViewIsDefault ? "Board-Ansicht ist bereits zurueckgesetzt" : "Suche, Filter und Sortierung zuruecksetzen";
+            clearBoardSearch.setAttribute("aria-label", clearBoardSearch.title);
+          }
           const search = qs("#boardSearch");
           if (search && search.value !== currentBoardSearch) search.value = currentBoardSearch;
+          const sort = qs("#boardSort");
+          if (sort && sort.value !== currentBoardSort) sort.value = currentBoardSort;
           const doneCount = items.filter((item) => item.status === "done").length;
           const clearDoneButton = qs("#clearDoneButton");
           if (clearDoneButton) {
@@ -5284,8 +5321,8 @@
                   <button type="button" data-open-tool="proof">Proof</button>
                   <button type="button" data-open-tool="monthly">Monthly</button>
                   <button type="button" data-copy-item="true" aria-label="Board-Eintrag ${escapeHtml(item.title)} kopieren" title="Board-Eintrag ${escapeHtml(item.title)} kopieren">Kopieren</button>
-                  <button type="button" data-move="up" ${index === 0 ? "disabled" : ""}>Hoch</button>
-                  <button type="button" data-move="down" ${index === visibleItems.length - 1 ? "disabled" : ""}>Runter</button>
+                  <button type="button" data-move="up" title="${currentBoardSort === "manual" ? "Eintrag in manueller Reihenfolge nach oben verschieben" : "Hoch/Runter ist nur bei manueller Sortierung verfuegbar"}" ${currentBoardSort !== "manual" || index === 0 ? "disabled" : ""}>Hoch</button>
+                  <button type="button" data-move="down" title="${currentBoardSort === "manual" ? "Eintrag in manueller Reihenfolge nach unten verschieben" : "Hoch/Runter ist nur bei manueller Sortierung verfuegbar"}" ${currentBoardSort !== "manual" || index === visibleItems.length - 1 ? "disabled" : ""}>Runter</button>
                   <button type="button" data-delete="true" aria-label="Board-Eintrag ${escapeHtml(item.title)} loeschen" title="Board-Eintrag ${escapeHtml(item.title)} loeschen">Loeschen</button>
                 </div>
               </details>
@@ -5310,9 +5347,12 @@
           currentFilter = "all";
           currentStatKey = "revenue";
           currentBoardSearch = "";
+          currentBoardSort = "manual";
           saveBoardView();
           const search = qs("#boardSearch");
           if (search) search.value = "";
+          const sort = qs("#boardSort");
+          if (sort) sort.value = currentBoardSort;
           renderStats();
           renderBoard();
           renderNextAction();
@@ -5333,9 +5373,12 @@
           currentFilter = "all";
           currentStatKey = "revenue";
           currentBoardSearch = "";
+          currentBoardSort = "manual";
           saveBoardView();
           const search = qs("#boardSearch");
           if (search) search.value = "";
+          const sort = qs("#boardSort");
+          if (sort) sort.value = currentBoardSort;
         }
 
         function resetEmptyCurrentFilter() {
@@ -6318,6 +6361,14 @@
           }
         });
         qs("#clearBoardSearch")?.addEventListener("click", resetBoardView);
+        qs("#boardSort")?.addEventListener("change", (event) => {
+          currentBoardSort = boardSortOptions.includes(event.target.value) ? event.target.value : "manual";
+          saveBoardView();
+          renderBoard();
+          renderNextAction();
+          const status = qs("#boardCount");
+          if (status) status.textContent = `${status.textContent} Sortierung gespeichert.`;
+        });
 
         qs("#stripeForm").addEventListener("submit", (event) => {
           event.preventDefault();
