@@ -4576,6 +4576,7 @@
         const pitchChannelKey = "nurGutesPitchChannel";
         const trustSettingsKey = "nurGutesTrustSettings";
         const monthlySettingsKey = "nurGutesMonthlySettings";
+        const proofSettingsKey = "nurGutesProofSettings";
         const seedItems = [
           {
             id: "seed-proof-1",
@@ -4650,6 +4651,7 @@
         let savedPitchChannel = localStorage.getItem(pitchChannelKey) || "daily-growth";
         let savedTrustSettings = loadJson(trustSettingsKey, {});
         let savedMonthlySettings = loadJson(monthlySettingsKey, {});
+        let savedProofSettings = loadJson(proofSettingsKey, {});
         let editingItemId = "";
         let lastRemovedItems = loadJson(removedItemsKey, []);
 
@@ -5837,6 +5839,15 @@
           const field = qs(selector);
           if (field && savedTrustSettings[key]) field.value = savedTrustSettings[key];
         });
+        const proofSettingSelectors = {
+          status: "#proofStatus",
+          evidence: "#proofEvidence",
+          days: "#proofDays"
+        };
+        Object.entries(proofSettingSelectors).forEach(([key, selector]) => {
+          const field = qs(selector);
+          if (field && savedProofSettings[key]) field.value = savedProofSettings[key];
+        });
         const monthlySettingSelectors = {
           base: "#monthlyBase",
           rhythm: "#monthlyRhythm"
@@ -6050,8 +6061,17 @@
         });
 
         ["#proofItem", "#proofStatus", "#proofEvidence", "#proofDays"].forEach((selector) => {
-          qs(selector).addEventListener("input", renderProof);
-          qs(selector).addEventListener("change", renderProof);
+          const updateProof = () => {
+            savedProofSettings = {
+              status: qs("#proofStatus").value,
+              evidence: qs("#proofEvidence").value,
+              days: qs("#proofDays").value
+            };
+            localStorage.setItem(proofSettingsKey, JSON.stringify(savedProofSettings));
+            renderProof();
+          };
+          qs(selector).addEventListener("input", updateProof);
+          qs(selector).addEventListener("change", updateProof);
         });
 
         ["#monthlyItem", "#monthlyBase", "#monthlyRhythm"].forEach((selector) => {
