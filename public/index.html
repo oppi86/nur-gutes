@@ -6036,10 +6036,14 @@
           if (!select) return;
           const card = event.target.closest("[data-id]");
           if (!card) return;
+          const itemBefore = items.find((item) => item.id === card.dataset.id);
           items = items.map((item) => item.id === card.dataset.id ? { ...item, status: select.value } : item);
           resetEmptyCurrentFilter();
           saveItems();
           renderAll();
+          const statusLabels = { planned: "Geplant", active: "Aktiv", done: "Fertig" };
+          const undoStatus = qs("#boardUndoStatus");
+          if (undoStatus && itemBefore) undoStatus.textContent = `${itemBefore.title || "Eintrag"} ist jetzt ${statusLabels[select.value] || select.value}.`;
         });
 
         qsa("[data-filter]").forEach((button) => {
