@@ -4678,10 +4678,10 @@
           ].join("\n");
         }
 
-        function setFocusMode(enabled, shouldScroll = false) {
+        function setFocusMode(enabled, shouldScroll = false, shouldPersist = true) {
           focusMode = Boolean(enabled);
           document.body.classList.toggle("focus-mode", focusMode);
-          localStorage.setItem(focusKey, String(focusMode));
+          if (shouldPersist) localStorage.setItem(focusKey, String(focusMode));
           const button = qs("#focusModeToggle");
           const status = qs("#focusModeStatus");
           if (button) {
@@ -5324,7 +5324,7 @@
           toggle.textContent = closedLabel;
           archiveSearch.value = savedArchiveSearch;
           const openArchive = (targetId) => {
-            setFocusMode(false);
+            setFocusMode(false, false, false);
             document.body.classList.add("show-legacy");
             toggle.textContent = "Archiv ausblenden";
             if (!targetId) return;
