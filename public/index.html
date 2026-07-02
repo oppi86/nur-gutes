@@ -1335,6 +1335,7 @@
               <div class="app-focus-actions">
                 <button type="button" id="startDailyFocusButton" disabled>Fokus starten</button>
                 <button type="button" id="copyDailyFocusButton" disabled>Brief kopieren</button>
+                <button type="button" id="completeDailyFocusButton" disabled>Fertig markieren</button>
                 <button type="button" id="clearDailyFocusButton" disabled>Fokus loesen</button>
               </div>
             </div>
@@ -4695,18 +4696,18 @@
           }
         ];
         const dailyProductIdea = {
-          id: "daily-2026-07-03-focus-brief",
+          id: "daily-2026-07-03-focus-complete",
           date: "3. Juli 2026",
-          title: "Daily Focus Brief",
+          title: "Daily Focus Complete",
           category: "Business Idee",
-          amount: 45,
-          next: "Aus dem Tagesfokus einen kopierbaren Umsetzungsbrief erzeugen",
-          text: "Die Website verwandelt den gespeicherten Tagesfokus in einen kurzen Arbeitsbrief mit naechstem Schritt, Revenue-Ziel, Impact-Anteil und Reinvestitionslogik.",
-          revenueStream: "45-Euro Focus Brief Setup",
-          dailyRevenue: "Ziel: erster 45-Euro Setup-Kauf fuer einen klaren Tagesbrief",
-          userGrowth: "+1 Share- oder Team-Signal durch kopierbaren Fokusplan",
+          amount: 35,
+          next: "Den Tagesfokus direkt im Dashboard als erledigt markieren",
+          text: "Die Website schliesst den Fokus-Workflow im ersten Screen: ein gespeicherter Fokus kann als fertig markiert werden, aktualisiert Metriken und verschwindet aus dem aktiven Fokus.",
+          revenueStream: "35-Euro Focus Workflow Setup",
+          dailyRevenue: "Ziel: erster 35-Euro Setup-Kauf fuer schnelleren Tagesabschluss",
+          userGrowth: "+1 Abschluss-Signal durch weniger Wechsel zwischen Tools",
           socialStatus: "Postingtexte im Social-Tool vorbereitet; keine externen Connectoren autorisiert",
-          implementedFunction: "Tagesfokus als strukturierten Brief kopieren.",
+          implementedFunction: "Tagesfokus als erledigt markieren, Board speichern, Metriken aktualisieren und Fokus loesen.",
           reinvestment: "40% gute Taten, 25% bessere Fokus- und Workspace-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
         };
         const paymentLabels = {
@@ -5395,6 +5396,7 @@
           const status = qs("#dailyFocusStatus");
           const startButton = qs("#startDailyFocusButton");
           const copyButton = qs("#copyDailyFocusButton");
+          const completeButton = qs("#completeDailyFocusButton");
           const clearButton = qs("#clearDailyFocusButton");
           const hasFocus = Boolean(item);
           if (title) title.textContent = item?.title || "Kein Fokus gesetzt";
@@ -5410,6 +5412,10 @@
           if (copyButton) {
             copyButton.disabled = !hasFocus;
             copyButton.title = hasFocus ? "Kopierbaren Tagesbrief aus Fokus erzeugen" : "Noch kein Tagesfokus gesetzt";
+          }
+          if (completeButton) {
+            completeButton.disabled = !hasFocus || item.status === "done";
+            completeButton.title = !hasFocus ? "Noch kein Tagesfokus gesetzt" : item.status === "done" ? "Tagesfokus ist bereits fertig" : "Tagesfokus als fertig markieren";
           }
           if (clearButton) {
             clearButton.disabled = !hasFocus;
@@ -5457,6 +5463,19 @@
           const item = dailyFocusItem();
           if (!item || item.status === "done") return;
           startBoardItem(item.id);
+        }
+
+        function completeDailyFocus() {
+          const item = dailyFocusItem();
+          const status = qs("#dailyFocusStatus");
+          if (!item || item.status === "done") return;
+          items = items.map((entry) => entry.id === item.id ? { ...entry, status: "done" } : entry);
+          dailyFocusItemId = "";
+          localStorage.removeItem(dailyFocusKey);
+          resetEmptyCurrentFilter();
+          saveItems();
+          renderAll();
+          if (status) status.textContent = `${item.title} wurde als fertig markiert.`;
         }
 
         function addDailyIdeaToBoard() {
@@ -6585,6 +6604,7 @@
         qs("#nextActionButton")?.addEventListener("click", startRecommendedAction);
         qs("#startDailyFocusButton")?.addEventListener("click", startDailyFocus);
         qs("#copyDailyFocusButton")?.addEventListener("click", copyDailyFocusBrief);
+        qs("#completeDailyFocusButton")?.addEventListener("click", completeDailyFocus);
         qs("#clearDailyFocusButton")?.addEventListener("click", () => setDailyFocus(""));
         qs("#addDailyIdeaButton")?.addEventListener("click", addDailyIdeaToBoard);
         qs("#toggleDailyDetails")?.addEventListener("click", () => setDailyDetailsOpen(!dailyDetailsOpen));
