@@ -1186,6 +1186,12 @@
       .board-sort select { width: 100%; border: 1px solid #d9d1c4; border-radius: 8px; background: #fff; color: #20211d; font: inherit; padding: 12px; min-width: 0; }
       .board-count { margin: 10px 0 0; font-size: 13px; color: #575952; }
       .board-view-status { border: 1px solid #e7e1d7; border-radius: 8px; background: #f7f4ef; color: #17332f; font-size: 13px; font-weight: 900; margin: 10px 0 0; padding: 10px 12px; }
+      .board-preset { border: 1px solid #e7e1d7; border-radius: 8px; background: #fff; display: grid; gap: 8px; margin-top: 10px; padding: 10px; }
+      .board-preset-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+      .board-preset button { border: 1px solid #e7e1d7; border-radius: 8px; background: #f7f4ef; color: #20211d; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 10px 12px; }
+      .board-preset button:first-child { background: #17332f; border-color: #17332f; color: white; }
+      .board-preset button:disabled { cursor: not-allowed; opacity: .48; }
+      .board-preset p { margin: 0; color: #575952; font-size: 13px; }
       .board-undo { margin: -6px 0 14px; font-size: 13px; color: #575952; }
       .app-actions-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 16px 0; }
       .app-filter { background: #f7f4ef; color: #575952; border: 1px solid #e7e1d7; }
@@ -1393,6 +1399,14 @@
               </label>
               <p class="board-count" id="boardCount" aria-live="polite">Eintraege werden geladen.</p>
               <p class="board-view-status" id="boardViewStatus" aria-live="polite">Aktuelle Board-Ansicht wird berechnet.</p>
+              <div class="board-preset" aria-label="Board Ansichtspreset">
+                <div class="board-preset-actions">
+                  <button type="button" id="saveBoardPresetButton">Ansicht merken</button>
+                  <button type="button" id="applyBoardPresetButton" disabled>Gemerkte Ansicht laden</button>
+                  <button type="button" id="clearBoardPresetButton" disabled>Preset loeschen</button>
+                </div>
+                <p id="boardPresetStatus" aria-live="polite">Kein Board-Preset gespeichert.</p>
+              </div>
               <div class="app-actions-row" aria-label="Board Filter">
                 <button class="app-filter active" type="button" data-filter="all">Alle</button>
                 <button class="app-filter" type="button" data-filter="planned">Geplant</button>
@@ -4609,6 +4623,7 @@
         const boardSearchKey = "nurGutesBoardSearch";
         const boardSortKey = "nurGutesBoardSort";
         const boardFocusLimitKey = "nurGutesBoardFocusLimit";
+        const boardPresetKey = "nurGutesBoardPreset";
         const toolDetailsKey = "nurGutesToolDetails";
         const lastCopyKey = "nurGutesLastCopy";
         const lastExportKey = "nurGutesLastExport";
@@ -4642,19 +4657,19 @@
           }
         ];
         const dailyProductIdea = {
-          id: "daily-2026-07-02-action-brief",
+          id: "daily-2026-07-02-board-view-preset",
           date: "2. Juli 2026",
-          title: "Action Brief Promoter",
+          title: "Board View Preset",
           category: "Business Idee",
-          amount: 79,
-          next: "Einen positiven Artikel in ein Sponsor-faehiges Action Briefing verwandeln",
-          text: "Die Website macht aus einer guten Nachricht einen kompakten Action Brief mit naechster Tat, Sponsor-Ask, Share-Text und Proof-Pfad.",
-          revenueStream: "79-Euro Action Brief Sprint",
-          dailyRevenue: "Ziel: erster 79-Euro Briefing-Kauf",
-          userGrowth: "+1 teilbarer Action Brief aus bestehendem Artikel",
+          amount: 49,
+          next: "Eine hilfreiche Board-Ansicht speichern und als Arbeitsmodus wiederverwenden",
+          text: "Die Website merkt eine gefilterte, sortierte und kompakte Board-Ansicht, damit wiederkehrende Nutzer sofort in ihren wichtigsten Arbeitsmodus zurueckkehren.",
+          revenueStream: "49-Euro Workspace Setup",
+          dailyRevenue: "Ziel: erster 49-Euro Setup-Kauf fuer ein gespeichertes Impact-Board",
+          userGrowth: "+1 wiederkehrender Nutzer durch schnelleren Einstieg",
           socialStatus: "Postingtexte im Social-Tool vorbereitet; keine externen Connectoren autorisiert",
-          implementedFunction: "Ein Klick speichert die Daily-Idee als Board-Eintrag.",
-          reinvestment: "40% gute Taten, 25% bessere Briefing-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
+          implementedFunction: "Board-Ansicht speichern, laden und loeschen.",
+          reinvestment: "40% gute Taten, 25% bessere Workspace-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
         };
         const paymentLabels = {
           quick: "Quick Sponsor",
@@ -4703,6 +4718,7 @@
         let currentBoardSearch = localStorage.getItem(boardSearchKey) || "";
         let currentBoardSort = boardSortOptions.includes(localStorage.getItem(boardSortKey)) ? localStorage.getItem(boardSortKey) : "manual";
         let boardFocusLimitEnabled = localStorage.getItem(boardFocusLimitKey) !== "false";
+        let savedBoardPreset = loadJson(boardPresetKey, null);
         let savedToolDetails = loadJson(toolDetailsKey, {});
         let savedPitchChannel = localStorage.getItem(pitchChannelKey) || "daily-growth";
         let savedTrustSettings = loadJson(trustSettingsKey, {});
@@ -4726,6 +4742,9 @@
           else localStorage.removeItem(boardSearchKey);
           localStorage.setItem(boardSortKey, currentBoardSort);
         };
+        const boardPresetIsValid = (preset) => Boolean(preset)
+          && ["all", "planned", "active", "done"].includes(preset.filter)
+          && boardSortOptions.includes(preset.sort);
         const csvCell = (value) => `"${String(value ?? "").replace(/"/g, '""')}"`;
 
         async function copyText(text) {
@@ -5360,6 +5379,83 @@
           return { query, filteredItems, visibleItems, outputItems, hiddenFocusCount, scope };
         }
 
+        function currentBoardPresetSnapshot() {
+          return {
+            filter: currentFilter,
+            stat: currentStatKey,
+            search: currentBoardSearch.trim(),
+            sort: currentBoardSort,
+            focusLimit: Boolean(boardFocusLimitEnabled),
+            compact: Boolean(boardCompact),
+            savedAt: new Date().toISOString()
+          };
+        }
+
+        function boardPresetLabel(preset = savedBoardPreset) {
+          if (!boardPresetIsValid(preset)) return "Kein Board-Preset gespeichert.";
+          const filterLabels = { all: "Alle", planned: "Geplant", active: "Aktiv", done: "Fertig" };
+          const sortLabels = { manual: "manuell", priority: "Prioritaet", revenue: "Revenue", newest: "neueste" };
+          const parts = [
+            filterLabels[preset.filter] || "Alle",
+            sortLabels[preset.sort] || "manuell",
+            preset.search ? `Suche "${preset.search}"` : "ohne Suche",
+            preset.focusLimit ? "Fokusliste" : "alle Treffer",
+            preset.compact ? "kompakt" : "normal"
+          ];
+          return `Gemerkte Ansicht: ${parts.join(" · ")}.`;
+        }
+
+        function renderBoardPreset() {
+          const hasPreset = boardPresetIsValid(savedBoardPreset);
+          const status = qs("#boardPresetStatus");
+          const applyButton = qs("#applyBoardPresetButton");
+          const clearButton = qs("#clearBoardPresetButton");
+          if (status) status.textContent = boardPresetLabel();
+          [applyButton, clearButton].filter(Boolean).forEach((button) => {
+            button.disabled = !hasPreset;
+          });
+          if (applyButton) applyButton.title = hasPreset ? "Gespeicherte Board-Ansicht wiederherstellen" : "Noch kein Board-Preset gespeichert";
+          if (clearButton) clearButton.title = hasPreset ? "Gespeicherte Board-Ansicht entfernen" : "Noch kein Board-Preset gespeichert";
+        }
+
+        function saveBoardPreset() {
+          savedBoardPreset = currentBoardPresetSnapshot();
+          localStorage.setItem(boardPresetKey, JSON.stringify(savedBoardPreset));
+          renderBoardPreset();
+          const status = qs("#boardViewStatus");
+          if (status) status.textContent = `${status.textContent} · Ansicht gemerkt`;
+        }
+
+        function applyBoardPreset() {
+          if (!boardPresetIsValid(savedBoardPreset)) return;
+          currentFilter = savedBoardPreset.filter;
+          currentStatKey = ["active", "revenue", "impact", "done"].includes(savedBoardPreset.stat) ? savedBoardPreset.stat : currentFilter === "active" ? "active" : currentFilter === "done" ? "done" : "revenue";
+          currentBoardSearch = savedBoardPreset.search || "";
+          currentBoardSort = savedBoardPreset.sort;
+          boardFocusLimitEnabled = Boolean(savedBoardPreset.focusLimit);
+          boardCompact = Boolean(savedBoardPreset.compact);
+          localStorage.setItem(boardFocusLimitKey, String(boardFocusLimitEnabled));
+          localStorage.setItem(compactBoardKey, String(boardCompact));
+          saveBoardView();
+          const search = qs("#boardSearch");
+          if (search) search.value = currentBoardSearch;
+          const sort = qs("#boardSort");
+          if (sort) sort.value = currentBoardSort;
+          setFocusMode(true);
+          setActiveTool("board");
+          setQuickTask("board");
+          renderAll();
+          const status = qs("#boardPresetStatus");
+          if (status) status.textContent = `${boardPresetLabel()} Geladen.`;
+          requestAnimationFrame(() => qs("#impactList")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+        }
+
+        function clearBoardPreset() {
+          savedBoardPreset = null;
+          localStorage.removeItem(boardPresetKey);
+          renderBoardPreset();
+        }
+
         function renderBoard() {
           const list = qs("#impactList");
           const { query, filteredItems, visibleItems } = getVisibleBoardItems();
@@ -5427,6 +5523,7 @@
             const focusLabel = hiddenFocusCount ? ` · Fokusliste zeigt ${displayedItems.length}, ${hiddenFocusCount} ausgeblendet` : "";
             viewStatus.textContent = `${filterLabel} · ${sortLabels[currentBoardSort] || sortLabels.manual}${searchLabel}${focusLabel} · Revenue ${money(visibleRevenue)} · Impact ${money(visibleImpact)}`;
           }
+          renderBoardPreset();
           const exportBoardButton = qs("#exportBoardButton");
           const copyBoardReportButton = qs("#copyBoardReportButton");
           const outputCount = boardFocusLimitEnabled ? displayedItems.length : visibleItems.length;
@@ -6565,6 +6662,9 @@
           localStorage.setItem(compactBoardKey, String(boardCompact));
           renderBoard();
         });
+        qs("#saveBoardPresetButton")?.addEventListener("click", saveBoardPreset);
+        qs("#applyBoardPresetButton")?.addEventListener("click", applyBoardPreset);
+        qs("#clearBoardPresetButton")?.addEventListener("click", clearBoardPreset);
         qs("#focusListButton")?.addEventListener("click", () => {
           boardFocusLimitEnabled = !boardFocusLimitEnabled;
           localStorage.setItem(boardFocusLimitKey, String(boardFocusLimitEnabled));
