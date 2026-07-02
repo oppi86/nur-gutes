@@ -4799,15 +4799,21 @@
 
         function collapseWorkspaceChrome() {
           archiveOpen = false;
+          dailyDetailsOpen = false;
           savedToolDetails = { router: false, tabs: false };
           document.body.classList.remove("show-legacy");
           qsa(".legacy-daily-section.archive-visible").forEach((section) => section.classList.remove("archive-visible"));
           localStorage.setItem(archiveOpenKey, String(archiveOpen));
+          localStorage.setItem(dailyDetailsKey, String(dailyDetailsOpen));
           localStorage.setItem(toolDetailsKey, JSON.stringify(savedToolDetails));
           qs(".tool-router-details")?.removeAttribute("open");
           qs(".tool-tabs")?.removeAttribute("open");
+          qs("#dailyIdeaCard")?.classList.add("daily-details-collapsed");
+          qs("#toggleDailyDetails")?.setAttribute("aria-expanded", "false");
           const archiveToggle = qs("#toggleArchive");
           if (archiveToggle) archiveToggle.textContent = archiveToggle.dataset.closedLabel || "Archiv anzeigen";
+          const dailyDetailsToggle = qs("#toggleDailyDetails");
+          if (dailyDetailsToggle) dailyDetailsToggle.textContent = "Metriken anzeigen";
         }
 
         function setFocusMode(enabled, shouldScroll = false, shouldPersist = true) {
