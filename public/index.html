@@ -120,6 +120,8 @@
       .archive-item a { color: #17332f; font-weight: 900; text-decoration: none; }
       .archive-item p { margin: 6px 0 0; }
       .archive-empty { border: 1px dashed #d9d1c4; border-radius: 8px; padding: 16px; }
+      .archive-more { width: 100%; border: 1px solid #d9d1c4; border-radius: 8px; background: #f7f4ef; color: #17332f; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; margin-top: 12px; padding: 12px 14px; }
+      .archive-more[hidden] { display: none; }
       .legacy-daily-section { display: none; }
       .show-legacy .legacy-daily-section { display: block; }
       .creator-kit { background: #fff; }
@@ -1661,6 +1663,7 @@
             </label>
             <p class="muted" id="archiveCount">Archiv wird geladen.</p>
             <div class="archive-list" id="archiveList"></div>
+            <button class="archive-more" type="button" id="loadMoreArchive" hidden>Mehr laden</button>
           </article>
         </div>
       </section>
@@ -5298,10 +5301,13 @@
           const archiveSearch = qs("#archiveSearch");
           const archiveCount = qs("#archiveCount");
           const clearArchiveSearch = qs("#clearArchiveSearch");
+          const loadMoreArchive = qs("#loadMoreArchive");
           const toggle = qs("#toggleArchive");
           const growthLoop = qs(".growth-loop");
           const commons = qs("#taten");
-          if (!archiveList || !archiveSearch || !archiveCount || !clearArchiveSearch || !toggle || !growthLoop || !commons) return;
+          if (!archiveList || !archiveSearch || !archiveCount || !clearArchiveSearch || !loadMoreArchive || !toggle || !growthLoop || !commons) return;
+          const archivePageSize = 12;
+          let visibleArchiveCount = archivePageSize;
           const legacyItems = qsa("main > section").filter((section) => {
             const afterGrowth = Boolean(growthLoop.compareDocumentPosition(section) & Node.DOCUMENT_POSITION_FOLLOWING);
             const beforeCommons = Boolean(section.compareDocumentPosition(commons) & Node.DOCUMENT_POSITION_FOLLOWING);
@@ -5328,23 +5334,36 @@
           const renderArchive = () => {
             const query = archiveSearch.value.trim().toLowerCase();
             const matches = query ? legacyItems.filter((item) => item.searchText.includes(query)) : legacyItems;
-            archiveCount.textContent = query ? `${matches.length} Treffer fuer "${archiveSearch.value.trim()}"` : `${legacyItems.length} archivierte Iterationen`;
+            const visibleMatches = matches.slice(0, visibleArchiveCount);
+            const shown = visibleMatches.length;
+            archiveCount.textContent = query
+              ? `${shown} von ${matches.length} Treffern fuer "${archiveSearch.value.trim()}" sichtbar`
+              : `${shown} von ${legacyItems.length} archivierten Iterationen sichtbar`;
             clearArchiveSearch.disabled = query.length === 0;
-            archiveList.innerHTML = matches.length ? matches.map((item) => (
+            loadMoreArchive.hidden = shown >= matches.length;
+            loadMoreArchive.textContent = matches.length > shown ? `Mehr laden (${matches.length - shown})` : "Alles geladen";
+            archiveList.innerHTML = visibleMatches.length ? visibleMatches.map((item) => (
               `<article class="archive-item"><a href="#${escapeHtml(item.id)}" data-archive-target="${escapeHtml(item.id)}">${escapeHtml(item.title)}</a><p class="muted">${escapeHtml(item.label)}</p></article>`
             )).join("") : `<article class="archive-empty"><p class="muted">Keine Archivtreffer. Suche kuerzer formulieren oder Archiv anzeigen.</p></article>`;
           };
           archiveSearch.addEventListener("input", () => {
             savedArchiveSearch = archiveSearch.value;
+            visibleArchiveCount = archivePageSize;
             localStorage.setItem(archiveSearchKey, savedArchiveSearch);
             renderArchive();
           });
           clearArchiveSearch.addEventListener("click", () => {
             savedArchiveSearch = "";
             archiveSearch.value = "";
+            visibleArchiveCount = archivePageSize;
             localStorage.removeItem(archiveSearchKey);
             renderArchive();
             archiveSearch.focus();
+          });
+          loadMoreArchive.addEventListener("click", () => {
+            visibleArchiveCount += archivePageSize;
+            renderArchive();
+            loadMoreArchive.focus();
           });
           archiveList.addEventListener("click", (event) => {
             const link = event.target.closest("[data-archive-target]");
