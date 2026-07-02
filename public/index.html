@@ -5274,7 +5274,7 @@
                     <option value="done" ${item.status === "done" ? "selected" : ""}>Fertig</option>
                   </select>
                 </label>
-                <button type="button" data-start-item="true" ${item.status === "done" ? "disabled" : ""}>Starten</button>
+                <button type="button" data-start-item="true" aria-label="${item.status === "done" ? `Fertigen Eintrag ${escapeHtml(item.title)} nicht starten` : `Naechste Aktion fuer ${escapeHtml(item.title)} starten`}" title="${item.status === "done" ? "Fertige Eintraege koennen nicht gestartet werden" : `Naechste Aktion fuer ${escapeHtml(item.title)} starten`}" ${item.status === "done" ? "disabled" : ""}>Starten</button>
               </div>
               <details class="app-card-actions">
                 <summary>Weitere Aktionen</summary>
