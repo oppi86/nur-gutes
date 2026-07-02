@@ -1170,7 +1170,7 @@
       .app-form[hidden] { display: none; }
       .board-form-toggle { width: 100%; margin-bottom: 14px; }
       .app-form label, .stripe-grid label, .pitch-grid label, .trust-grid label, .proof-grid label, .monthly-grid label, .second-grid label { display: grid; gap: 6px; color: #575952; font-size: 12px; font-weight: 900; text-transform: uppercase; }
-      .app-form input, .app-form select, .app-form textarea, .stripe-grid input, .app-share textarea, .pitch-grid input, .pitch-grid select, .pitch-grid textarea, .trust-grid input, .trust-grid select, .trust-grid textarea, .proof-grid input, .proof-grid select, .proof-grid textarea, .monthly-grid input, .monthly-grid select, .monthly-grid textarea, .second-grid input, .second-grid select, .second-grid textarea { width: 100%; border: 1px solid #d9d1c4; border-radius: 8px; background: #fff; color: #20211d; font: inherit; padding: 12px; min-width: 0; }
+      .app-form input, .app-form select, .app-form textarea, .stripe-grid input, .app-share select, .app-share textarea, .pitch-grid input, .pitch-grid select, .pitch-grid textarea, .trust-grid input, .trust-grid select, .trust-grid textarea, .proof-grid input, .proof-grid select, .proof-grid textarea, .monthly-grid input, .monthly-grid select, .monthly-grid textarea, .second-grid input, .second-grid select, .second-grid textarea { width: 100%; border: 1px solid #d9d1c4; border-radius: 8px; background: #fff; color: #20211d; font: inherit; padding: 12px; min-width: 0; }
       .app-form textarea, .app-wide { grid-column: 1 / -1; }
       .board-search { display: grid; gap: 6px; margin-top: 16px; color: #575952; font-size: 12px; font-weight: 900; text-transform: uppercase; }
       .board-search-controls { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 8px; }
@@ -1206,6 +1206,7 @@
       .app-pay { text-align: center; }
       .app-pay.missing { background: #f7f4ef; border: 1px solid #e7e1d7; color: #777a70; }
       .app-share textarea { min-height: 230px; resize: vertical; }
+      .app-share label { display: grid; gap: 6px; color: #575952; font-size: 12px; font-weight: 900; margin-bottom: 12px; text-transform: uppercase; }
       .app-copy { background: #17332f; color: white; margin-top: 12px; }
       .pitch-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
       .pitch-grid textarea { grid-column: 1 / -1; min-height: 220px; resize: vertical; }
@@ -1480,6 +1481,15 @@
 
             <div class="app-panel app-share" data-app-panel="share">
               <p class="muted">Aus dem Board entsteht ein sofort postbarer Social- und Outreach-Text fuer Instagram, TikTok, LinkedIn, Twitter und direkte Nachrichten.</p>
+              <label>Kanal
+                <select id="shareChannel">
+                  <option value="all">Alle Kanaele</option>
+                  <option value="short">Instagram/TikTok</option>
+                  <option value="linkedin">LinkedIn</option>
+                  <option value="twitter">Twitter/X</option>
+                  <option value="dm">Direktnachricht</option>
+                </select>
+              </label>
               <textarea id="shareText" readonly></textarea>
               <button class="app-copy" type="button" id="copyShare">Text kopieren</button>
             </div>
@@ -4579,6 +4589,7 @@
         const monthlySettingsKey = "nurGutesMonthlySettings";
         const proofSettingsKey = "nurGutesProofSettings";
         const secondSettingsKey = "nurGutesSecondGiftSettings";
+        const shareChannelKey = "nurGutesShareChannel";
         const seedItems = [
           {
             id: "seed-proof-1",
@@ -4656,6 +4667,7 @@
         let savedMonthlySettings = loadJson(monthlySettingsKey, {});
         let savedProofSettings = loadJson(proofSettingsKey, {});
         let savedSecondSettings = loadJson(secondSettingsKey, {});
+        let savedShareChannel = localStorage.getItem(shareChannelKey) || "all";
         let editingItemId = "";
         let lastRemovedItems = loadJson(removedItemsKey, []);
 
@@ -5264,19 +5276,26 @@
         function renderShare() {
           const topItems = items.slice(0, 3);
           const revenue = items.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
-          const lines = [
-            "Instagram/TikTok:",
-            `Heute in Nur Gutes: ${topItems[0]?.title || "eine kleine gute Tat"} wird konkret. Ziel: ${money(revenue)} Revenue, davon ${money(revenue * 0.4)} direkt fuer Wirkung. Wer will mitmachen?`,
-            "",
-            "LinkedIn:",
-            `Wir testen eine produktive Impact-App: Gute Taten planen, Revenue-Ziel setzen, Stripe-Link verbinden, Fortschritt teilen. Aktuelle naechste Schritte: ${topItems.map((item) => item.next).filter(Boolean).join(" / ") || "ersten Partner ansprechen"}.`,
-            "",
-            "Twitter/X:",
-            `Nur Gutes wird vom Magazin zur App: Board + Payment Links + Proof + Reinvestition. Heute offen: ${items.length} Eintraege, ${money(revenue)} Ziel, ${money(revenue * 0.4)} Impact-Anteil.`,
-            "",
-            "Direktnachricht:",
-            `Ich baue gerade ein kleines System, das gute Taten in klare Aufgaben, Finanzierung und sichtbare Belege uebersetzt. Hast du ein Projekt, das wir als ersten Proof-Sprint testen sollen?`
-          ];
+          const channel = qs("#shareChannel")?.value || "all";
+          const copyBlocks = {
+            short: [
+              "Instagram/TikTok:",
+              `Heute in Nur Gutes: ${topItems[0]?.title || "eine kleine gute Tat"} wird konkret. Ziel: ${money(revenue)} Revenue, davon ${money(revenue * 0.4)} direkt fuer Wirkung. Wer will mitmachen?`
+            ],
+            linkedin: [
+              "LinkedIn:",
+              `Wir testen eine produktive Impact-App: Gute Taten planen, Revenue-Ziel setzen, Stripe-Link verbinden, Fortschritt teilen. Aktuelle naechste Schritte: ${topItems.map((item) => item.next).filter(Boolean).join(" / ") || "ersten Partner ansprechen"}.`
+            ],
+            twitter: [
+              "Twitter/X:",
+              `Nur Gutes wird vom Magazin zur App: Board + Payment Links + Proof + Reinvestition. Heute offen: ${items.length} Eintraege, ${money(revenue)} Ziel, ${money(revenue * 0.4)} Impact-Anteil.`
+            ],
+            dm: [
+              "Direktnachricht:",
+              `Ich baue gerade ein kleines System, das gute Taten in klare Aufgaben, Finanzierung und sichtbare Belege uebersetzt. Hast du ein Projekt, das wir als ersten Proof-Sprint testen sollen?`
+            ]
+          };
+          const lines = channel === "all" ? Object.values(copyBlocks).flatMap((block, index) => index ? ["", ...block] : block) : copyBlocks[channel] || copyBlocks.short;
           qs("#shareText").value = lines.join("\n");
         }
 
@@ -5842,6 +5861,8 @@
         setQuickTask(quickTask, false);
         const pitchChannelInput = qs("#pitchChannel");
         if (pitchChannelInput) pitchChannelInput.value = savedPitchChannel;
+        const shareChannelInput = qs("#shareChannel");
+        if (shareChannelInput && ["all", "short", "linkedin", "twitter", "dm"].includes(savedShareChannel)) shareChannelInput.value = savedShareChannel;
         const toolDetailSelectors = {
           router: ".tool-router-details",
           tabs: ".tool-tabs"
@@ -6074,6 +6095,11 @@
           event.preventDefault();
           qsa("[data-app-tab]").find((tab) => tab.dataset.appTab === "payments")?.click();
           qs("#stripeForm input")?.focus();
+        });
+        qs("#shareChannel")?.addEventListener("change", (event) => {
+          savedShareChannel = event.target.value;
+          localStorage.setItem(shareChannelKey, savedShareChannel);
+          renderShare();
         });
 
         ["#pitchItem", "#pitchPartner", "#pitchChannel"].forEach((selector) => {
