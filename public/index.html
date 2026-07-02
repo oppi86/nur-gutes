@@ -1193,6 +1193,8 @@
       .app-card button { background: #f7f4ef; border: 1px solid #e7e1d7; color: #20211d; margin-top: 12px; margin-right: 6px; }
       .app-card-primary-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
       .app-card-primary-actions button, .app-card-action-menu button { margin: 0; }
+      .app-card-status { display: grid; gap: 5px; min-width: 150px; color: #575952; font-size: 11px; font-weight: 900; text-transform: uppercase; }
+      .app-card-status select { width: 100%; border: 1px solid #d9d1c4; border-radius: 8px; background: #fff; color: #20211d; font: inherit; padding: 9px 10px; min-width: 0; }
       .app-card button.current-status { background: #17332f; border-color: #17332f; color: white; cursor: default; opacity: 1; }
       .app-card-actions { margin-top: 12px; }
       .app-card-actions summary { cursor: pointer; color: #17332f; font-size: 13px; font-weight: 900; }
@@ -5139,9 +5141,13 @@
               <p class="muted">${escapeHtml(item.text)}</p>
               <div class="app-card-meta"><span>${escapeHtml(item.next || "Naechsten Schritt klaeren")}</span><span>Impact 40%: ${money((Number(item.amount) || 0) * 0.4)}</span></div>
               <div class="app-card-primary-actions" aria-label="Schnellaktionen">
-                <button type="button" data-status="planned" aria-pressed="${item.status === "planned"}" class="${item.status === "planned" ? "current-status" : ""}" ${item.status === "planned" ? "disabled" : ""}>Plan</button>
-                <button type="button" data-status="active" aria-pressed="${item.status === "active"}" class="${item.status === "active" ? "current-status" : ""}" ${item.status === "active" ? "disabled" : ""}>Aktiv</button>
-                <button type="button" data-status="done" aria-pressed="${item.status === "done"}" class="${item.status === "done" ? "current-status" : ""}" ${item.status === "done" ? "disabled" : ""}>Fertig</button>
+                <label class="app-card-status">Status
+                  <select data-status-select>
+                    <option value="planned" ${item.status === "planned" ? "selected" : ""}>Geplant</option>
+                    <option value="active" ${item.status === "active" ? "selected" : ""}>Aktiv</option>
+                    <option value="done" ${item.status === "done" ? "selected" : ""}>Fertig</option>
+                  </select>
+                </label>
                 <button type="button" data-start-item="true" ${item.status === "done" ? "disabled" : ""}>Starten</button>
               </div>
               <details class="app-card-actions">
@@ -6022,6 +6028,16 @@
             items = items.map((item) => item.id === card.dataset.id ? { ...item, status: button.dataset.status } : item);
             resetEmptyCurrentFilter();
           }
+          saveItems();
+          renderAll();
+        });
+        qs("#impactList").addEventListener("change", (event) => {
+          const select = event.target.closest("[data-status-select]");
+          if (!select) return;
+          const card = event.target.closest("[data-id]");
+          if (!card) return;
+          items = items.map((item) => item.id === card.dataset.id ? { ...item, status: select.value } : item);
+          resetEmptyCurrentFilter();
           saveItems();
           renderAll();
         });
