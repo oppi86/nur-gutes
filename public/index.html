@@ -6180,9 +6180,9 @@
           if (event.key === "Enter") {
             event.preventDefault();
             startFirstVisibleBoardItem();
-          } else if (event.key === "Escape" && currentBoardSearch.trim()) {
+          } else if (event.key === "Escape" && (currentBoardSearch.trim() || currentFilter !== "all")) {
             event.preventDefault();
-            clearBoardSearchValue();
+            resetBoardView();
           }
         });
         qs("#clearBoardSearch")?.addEventListener("click", resetBoardView);
