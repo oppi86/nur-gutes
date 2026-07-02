@@ -5682,6 +5682,7 @@
             visibleArchiveCount = archivePageSize;
             localStorage.removeItem(archiveSearchKey);
             renderArchive();
+            archiveCount.textContent = `${archivePageSize} Archivtreffer sichtbar. Suche geloescht; alte Iterationen bleiben kompakt.`;
             archiveSearch.focus();
           });
           loadMoreArchive.addEventListener("click", () => {
