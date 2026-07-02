@@ -4820,18 +4820,18 @@
           }
         ];
         const dailyProductIdea = {
-          id: "daily-2026-07-03-board-export-ia",
+          id: "daily-2026-07-03-auto-focus",
           date: "3. Juli 2026",
-          title: "Board Export IA",
+          title: "Auto Tagesfokus",
           category: "Business Idee",
           amount: 29,
-          next: "Board-Export aus dem Dashboard-Intro in den Board-Workspace verschieben",
-          text: "Der Export sitzt jetzt direkt bei Suche, Sortierung und Board-Ansicht. Das Dashboard-Intro bleibt ruhiger, und der ausgegebene Datenausschnitt ist klarer nachvollziehbar.",
-          revenueStream: "29-Euro Board Export Setup",
-          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer bessere Board-Ausgaben",
-          userGrowth: "+1 Nutzbarkeits-Signal durch kontextnahen Export im Board",
+          next: "Empfohlene Board-Aktion direkt als Tagesfokus speichern",
+          text: "Der Tagesfokus ist kein leerer Zustand mehr: Wenn noch kein Fokus gesetzt ist, speichert der Primaerbutton automatisch die empfohlene Board-Aktion als Fokus.",
+          revenueStream: "29-Euro Focus Setup",
+          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer klarere Tagesstarts",
+          userGrowth: "+1 Aktivierungs-Signal durch weniger leere Fokus-Zustaende",
           socialStatus: "Postingtexte im Social-Tool vorbereitet; keine externen Connectoren autorisiert",
-          implementedFunction: "Gefilterte Board-Daten weiter als CSV exportieren oder als Report kopieren, jetzt direkt im Board-Kontext.",
+          implementedFunction: "Empfohlene naechste Aktion berechnen, als Tagesfokus in localStorage speichern und danach wie gewohnt starten.",
           reinvestment: "40% gute Taten, 25% bessere Fokus- und Workspace-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
         };
         const paymentLabels = {
@@ -5639,7 +5639,7 @@
           if (status) {
             status.textContent = item
               ? `${item.category || "Board"} / ${item.status || "planned"} - ${item.next || "Naechsten Schritt klaeren"}`
-              : "Waehle einen Board-Eintrag als Fokus, damit der naechste Besuch direkt klar startet.";
+              : "Empfohlenen Board-Eintrag als Tagesfokus setzen oder manuell im Board waehlen.";
           }
           if (note) {
             note.disabled = !hasFocus;
@@ -5647,8 +5647,13 @@
           }
           if (actionsMore && actionsMore.open !== dailyFocusActionsOpen) actionsMore.open = dailyFocusActionsOpen;
           if (startButton) {
-            startButton.disabled = !hasFocus || item.status === "done";
-            startButton.title = !hasFocus ? "Noch kein Tagesfokus gesetzt" : item.status === "done" ? "Fertige Eintraege koennen nicht gestartet werden" : "Tagesfokus mit passendem Tool starten";
+            const recommendedAction = hasFocus ? null : recommendNextAction();
+            const canSetRecommendedFocus = Boolean(recommendedAction?.item) && !recommendedAction.empty && recommendedAction.item.status !== "done";
+            startButton.disabled = hasFocus ? item.status === "done" : !canSetRecommendedFocus;
+            startButton.textContent = hasFocus ? "Fokus starten" : "Empfohlenen Fokus setzen";
+            startButton.title = hasFocus
+              ? item.status === "done" ? "Fertige Eintraege koennen nicht gestartet werden" : "Tagesfokus mit passendem Tool starten"
+              : canSetRecommendedFocus ? `Empfohlenen Fokus setzen: ${recommendedAction.item.title}` : "Kein startbarer Board-Eintrag verfuegbar";
           }
           if (copyButton) {
             copyButton.disabled = !hasFocus;
@@ -5708,7 +5713,18 @@
 
         function startDailyFocus() {
           const item = dailyFocusItem();
-          if (!item || item.status === "done") return;
+          if (!item) {
+            const action = recommendNextAction();
+            const status = qs("#dailyFocusStatus");
+            if (!action?.item || action.empty || action.item.status === "done") {
+              if (status) status.textContent = "Kein startbarer Board-Eintrag fuer den Tagesfokus verfuegbar.";
+              return;
+            }
+            setDailyFocus(action.item.id);
+            if (status) status.textContent = `${action.item.title} ist jetzt Tagesfokus.`;
+            return;
+          }
+          if (item.status === "done") return;
           startBoardItem(item.id);
         }
 
