@@ -123,7 +123,7 @@
       .archive-more { width: 100%; border: 1px solid #d9d1c4; border-radius: 8px; background: #f7f4ef; color: #17332f; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; margin-top: 12px; padding: 12px 14px; }
       .archive-more[hidden] { display: none; }
       .legacy-daily-section { display: none; }
-      .show-legacy .legacy-daily-section { display: block; }
+      .show-legacy .legacy-daily-section.archive-visible { display: block; }
       .creator-kit { background: #fff; }
       .creator-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: start; }
       .creator-card { border: 1px solid #e7e1d7; box-shadow: none; padding: 24px; }
@@ -5594,14 +5594,22 @@
           const closedLabel = `Archiv anzeigen (${legacyItems.length})`;
           toggle.textContent = closedLabel;
           archiveSearch.value = savedArchiveSearch;
+          let visibleArchiveIds = [];
+          const setVisibleLegacySections = (ids = []) => {
+            const visibleIds = new Set(ids);
+            legacyItems.forEach((item) => document.getElementById(item.id)?.classList.toggle("archive-visible", visibleIds.has(item.id)));
+          };
           const setArchiveOpen = (open, shouldPersist = true) => {
             archiveOpen = Boolean(open);
+            setVisibleLegacySections(archiveOpen ? visibleArchiveIds : []);
             document.body.classList.toggle("show-legacy", archiveOpen);
             toggle.textContent = archiveOpen ? "Archiv ausblenden" : closedLabel;
+            if (archiveOpen && archiveCount) archiveCount.textContent = `${visibleArchiveIds.length} von ${legacyItems.length} archivierten Iterationen eingeblendet. Mehr laden oder gezielt suchen.`;
             if (shouldPersist) localStorage.setItem(archiveOpenKey, String(archiveOpen));
             if (archiveOpen) setFocusMode(false, false, false);
           };
           const openArchive = (targetId) => {
+            visibleArchiveIds = targetId ? [targetId] : visibleArchiveIds;
             setArchiveOpen(true);
             if (!targetId) return;
             const target = document.getElementById(targetId);
@@ -5612,6 +5620,8 @@
             const query = archiveSearch.value.trim().toLowerCase();
             const matches = query ? legacyItems.filter((item) => item.searchText.includes(query)) : legacyItems;
             const visibleMatches = matches.slice(0, visibleArchiveCount);
+            visibleArchiveIds = visibleMatches.map((item) => item.id);
+            if (archiveOpen) setVisibleLegacySections(visibleArchiveIds);
             const shown = visibleMatches.length;
             archiveCount.textContent = query
               ? `${shown} von ${matches.length} Treffern fuer "${archiveSearch.value.trim()}" sichtbar`
@@ -5667,6 +5677,7 @@
           loadMoreArchive.addEventListener("click", () => {
             visibleArchiveCount += archivePageSize;
             renderArchive();
+            if (archiveOpen) setArchiveOpen(true);
             loadMoreArchive.focus();
           });
           archiveList.addEventListener("click", (event) => {
