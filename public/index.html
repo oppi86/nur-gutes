@@ -5231,16 +5231,19 @@
             saveItems();
           }
           const dailyItem = items.find((item) => item.id === dailyProductIdea.id);
-          revealSavedBoardItem();
+          revealSavedBoardItem(dailyItem);
+          setActiveTool("board");
+          setQuickTask("board");
+          setBoardFormCollapsed(true);
           renderAll();
-          if (dailyItem) startAction(recommendActionForItem(dailyItem));
           const status = qs("#dailyIdeaStatus");
           if (status) {
             status.dataset.locked = "true";
             status.textContent = existing
-              ? "Daily-Idee war schon im Board. Das passende Tool ist geoeffnet."
-              : "Daily-Idee wurde gespeichert und direkt als naechste Aktion gestartet.";
+              ? "Daily-Idee war schon im Board und ist jetzt sichtbar gefiltert."
+              : "Daily-Idee wurde gespeichert und im Board sichtbar gefiltert.";
           }
+          requestAnimationFrame(() => qs("#impactList")?.scrollIntoView({ behavior: "smooth", block: "start" }));
         }
 
         function getVisibleBoardItems() {
@@ -5474,16 +5477,16 @@
           if (shouldFocus) search?.focus();
         }
 
-        function revealSavedBoardItem() {
+        function revealSavedBoardItem(item = null) {
           currentFilter = "all";
           currentStatKey = "revenue";
-          currentBoardSearch = "";
+          currentBoardSearch = item?.title || "";
           currentBoardSort = "manual";
           boardFocusLimitEnabled = true;
           localStorage.setItem(boardFocusLimitKey, String(boardFocusLimitEnabled));
           saveBoardView();
           const search = qs("#boardSearch");
-          if (search) search.value = "";
+          if (search) search.value = currentBoardSearch;
           const sort = qs("#boardSort");
           if (sort) sort.value = currentBoardSort;
         }
