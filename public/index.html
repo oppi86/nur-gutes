@@ -1120,6 +1120,7 @@
       .app-daily { border: 1px solid rgba(255,255,255,.2); border-radius: 8px; background: rgba(255,255,255,.1); margin-top: 18px; padding: 16px; }
       .app-daily h3 { color: white; font-size: 20px; margin: 4px 0 8px; }
       .app-daily p { color: rgba(255,255,255,.82); font-size: 13px; margin: 0; }
+      .app-daily.daily-details-collapsed .app-daily-details { display: none; }
       .app-daily-metrics { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; margin: 12px 0; }
       .app-daily-metrics span { border: 1px solid rgba(255,255,255,.18); border-radius: 8px; color: rgba(255,255,255,.86); font-size: 12px; font-weight: 900; padding: 9px; }
       .app-daily-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
@@ -1275,19 +1276,22 @@
               <button type="button" id="exportBoardButton">Board als CSV exportieren</button>
               <p id="exportBoardStatus">Export fuer Sheets, CRM oder Partner-Reporting.</p>
             </div>
-            <article class="app-daily" aria-labelledby="dailyIdeaTitle">
+            <article class="app-daily" id="dailyIdeaCard" aria-labelledby="dailyIdeaTitle">
               <p class="tag" id="dailyIdeaDate">Daily Product Cycle</p>
               <h3 id="dailyIdeaTitle">Daily-Idee wird geladen</h3>
               <p id="dailyIdeaSummary">Die aktuelle Idee wird kompakt gehalten und kann als Board-Arbeit gestartet werden.</p>
-              <div class="app-daily-metrics" aria-label="Daily Produktmetriken">
-                <span id="dailyRevenueStream">Revenue-Stream</span>
-                <span id="dailyRevenueMetric">Daily Revenue</span>
-                <span id="dailyGrowthMetric">User-Growth</span>
-                <span id="dailySocialStatus">Social-Status</span>
+              <div class="app-daily-details" id="dailyIdeaDetails">
+                <div class="app-daily-metrics" aria-label="Daily Produktmetriken">
+                  <span id="dailyRevenueStream">Revenue-Stream</span>
+                  <span id="dailyRevenueMetric">Daily Revenue</span>
+                  <span id="dailyGrowthMetric">User-Growth</span>
+                  <span id="dailySocialStatus">Social-Status</span>
+                </div>
+                <p id="dailyReinvestment">Reinvestition wird geladen.</p>
               </div>
-              <p id="dailyReinvestment">Reinvestition wird geladen.</p>
               <div class="app-daily-actions">
                 <button type="button" id="addDailyIdeaButton">Daily-Idee ins Board uebernehmen</button>
+                <button type="button" id="toggleDailyDetails" aria-expanded="false" aria-controls="dailyIdeaDetails">Metriken anzeigen</button>
                 <a href="#daily-archive">Archiv oeffnen</a>
               </div>
               <p class="app-daily-status" id="dailyIdeaStatus">Bereit als kompakter Board-Eintrag statt neuer Scroll-Sektion.</p>
@@ -4537,6 +4541,7 @@
         const activeToolKey = "nurGutesActiveTool";
         const compactBoardKey = "nurGutesCompactBoard";
         const boardFormCollapsedKey = "nurGutesBoardFormCollapsed";
+        const dailyDetailsKey = "nurGutesDailyDetailsOpen";
         const removedItemsKey = "nurGutesRemovedDone";
         const seedItems = [
           {
@@ -4604,6 +4609,7 @@
         let activeTool = localStorage.getItem(activeToolKey) || "board";
         let boardCompact = localStorage.getItem(compactBoardKey) === "true";
         let boardFormCollapsed = localStorage.getItem(boardFormCollapsedKey) !== "false";
+        let dailyDetailsOpen = localStorage.getItem(dailyDetailsKey) === "true";
         let currentFilter = "all";
         let currentBoardSearch = "";
         let editingItemId = "";
@@ -4843,13 +4849,26 @@
             if (element) element.textContent = value;
           });
           const button = qs("#addDailyIdeaButton");
+          const detailsButton = qs("#toggleDailyDetails");
+          const card = qs("#dailyIdeaCard");
           const status = qs("#dailyIdeaStatus");
           if (button) button.textContent = alreadyAdded ? "Daily-Idee im Board anzeigen" : "Daily-Idee ins Board uebernehmen";
+          if (card) card.classList.toggle("daily-details-collapsed", !dailyDetailsOpen);
+          if (detailsButton) {
+            detailsButton.setAttribute("aria-expanded", String(dailyDetailsOpen));
+            detailsButton.textContent = dailyDetailsOpen ? "Metriken ausblenden" : "Metriken anzeigen";
+          }
           if (status && !status.dataset.locked) {
             status.textContent = alreadyAdded
               ? "Daily-Idee liegt als Board-Eintrag vor."
               : "Bereit als kompakter Board-Eintrag statt neuer Scroll-Sektion.";
           }
+        }
+
+        function setDailyDetailsOpen(open) {
+          dailyDetailsOpen = Boolean(open);
+          localStorage.setItem(dailyDetailsKey, String(dailyDetailsOpen));
+          renderDailyIdea();
         }
 
         function addDailyIdeaToBoard() {
@@ -5489,6 +5508,7 @@
         }));
         qs("#nextActionButton")?.addEventListener("click", startRecommendedAction);
         qs("#addDailyIdeaButton")?.addEventListener("click", addDailyIdeaToBoard);
+        qs("#toggleDailyDetails")?.addEventListener("click", () => setDailyDetailsOpen(!dailyDetailsOpen));
         qs("#exportBoardButton")?.addEventListener("click", exportBoardCsv);
         setActiveTool(activeTool, false);
         qsa("[data-top-tool]").forEach((button) => {
