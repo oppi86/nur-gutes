@@ -4757,11 +4757,13 @@
             button.disabled = true;
             button.textContent = "Kein sichtbarer Start";
             status.textContent = "Aktuelle Board-Suche oder Filter zeigt keinen startbaren Eintrag.";
+            syncAutoRouterHint(action);
             return;
           }
           button.disabled = false;
           button.textContent = `${action.label} starten`;
           status.textContent = `${action.scoped ? "Aus aktueller Ansicht: " : ""}${action.item.title}: ${action.reason}`;
+          syncAutoRouterHint(action);
         }
 
         function startRecommendedAction() {
@@ -5631,18 +5633,22 @@
           second: "Berechne Timing und Betrag fuer die zweite Gabe nach einem Signal.",
           share: "Bereite kurze Posting-Texte fuer externe Kanaele vor."
         };
+        function syncAutoRouterHint(action = recommendNextAction()) {
+          if (quickTask !== "auto") return;
+          const hint = qs("#toolRouterHint");
+          if (!hint) return;
+          hint.textContent = action?.item
+            ? `Empfohlen: ${action.label} fuer "${action.item.title}". Mit Starten oeffnest du den passenden Workspace.`
+            : `${toolHints.auto} Mit Starten oeffnest du den passenden Workspace.`;
+        }
         function setQuickTask(name, shouldPersist = true) {
           const selectedName = name === "auto" || qsa("[data-app-panel]").some((panel) => panel.dataset.appPanel === name) ? name : "auto";
           quickTask = selectedName;
           const router = qs("#toolRouter");
           const hint = qs("#toolRouterHint");
           if (router) router.value = selectedName;
-          if (hint) {
-            const action = selectedName === "auto" ? recommendNextAction() : null;
-            hint.textContent = action?.item
-              ? `Empfohlen: ${action.label} fuer "${action.item.title}". Mit Starten oeffnest du den passenden Workspace.`
-              : `${toolHints[selectedName] || toolHints.auto} Mit Starten oeffnest du den passenden Workspace.`;
-          }
+          if (selectedName === "auto") syncAutoRouterHint();
+          else if (hint) hint.textContent = `${toolHints[selectedName] || toolHints.auto} Mit Starten oeffnest du den passenden Workspace.`;
           if (shouldPersist) localStorage.setItem(quickTaskKey, selectedName);
         }
         function startQuickTask() {
