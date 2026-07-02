@@ -4574,6 +4574,7 @@
         const lastCopyKey = "nurGutesLastCopy";
         const lastExportKey = "nurGutesLastExport";
         const pitchChannelKey = "nurGutesPitchChannel";
+        const trustSettingsKey = "nurGutesTrustSettings";
         const seedItems = [
           {
             id: "seed-proof-1",
@@ -4646,6 +4647,7 @@
         let currentFilter = ["all", "planned", "active", "done"].includes(localStorage.getItem(boardFilterKey)) ? localStorage.getItem(boardFilterKey) : "all";
         let currentBoardSearch = localStorage.getItem(boardSearchKey) || "";
         let savedPitchChannel = localStorage.getItem(pitchChannelKey) || "daily-growth";
+        let savedTrustSettings = loadJson(trustSettingsKey, {});
         let editingItemId = "";
         let lastRemovedItems = loadJson(removedItemsKey, []);
 
@@ -5824,6 +5826,15 @@
         setQuickTask(quickTask, false);
         const pitchChannelInput = qs("#pitchChannel");
         if (pitchChannelInput) pitchChannelInput.value = savedPitchChannel;
+        const trustSettingSelectors = {
+          supporter: "#trustSupporter",
+          action: "#trustAction",
+          tone: "#trustTone"
+        };
+        Object.entries(trustSettingSelectors).forEach(([key, selector]) => {
+          const field = qs(selector);
+          if (field && savedTrustSettings[key]) field.value = savedTrustSettings[key];
+        });
         qsa("[data-top-tool]").forEach((button) => {
           button.addEventListener("click", () => {
             activateToolShortcut(button.dataset.topTool);
@@ -6015,8 +6026,17 @@
         });
 
         ["#trustItem", "#trustSupporter", "#trustAction", "#trustTone"].forEach((selector) => {
-          qs(selector).addEventListener("input", renderTrust);
-          qs(selector).addEventListener("change", renderTrust);
+          const updateTrust = () => {
+            savedTrustSettings = {
+              supporter: qs("#trustSupporter").value,
+              action: qs("#trustAction").value,
+              tone: qs("#trustTone").value
+            };
+            localStorage.setItem(trustSettingsKey, JSON.stringify(savedTrustSettings));
+            renderTrust();
+          };
+          qs(selector).addEventListener("input", updateTrust);
+          qs(selector).addEventListener("change", updateTrust);
         });
 
         ["#proofItem", "#proofStatus", "#proofEvidence", "#proofDays"].forEach((selector) => {
