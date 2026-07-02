@@ -1325,6 +1325,7 @@
               <button class="app-mode-toggle" type="button" id="focusModeToggle" aria-pressed="false">Arbeitsmodus aktivieren</button>
               <button class="app-mode-toggle" type="button" id="resumeWorkspaceButton">Zuletztes Tool oeffnen</button>
               <button class="app-mode-reset" type="button" id="resetDashboardButton">Dashboard aufraeumen</button>
+              <button class="app-mode-reset" type="button" id="copyCompactnessButton">Kompakt-Check kopieren</button>
               <p class="app-mode-status" id="focusModeStatus">Magazinbereiche bleiben sichtbar.</p>
               <p class="app-mode-status" id="dashboardCompactnessStatus" aria-live="polite">Dashboard-Kompaktheit wird berechnet.</p>
             </div>
@@ -4839,18 +4840,43 @@
           renderDashboardCompactness();
         }
 
-        function renderDashboardCompactness() {
-          const status = qs("#dashboardCompactnessStatus");
-          if (!status) return;
+        function getDashboardCompactness() {
           const sections = qsa("main > section");
           const visibleSections = sections.filter((section) => getComputedStyle(section).display !== "none").length;
           const archivedDailySections = qsa(".legacy-daily-section").length;
           const openDailySections = qsa(".legacy-daily-section.archive-visible").filter((section) => getComputedStyle(section).display !== "none").length;
           const resourceSections = qsa(".resource-section").length;
           const openResourceSections = qsa(".resource-section").filter((section) => getComputedStyle(section).display !== "none").length;
+          return { visibleSections, archivedDailySections, openDailySections, resourceSections, openResourceSections };
+        }
+
+        function renderDashboardCompactness() {
+          const status = qs("#dashboardCompactnessStatus");
+          if (!status) return;
+          const { visibleSections, archivedDailySections, openDailySections, resourceSections, openResourceSections } = getDashboardCompactness();
           status.textContent = focusMode
             ? `Kompakt: ${visibleSections} sichtbare Bereiche, ${archivedDailySections} Daily-Iterationen im Archiv, ${resourceSections} Ressourcen eingeklappt.`
             : `Magazinansicht: ${visibleSections} Bereiche sichtbar, ${openDailySections} Archiv-Iterationen und ${openResourceSections} Ressourcen geoeffnet.`;
+        }
+
+        async function copyDashboardCompactness() {
+          const { visibleSections, archivedDailySections, openDailySections, resourceSections, openResourceSections } = getDashboardCompactness();
+          const text = [
+            "Nur Gutes Dashboard-Check",
+            `Modus: ${focusMode ? "Arbeitsmodus" : "Magazinmodus"}`,
+            `Aktives Tool: ${activeToolLabel()}`,
+            `Sichtbare Bereiche: ${visibleSections}`,
+            `Archivierte Daily-Iterationen: ${archivedDailySections}`,
+            `Geoeffnete Archiv-Iterationen: ${openDailySections}`,
+            `Ressourcen eingeklappt: ${Math.max(0, resourceSections - openResourceSections)} von ${resourceSections}`,
+            "Ziel: erster Screen bleibt Workspace, maximal 3 Top-Tools sichtbar, Daily-Idee kompakt, Archiv statt endloser Feed."
+          ].join("\n");
+          const copied = await copyText(text);
+          rememberCopy("Dashboard-Kompakt-Check", copied);
+          const status = qs("#dashboardCompactnessStatus");
+          if (status) status.textContent = copied
+            ? "Dashboard-Kompakt-Check kopiert."
+            : "Dashboard-Kompakt-Check konnte nicht automatisch kopiert werden.";
         }
 
         function renderResumeWorkspaceButton() {
@@ -6237,6 +6263,7 @@
         qs("#focusModeToggle")?.addEventListener("click", () => setFocusMode(!focusMode, true));
         qs("#resumeWorkspaceButton")?.addEventListener("click", resumeLastWorkspace);
         qs("#resetDashboardButton")?.addEventListener("click", resetDashboardMode);
+        qs("#copyCompactnessButton")?.addEventListener("click", copyDashboardCompactness);
         qsa("[data-dashboard-start]").forEach((button) => button.addEventListener("click", (event) => {
           event.preventDefault();
           startDashboardMode();
