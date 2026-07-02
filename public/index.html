@@ -5630,6 +5630,23 @@
             renderArchive();
           });
           archiveSearch.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") {
+              event.preventDefault();
+              if (archiveSearch.value.trim()) {
+                savedArchiveSearch = "";
+                archiveSearch.value = "";
+                visibleArchiveCount = archivePageSize;
+                localStorage.removeItem(archiveSearchKey);
+                renderArchive();
+                archiveCount.textContent = "Archiv-Suche geloescht. Escape erneut druecken, um zum Workspace zurueckzukehren.";
+                return;
+              }
+              setArchiveOpen(false);
+              setFocusMode(true, true, true);
+              const status = qs("#focusModeStatus");
+              if (status) status.textContent = "Archiv verlassen. Kompakter Workspace ist wieder aktiv.";
+              return;
+            }
             if (event.key !== "Enter") return;
             event.preventDefault();
             const firstResult = archiveList.querySelector("[data-archive-target]");
