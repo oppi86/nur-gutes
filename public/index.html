@@ -4556,6 +4556,8 @@
         const archiveSearchKey = "nurGutesArchiveSearch";
         const removedItemsKey = "nurGutesRemovedDone";
         const quickTaskKey = "nurGutesQuickTask";
+        const boardFilterKey = "nurGutesBoardFilter";
+        const boardSearchKey = "nurGutesBoardSearch";
         const seedItems = [
           {
             id: "seed-proof-1",
@@ -4625,8 +4627,8 @@
         let dailyDetailsOpen = localStorage.getItem(dailyDetailsKey) === "true";
         let savedArchiveSearch = localStorage.getItem(archiveSearchKey) || "";
         let quickTask = localStorage.getItem(quickTaskKey) || activeTool || "board";
-        let currentFilter = "all";
-        let currentBoardSearch = "";
+        let currentFilter = ["all", "planned", "active", "done"].includes(localStorage.getItem(boardFilterKey)) ? localStorage.getItem(boardFilterKey) : "all";
+        let currentBoardSearch = localStorage.getItem(boardSearchKey) || "";
         let editingItemId = "";
         let lastRemovedItems = loadJson(removedItemsKey, []);
 
@@ -4635,6 +4637,11 @@
         const saveItems = () => localStorage.setItem(itemKey, JSON.stringify(items));
         const saveStripe = () => localStorage.setItem(stripeKey, JSON.stringify(stripeLinks));
         const saveRemovedItems = () => localStorage.setItem(removedItemsKey, JSON.stringify(lastRemovedItems));
+        const saveBoardView = () => {
+          localStorage.setItem(boardFilterKey, currentFilter);
+          if (currentBoardSearch.trim()) localStorage.setItem(boardSearchKey, currentBoardSearch);
+          else localStorage.removeItem(boardSearchKey);
+        };
         const csvCell = (value) => `"${String(value ?? "").replace(/"/g, '""')}"`;
 
         async function copyText(text) {
@@ -4940,6 +4947,7 @@
             const filter = button.dataset.filter;
             const filterCount = filterCounts[filter] || 0;
             button.textContent = `${filterLabels[filter] || filter} (${filterCount})`;
+            button.classList.toggle("active", currentFilter === filter);
             button.disabled = filter !== "all" && filterCount === 0 && currentFilter !== filter;
           });
           list?.classList.toggle("compact", boardCompact);
@@ -4953,6 +4961,8 @@
           if (count) count.textContent = query ? `${visibleItems.length} Treffer in ${filteredItems.length} gefilterten Eintraegen` : `${visibleItems.length} von ${items.length} Eintraegen sichtbar`;
           const clearBoardSearch = qs("#clearBoardSearch");
           if (clearBoardSearch) clearBoardSearch.disabled = query.length === 0;
+          const search = qs("#boardSearch");
+          if (search && search.value !== currentBoardSearch) search.value = currentBoardSearch;
           const doneCount = items.filter((item) => item.status === "done").length;
           const clearDoneButton = qs("#clearDoneButton");
           if (clearDoneButton) {
@@ -5017,12 +5027,17 @@
 
         function resetBoardView() {
           currentFilter = "all";
-          qsa("[data-filter]").forEach((filterButton) => filterButton.classList.toggle("active", filterButton.dataset.filter === "all"));
-          clearBoardSearchValue();
+          currentBoardSearch = "";
+          saveBoardView();
+          const search = qs("#boardSearch");
+          if (search) search.value = "";
+          renderBoard();
+          search?.focus();
         }
 
         function clearBoardSearchValue(shouldFocus = true) {
           currentBoardSearch = "";
+          saveBoardView();
           const search = qs("#boardSearch");
           if (search) search.value = "";
           renderBoard();
@@ -5032,16 +5047,16 @@
         function revealSavedBoardItem() {
           currentFilter = "all";
           currentBoardSearch = "";
+          saveBoardView();
           const search = qs("#boardSearch");
           if (search) search.value = "";
-          qsa("[data-filter]").forEach((filterButton) => filterButton.classList.toggle("active", filterButton.dataset.filter === "all"));
         }
 
         function resetEmptyCurrentFilter() {
           if (currentFilter === "all") return;
           if (items.some((item) => item.status === currentFilter)) return;
           currentFilter = "all";
-          qsa("[data-filter]").forEach((filterButton) => filterButton.classList.toggle("active", filterButton.dataset.filter === "all"));
+          saveBoardView();
         }
 
         function setEditMode(itemId = "") {
@@ -5719,7 +5734,7 @@
         qsa("[data-filter]").forEach((button) => {
           button.addEventListener("click", () => {
             currentFilter = button.dataset.filter;
-            qsa("[data-filter]").forEach((filterButton) => filterButton.classList.toggle("active", filterButton === button));
+            saveBoardView();
             renderBoard();
           });
         });
@@ -5730,7 +5745,7 @@
           if (before === items.length) return;
           saveRemovedItems();
           currentFilter = "all";
-          qsa("[data-filter]").forEach((filterButton) => filterButton.classList.toggle("active", filterButton.dataset.filter === "all"));
+          saveBoardView();
           saveItems();
           renderAll();
         });
@@ -5751,6 +5766,7 @@
         });
         qs("#boardSearch")?.addEventListener("input", (event) => {
           currentBoardSearch = event.target.value;
+          saveBoardView();
           renderBoard();
         });
         qs("#boardSearch")?.addEventListener("keydown", (event) => {
@@ -5763,7 +5779,7 @@
             clearBoardSearchValue();
           }
         });
-        qs("#clearBoardSearch")?.addEventListener("click", () => clearBoardSearchValue());
+        qs("#clearBoardSearch")?.addEventListener("click", resetBoardView);
 
         qs("#stripeForm").addEventListener("submit", (event) => {
           event.preventDefault();
