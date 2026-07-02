@@ -1141,6 +1141,7 @@
       .top-tool strong { display: block; font-size: 15px; line-height: 1.2; }
       .top-tool span { display: block; color: #575952; font-size: 12px; line-height: 1.35; margin-top: 5px; }
       .top-tool[aria-pressed="true"] { background: #e6efe1; border-color: #9db990; }
+      .top-tools.tool-hub-active { outline: 3px solid rgba(249,214,92,.85); outline-offset: 3px; }
       .tool-tabs { border: 1px solid #e7e1d7; border-radius: 8px; background: #fff; margin-bottom: 18px; }
       .tool-tabs summary { cursor: pointer; color: #17332f; font-size: 13px; font-weight: 900; list-style-position: inside; padding: 12px 14px; }
       .tool-tabs[open] summary { border-bottom: 1px solid #e7e1d7; }
@@ -1243,7 +1244,7 @@
       <section class="hero" id="start">
         <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1800&q=85" alt="Eine offene Strasse fuehrt durch eine weite Felslandschaft" />
         <div class="shade"></div>
-        <nav><a class="brand" href="#start">Nur Gutes</a><div><a href="#app">Dashboard</a><a href="#app">Tools</a><a href="#daily-archive">Archiv</a></div></nav>
+        <nav><a class="brand" href="#start">Nur Gutes</a><div><a href="#app">Dashboard</a><a href="#tools" data-tool-hub="true">Tools</a><a href="#daily-archive">Archiv</a></div></nav>
         <div class="hero-content">
           <p class="pill">Positive Impulse fuer Menschen, die etwas aufbauen wollen</p>
           <h1>Nur Gutes</h1>
@@ -1296,7 +1297,7 @@
             </div>
           </article>
           <article class="app-workbench">
-            <div class="top-tools" aria-label="Wichtigste Tools">
+            <div class="top-tools" id="tools" aria-label="Wichtigste Tools">
               <button class="top-tool" type="button" data-top-tool="board" aria-pressed="true"><strong>Board</strong><span>Aufgaben speichern und starten</span></button>
               <button class="top-tool" type="button" data-top-tool="pitch" aria-pressed="false"><strong>Pitch</strong><span>Partner-Ask erzeugen</span></button>
               <button class="top-tool" type="button" data-top-tool="proof" aria-pressed="false"><strong>Proof</strong><span>Wirkungsbeleg bauen</span></button>
@@ -4733,6 +4734,18 @@
           if (status) status.textContent = "Dashboard-Modus gespeichert: Board kompakt, Formular geschlossen, Arbeitsmodus aktiv.";
         }
 
+        function openToolHub() {
+          setFocusMode(true);
+          setActiveTool(activeTool || "board");
+          const hub = qs("#tools");
+          const status = qs("#toolRouterHint");
+          if (status) status.textContent = "Tool-Hub aktiv: Waehle Board, Pitch oder Proof als schnellsten Arbeitsweg.";
+          if (!hub) return;
+          hub.classList.add("tool-hub-active");
+          requestAnimationFrame(() => hub.scrollIntoView({ behavior: "smooth", block: "center" }));
+          setTimeout(() => hub.classList.remove("tool-hub-active"), 1600);
+        }
+
         function startAction(action) {
           if (!action) return;
           const wasPlanned = action.item.status === "planned";
@@ -5467,6 +5480,10 @@
         qsa("[data-dashboard-start]").forEach((button) => button.addEventListener("click", (event) => {
           event.preventDefault();
           startDashboardMode();
+        }));
+        qsa("[data-tool-hub]").forEach((link) => link.addEventListener("click", (event) => {
+          event.preventDefault();
+          openToolHub();
         }));
         qs("#nextActionButton")?.addEventListener("click", startRecommendedAction);
         qs("#addDailyIdeaButton")?.addEventListener("click", addDailyIdeaToBoard);
