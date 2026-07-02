@@ -1287,7 +1287,7 @@
             </div>
             <div class="app-next-action">
               <button type="button" id="nextActionButton">Naechste Aktion starten</button>
-              <p id="nextActionStatus">Der Launcher waehlt den sinnvollsten naechsten Tool-Schritt.</p>
+              <p id="nextActionStatus" aria-live="polite">Der Launcher waehlt den sinnvollsten naechsten Tool-Schritt.</p>
             </div>
             <div class="app-export">
               <button type="button" id="exportBoardButton">Board als CSV exportieren</button>
@@ -5975,6 +5975,8 @@
           setActiveTool(toolName);
           setQuickTask(toolName);
           setFocusMode(true, false, true);
+          const status = qs("#nextActionStatus");
+          if (status) status.textContent = `${activeToolLabel()} geoeffnet. Dashboard bleibt kompakt; nur der aktive Workspace ist sichtbar.`;
           const panel = qs(`[data-app-panel="${activeTool}"]`);
           requestAnimationFrame(() => panel?.scrollIntoView({ behavior: "smooth", block: "start" }));
         }
