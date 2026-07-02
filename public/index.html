@@ -5963,6 +5963,13 @@
           renderResumeWorkspaceButton();
         }
         function resumeLastWorkspace() {
+          archiveOpen = false;
+          savedToolDetails = { router: false, tabs: false };
+          localStorage.setItem(archiveOpenKey, String(archiveOpen));
+          localStorage.setItem(toolDetailsKey, JSON.stringify(savedToolDetails));
+          document.body.classList.remove("show-legacy");
+          qs(".tool-router-details")?.removeAttribute("open");
+          qs(".tool-tabs")?.removeAttribute("open");
           setFocusMode(true, false, true);
           setBoardFormCollapsed(true);
           setActiveTool(activeTool || "board");
