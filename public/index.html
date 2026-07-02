@@ -1247,12 +1247,12 @@
       <section class="hero" id="start">
         <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1800&q=85" alt="Eine offene Strasse fuehrt durch eine weite Felslandschaft" />
         <div class="shade"></div>
-        <nav><a class="brand" href="#start">Nur Gutes</a><div><a href="#app">Dashboard</a><a href="#tools" data-tool-hub="true">Tools</a><a href="#daily-archive">Archiv</a></div></nav>
+        <nav><a class="brand" href="#start">Nur Gutes</a><div><a href="#app">Dashboard</a><a href="#tools" data-tool-hub="true">Tools</a><a href="#daily-archive" data-archive-search="true">Archiv</a></div></nav>
         <div class="hero-content">
           <p class="pill">Positive Impulse fuer Menschen, die etwas aufbauen wollen</p>
           <h1>Nur Gutes</h1>
           <p class="hero-copy">Ein kompaktes Dashboard fuer gute Taten, positive Artikel, finanzierbare Ideen und klare naechste Schritte.</p>
-          <div class="buttons"><a class="button yellow" href="#app" data-dashboard-start="true">Dashboard starten</a><a class="button outline" href="#daily-archive">Archiv durchsuchen</a></div>
+          <div class="buttons"><a class="button yellow" href="#app" data-dashboard-start="true">Dashboard starten</a><a class="button outline" href="#daily-archive" data-archive-search="true">Archiv durchsuchen</a></div>
         </div>
       </section>
 
@@ -1292,7 +1292,7 @@
               <div class="app-daily-actions">
                 <button type="button" id="addDailyIdeaButton">Daily-Idee ins Board uebernehmen</button>
                 <button type="button" id="toggleDailyDetails" aria-expanded="false" aria-controls="dailyIdeaDetails">Metriken anzeigen</button>
-                <a href="#daily-archive">Archiv oeffnen</a>
+                <a href="#daily-archive" data-archive-search="true">Archiv oeffnen</a>
               </div>
               <p class="app-daily-status" id="dailyIdeaStatus">Bereit als kompakter Board-Eintrag statt neuer Scroll-Sektion.</p>
             </article>
@@ -4542,6 +4542,7 @@
         const compactBoardKey = "nurGutesCompactBoard";
         const boardFormCollapsedKey = "nurGutesBoardFormCollapsed";
         const dailyDetailsKey = "nurGutesDailyDetailsOpen";
+        const archiveSearchKey = "nurGutesArchiveSearch";
         const removedItemsKey = "nurGutesRemovedDone";
         const seedItems = [
           {
@@ -4610,6 +4611,7 @@
         let boardCompact = localStorage.getItem(compactBoardKey) === "true";
         let boardFormCollapsed = localStorage.getItem(boardFormCollapsedKey) !== "false";
         let dailyDetailsOpen = localStorage.getItem(dailyDetailsKey) === "true";
+        let savedArchiveSearch = localStorage.getItem(archiveSearchKey) || "";
         let currentFilter = "all";
         let currentBoardSearch = "";
         let editingItemId = "";
@@ -5307,6 +5309,7 @@
           });
           const closedLabel = `Archiv anzeigen (${legacyItems.length})`;
           toggle.textContent = closedLabel;
+          archiveSearch.value = savedArchiveSearch;
           const openArchive = (targetId) => {
             document.body.classList.add("show-legacy");
             toggle.textContent = "Archiv ausblenden";
@@ -5323,7 +5326,11 @@
               `<article class="archive-item"><a href="#${escapeHtml(item.id)}" data-archive-target="${escapeHtml(item.id)}">${escapeHtml(item.title)}</a><p class="muted">${escapeHtml(item.label)}</p></article>`
             )).join("") : `<article class="archive-empty"><p class="muted">Keine Archivtreffer. Suche kuerzer formulieren oder Archiv anzeigen.</p></article>`;
           };
-          archiveSearch.addEventListener("input", renderArchive);
+          archiveSearch.addEventListener("input", () => {
+            savedArchiveSearch = archiveSearch.value;
+            localStorage.setItem(archiveSearchKey, savedArchiveSearch);
+            renderArchive();
+          });
           archiveList.addEventListener("click", (event) => {
             const link = event.target.closest("[data-archive-target]");
             if (!link) return;
@@ -5335,6 +5342,18 @@
             toggle.textContent = document.body.classList.contains("show-legacy") ? "Archiv ausblenden" : closedLabel;
           });
           renderArchive();
+        }
+
+        function focusArchiveSearch() {
+          setFocusMode(true);
+          const section = qs("#daily-archive");
+          const search = qs("#archiveSearch");
+          if (!section || !search) return;
+          requestAnimationFrame(() => {
+            section.scrollIntoView({ behavior: "smooth", block: "start" });
+            search.focus({ preventScroll: true });
+            search.select();
+          });
         }
 
         function setupIdeaExplorer() {
@@ -5505,6 +5524,10 @@
         qsa("[data-tool-hub]").forEach((link) => link.addEventListener("click", (event) => {
           event.preventDefault();
           openToolHub();
+        }));
+        qsa("[data-archive-search]").forEach((link) => link.addEventListener("click", (event) => {
+          event.preventDefault();
+          focusArchiveSearch();
         }));
         qs("#nextActionButton")?.addEventListener("click", startRecommendedAction);
         qs("#addDailyIdeaButton")?.addEventListener("click", addDailyIdeaToBoard);
