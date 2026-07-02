@@ -4581,6 +4581,7 @@
         const boardFormCollapsedKey = "nurGutesBoardFormCollapsed";
         const dailyDetailsKey = "nurGutesDailyDetailsOpen";
         const archiveSearchKey = "nurGutesArchiveSearch";
+        const archiveOpenKey = "nurGutesArchiveOpen";
         const removedItemsKey = "nurGutesRemovedDone";
         const quickTaskKey = "nurGutesQuickTask";
         const boardFilterKey = "nurGutesBoardFilter";
@@ -4663,6 +4664,8 @@
         let boardFormCollapsed = localStorage.getItem(boardFormCollapsedKey) !== "false";
         let dailyDetailsOpen = localStorage.getItem(dailyDetailsKey) === "true";
         let savedArchiveSearch = localStorage.getItem(archiveSearchKey) || "";
+        let archiveOpen = localStorage.getItem(archiveOpenKey) === "true";
+        if (archiveOpen) focusMode = false;
         let quickTask = localStorage.getItem(quickTaskKey) || "auto";
         let currentFilter = ["all", "planned", "active", "done"].includes(localStorage.getItem(boardFilterKey)) ? localStorage.getItem(boardFilterKey) : "all";
         let currentBoardSearch = localStorage.getItem(boardSearchKey) || "";
@@ -4890,9 +4893,11 @@
           currentBoardSearch = "";
           boardCompact = true;
           dailyDetailsOpen = false;
+          archiveOpen = false;
           savedToolDetails = { router: false, tabs: false };
           localStorage.setItem(compactBoardKey, String(boardCompact));
           localStorage.setItem(dailyDetailsKey, String(dailyDetailsOpen));
+          localStorage.setItem(archiveOpenKey, String(archiveOpen));
           localStorage.setItem(toolDetailsKey, JSON.stringify(savedToolDetails));
           saveBoardView();
           setEditMode("");
@@ -4900,6 +4905,7 @@
           setQuickTask("auto");
           setActiveTool("board");
           setFocusMode(true, false);
+          document.body.classList.remove("show-legacy");
           qs(".tool-router-details")?.removeAttribute("open");
           qs(".tool-tabs")?.removeAttribute("open");
           const boardSearch = qs("#boardSearch");
@@ -5565,10 +5571,15 @@
           const closedLabel = `Archiv anzeigen (${legacyItems.length})`;
           toggle.textContent = closedLabel;
           archiveSearch.value = savedArchiveSearch;
+          const setArchiveOpen = (open, shouldPersist = true) => {
+            archiveOpen = Boolean(open);
+            document.body.classList.toggle("show-legacy", archiveOpen);
+            toggle.textContent = archiveOpen ? "Archiv ausblenden" : closedLabel;
+            if (shouldPersist) localStorage.setItem(archiveOpenKey, String(archiveOpen));
+            if (archiveOpen) setFocusMode(false, false, false);
+          };
           const openArchive = (targetId) => {
-            setFocusMode(false, false, false);
-            document.body.classList.add("show-legacy");
-            toggle.textContent = "Archiv ausblenden";
+            setArchiveOpen(true);
             if (!targetId) return;
             const target = document.getElementById(targetId);
             if (!target) return;
@@ -5625,13 +5636,18 @@
             openArchive(link.dataset.archiveTarget);
           });
           toggle.addEventListener("click", () => {
-            document.body.classList.toggle("show-legacy");
-            toggle.textContent = document.body.classList.contains("show-legacy") ? "Archiv ausblenden" : closedLabel;
+            setArchiveOpen(!archiveOpen);
           });
           renderArchive();
+          setArchiveOpen(archiveOpen, false);
         }
 
         function focusArchiveSearch() {
+          archiveOpen = true;
+          localStorage.setItem(archiveOpenKey, String(archiveOpen));
+          document.body.classList.add("show-legacy");
+          const toggle = qs("#toggleArchive");
+          if (toggle) toggle.textContent = "Archiv ausblenden";
           setFocusMode(false);
           const section = qs("#daily-archive");
           const search = qs("#archiveSearch");
