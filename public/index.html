@@ -6070,14 +6070,17 @@
         qs("#restoreDoneButton")?.addEventListener("click", () => {
           if (!lastRemovedItems.length) return;
           const existingIds = new Set(items.map((item) => item.id));
-          items = [...lastRemovedItems.filter((item) => !existingIds.has(item.id)), ...items];
+          const restoredItems = lastRemovedItems.filter((item) => !existingIds.has(item.id));
+          items = [...restoredItems, ...items];
           lastRemovedItems = [];
           saveRemovedItems();
           revealSavedBoardItem();
           saveItems();
           renderAll();
           const undoStatus = qs("#boardUndoStatus");
-          if (undoStatus) undoStatus.textContent = "Entfernte Eintraege wurden wiederhergestellt.";
+          if (undoStatus) undoStatus.textContent = restoredItems.length
+            ? `${restoredItems.length} entfernte Eintraege wurden wiederhergestellt.`
+            : "Keine entfernten Eintraege mussten wiederhergestellt werden.";
         });
         qs("#compactBoardButton")?.addEventListener("click", () => {
           boardCompact = !boardCompact;
