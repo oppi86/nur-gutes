@@ -4822,18 +4822,18 @@
           }
         ];
         const dailyProductIdea = {
-          id: "daily-2026-07-03-focus-minimal",
+          id: "daily-2026-07-03-smart-preset",
           date: "3. Juli 2026",
-          title: "Minimaler Tagesfokus",
+          title: "Smart Board Preset",
           category: "Business Idee",
           amount: 29,
-          next: "Leere Fokus-Nebenaktionen ausblenden, bis ein Fokus gesetzt ist",
-          text: "Die Tagesfokus-Karte zeigt ohne gesetzten Fokus nur Titel, Status und Primaeraktion. Notizfeld und Nebenaktionen erscheinen erst, wenn ein Fokus wirklich gespeichert ist.",
-          revenueStream: "29-Euro Focus Setup",
-          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer schlankere Tagesstarts",
-          userGrowth: "+1 Klarheits-Signal durch weniger deaktivierte Kontrollelemente",
+          next: "Board-Preset-Verwaltung nur bei angepasster Ansicht anzeigen",
+          text: "Die Board-Preset-Verwaltung bleibt im Standard-Board verborgen und erscheint erst, wenn Suche, Filter, Sortierung oder Ansicht angepasst wurden oder bereits ein Preset gespeichert ist.",
+          revenueStream: "29-Euro Board Preset Setup",
+          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer schnellere Board-Arbeitsansichten",
+          userGrowth: "+1 Klarheits-Signal durch weniger Standard-Bedienelemente im Board",
           socialStatus: "Postingtexte im Social-Tool vorbereitet; keine externen Connectoren autorisiert",
-          implementedFunction: "Fokus-Zustand aus localStorage lesen, leere Nebenaktionen ausblenden und nach Fokus-Setzung automatisch wieder freigeben.",
+          implementedFunction: "Aktuelle Board-Ansicht auswerten, Preset-Drawer zustandsbasiert verstecken, speichern, laden und loeschen weiterhin unterstuetzen.",
           reinvestment: "40% gute Taten, 25% bessere Fokus- und Workspace-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
         };
         const paymentLabels = {
@@ -5917,14 +5917,37 @@
           return `Gemerkte Ansicht: ${parts.join(" · ")}.`;
         }
 
+        function boardViewMatchesDefault() {
+          return currentFilter === "all"
+            && currentStatKey === "revenue"
+            && currentBoardSearch.trim().length === 0
+            && currentBoardSort === "manual"
+            && boardFocusLimitEnabled
+            && boardCompact;
+        }
+
         function renderBoardPreset() {
           const hasPreset = boardPresetIsValid(savedBoardPreset);
+          const shouldShowPreset = hasPreset || !boardViewMatchesDefault();
           const presetMore = qs("#boardPresetMore");
           const status = qs("#boardPresetStatus");
           const applyButton = qs("#applyBoardPresetButton");
           const clearButton = qs("#clearBoardPresetButton");
-          if (presetMore && presetMore.open !== boardPresetMoreOpen) presetMore.open = boardPresetMoreOpen;
-          if (status) status.textContent = boardPresetLabel();
+          if (presetMore) {
+            presetMore.hidden = !shouldShowPreset;
+            if (!shouldShowPreset && presetMore.open) {
+              presetMore.open = false;
+              boardPresetMoreOpen = false;
+              localStorage.setItem(boardPresetMoreKey, String(boardPresetMoreOpen));
+            } else if (shouldShowPreset && presetMore.open !== boardPresetMoreOpen) {
+              presetMore.open = boardPresetMoreOpen;
+            }
+          }
+          if (status) {
+            status.textContent = hasPreset
+              ? boardPresetLabel()
+              : "Angepasste Ansicht kann als Preset gespeichert werden.";
+          }
           [applyButton, clearButton].filter(Boolean).forEach((button) => {
             button.disabled = !hasPreset;
           });
