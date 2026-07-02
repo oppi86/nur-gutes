@@ -1159,6 +1159,11 @@
       .app-daily-actions button, .app-daily-actions a { border: 0; border-radius: 8px; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 11px 13px; text-decoration: none; }
       .app-daily-actions button { background: #f9d65c; color: #20211d; }
       .app-daily-actions a { background: rgba(255,255,255,.13); color: white; }
+      .app-daily-primary button { width: 100%; }
+      .app-daily-more { border: 1px solid rgba(255,255,255,.18); border-radius: 8px; margin-top: 8px; overflow: hidden; }
+      .app-daily-more summary { cursor: pointer; color: rgba(255,255,255,.88); font-size: 13px; font-weight: 900; list-style-position: inside; padding: 10px 12px; }
+      .app-daily-more[open] summary { border-bottom: 1px solid rgba(255,255,255,.14); }
+      .app-daily-secondary { padding: 10px; }
       .app-daily-status { margin-top: 10px !important; }
       .app-note { border: 1px solid rgba(255,255,255,.18); border-radius: 8px; padding: 14px; margin-top: 18px; font-size: 14px; color: rgba(255,255,255,.86); }
       .app-mode-control { display: grid; gap: 8px; margin-top: 18px; }
@@ -1392,11 +1397,16 @@
                 </div>
                 <p id="dailyReinvestment">Reinvestition wird geladen.</p>
               </div>
-              <div class="app-daily-actions">
+              <div class="app-daily-actions app-daily-primary">
                 <button type="button" id="addDailyIdeaButton">Daily-Idee ins Board uebernehmen</button>
-                <button type="button" id="toggleDailyDetails" aria-expanded="false" aria-controls="dailyIdeaDetails">Metriken anzeigen</button>
-                <a href="#daily-archive" data-archive-search="true">Archiv oeffnen</a>
               </div>
+              <details class="app-daily-more" id="dailyActionsMore">
+                <summary>Weitere Daily-Aktionen</summary>
+                <div class="app-daily-actions app-daily-secondary">
+                  <button type="button" id="toggleDailyDetails" aria-expanded="false" aria-controls="dailyIdeaDetails">Metriken anzeigen</button>
+                  <a href="#daily-archive" data-archive-search="true">Archiv oeffnen</a>
+                </div>
+              </details>
               <p class="app-daily-status" id="dailyIdeaStatus">Bereit als kompakter Board-Eintrag statt neuer Scroll-Sektion.</p>
             </article>
             <p class="app-note">Revenue-Reinvestition: 40% gute Taten, 25% bessere Algorithmen und Automatisierung, 20% Growth/Marketing, 15% Betrieb und Qualitaet.</p>
@@ -4695,6 +4705,7 @@
         const archiveOpenKey = "nurGutesArchiveOpen";
         const removedItemsKey = "nurGutesRemovedDone";
         const dashboardFirstKey = "nurGutesDashboardFirst";
+        const dailyActionsMoreKey = "nurGutesDailyActionsMoreOpen";
         const dailyFocusKey = "nurGutesDailyFocusItem";
         const dailyFocusUndoKey = "nurGutesDailyFocusUndo";
         const dailyFocusNoteKey = "nurGutesDailyFocusNote";
@@ -4741,18 +4752,18 @@
           }
         ];
         const dailyProductIdea = {
-          id: "daily-2026-07-03-dashboard-action-drawer",
+          id: "daily-2026-07-03-daily-action-drawer",
           date: "3. Juli 2026",
-          title: "Dashboard Action Drawer",
+          title: "Daily Action Drawer",
           category: "Business Idee",
           amount: 29,
-          next: "Seltene Dashboard-Aktionen einklappen und den Zustand speichern",
-          text: "Die Website zeigt im linken Dashboard nur noch den wichtigsten Arbeitsmodus-Schalter direkt und legt Fortsetzen, Aufraeumen und Kompakt-Check in ein gespeichertes Aktionsmenue.",
-          revenueStream: "29-Euro Dashboard Cleanup Setup",
-          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer klarere Dashboard-Nutzung",
-          userGrowth: "+1 Rueckkehrsignal durch weniger sichtbare Steuerungs-Komplexitaet",
+          next: "Daily-Karte auf eine Primaeraktion reduzieren und Zusatzaktionen speichern",
+          text: "Die Website zeigt in der Daily-Karte nur noch die Board-Uebernahme direkt und legt Metriken sowie Archiv in ein gespeichertes Daily-Aktionsmenue.",
+          revenueStream: "29-Euro Daily Workflow Setup",
+          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer klarere Daily-Umsetzung",
+          userGrowth: "+1 Board-Startsignal durch weniger sichtbare Daily-Komplexitaet",
           socialStatus: "Postingtexte im Social-Tool vorbereitet; keine externen Connectoren autorisiert",
-          implementedFunction: "Dashboard-Aktionsmenue einklappen, oeffnen, speichern und nach Reload wiederherstellen.",
+          implementedFunction: "Daily-Aktionsmenue einklappen, oeffnen, speichern und nach Reload wiederherstellen.",
           reinvestment: "40% gute Taten, 25% bessere Fokus- und Workspace-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
         };
         const paymentLabels = {
@@ -4793,6 +4804,7 @@
         let archiveSearchMode = false;
         let selectedArchivePreviewTitle = "";
         let dashboardFirst = localStorage.getItem(dashboardFirstKey) !== "false";
+        let dailyActionsMoreOpen = localStorage.getItem(dailyActionsMoreKey) === "true";
         let dailyFocusItemId = localStorage.getItem(dailyFocusKey) || "";
         let lastCompletedFocus = loadJson(dailyFocusUndoKey, null);
         let dailyFocusNote = localStorage.getItem(dailyFocusNoteKey) || "";
@@ -5405,9 +5417,11 @@
           });
           const button = qs("#addDailyIdeaButton");
           const detailsButton = qs("#toggleDailyDetails");
+          const dailyActionsMore = qs("#dailyActionsMore");
           const card = qs("#dailyIdeaCard");
           const status = qs("#dailyIdeaStatus");
           if (button) button.textContent = alreadyAdded ? "Daily-Idee im Board anzeigen" : "Daily-Idee ins Board uebernehmen";
+          if (dailyActionsMore && dailyActionsMore.open !== dailyActionsMoreOpen) dailyActionsMore.open = dailyActionsMoreOpen;
           if (card) card.classList.toggle("daily-details-collapsed", !dailyDetailsOpen);
           if (detailsButton) {
             detailsButton.setAttribute("aria-expanded", String(dailyDetailsOpen));
@@ -5425,6 +5439,11 @@
           localStorage.setItem(dailyDetailsKey, String(dailyDetailsOpen));
           renderDailyIdea();
           renderDashboardCompactness();
+        }
+
+        function setDailyActionsMoreOpen(open) {
+          dailyActionsMoreOpen = Boolean(open);
+          localStorage.setItem(dailyActionsMoreKey, String(dailyActionsMoreOpen));
         }
 
         function dailyFocusItem() {
@@ -6736,6 +6755,7 @@
         qs("#dailyFocusNote")?.addEventListener("input", (event) => updateDailyFocusNote(event.target.value));
         qs("#dailyFocusActionsMore")?.addEventListener("toggle", (event) => setDailyFocusActionsOpen(event.target.open));
         qs("#addDailyIdeaButton")?.addEventListener("click", addDailyIdeaToBoard);
+        qs("#dailyActionsMore")?.addEventListener("toggle", (event) => setDailyActionsMoreOpen(event.target.open));
         qs("#toggleDailyDetails")?.addEventListener("click", () => setDailyDetailsOpen(!dailyDetailsOpen));
         qs("#exportBoardButton")?.addEventListener("click", exportBoardCsv);
         qs("#copyBoardReportButton")?.addEventListener("click", copyBoardReport);
