@@ -1326,6 +1326,7 @@
               <button class="app-mode-toggle" type="button" id="resumeWorkspaceButton">Zuletztes Tool oeffnen</button>
               <button class="app-mode-reset" type="button" id="resetDashboardButton">Dashboard aufraeumen</button>
               <p class="app-mode-status" id="focusModeStatus">Magazinbereiche bleiben sichtbar.</p>
+              <p class="app-mode-status" id="dashboardCompactnessStatus" aria-live="polite">Dashboard-Kompaktheit wird berechnet.</p>
             </div>
           </article>
           <article class="app-workbench">
@@ -4835,6 +4836,21 @@
           const mode = focusMode ? "Arbeitsmodus" : "Magazinmodus";
           const visibility = focusMode ? "nur Workspace sichtbar" : "Magazinbereiche sichtbar";
           status.textContent = `${mode}: ${activeToolLabel()} aktiv, ${visibility}.`;
+          renderDashboardCompactness();
+        }
+
+        function renderDashboardCompactness() {
+          const status = qs("#dashboardCompactnessStatus");
+          if (!status) return;
+          const sections = qsa("main > section");
+          const visibleSections = sections.filter((section) => getComputedStyle(section).display !== "none").length;
+          const archivedDailySections = qsa(".legacy-daily-section").length;
+          const openDailySections = qsa(".legacy-daily-section.archive-visible").filter((section) => getComputedStyle(section).display !== "none").length;
+          const resourceSections = qsa(".resource-section").length;
+          const openResourceSections = qsa(".resource-section").filter((section) => getComputedStyle(section).display !== "none").length;
+          status.textContent = focusMode
+            ? `Kompakt: ${visibleSections} sichtbare Bereiche, ${archivedDailySections} Daily-Iterationen im Archiv, ${resourceSections} Ressourcen eingeklappt.`
+            : `Magazinansicht: ${visibleSections} Bereiche sichtbar, ${openDailySections} Archiv-Iterationen und ${openResourceSections} Ressourcen geoeffnet.`;
         }
 
         function renderResumeWorkspaceButton() {
@@ -5832,6 +5848,7 @@
             if (archiveOpen && archiveCount) archiveCount.textContent = `${visibleArchiveIds.length} von ${legacyItems.length} archivierten Iterationen eingeblendet. Mehr laden oder gezielt suchen.`;
             if (shouldPersist) localStorage.setItem(archiveOpenKey, String(archiveOpen));
             if (archiveOpen) setFocusMode(false, false, false);
+            renderDashboardCompactness();
           };
           const openArchive = (targetId) => {
             visibleArchiveIds = targetId ? [targetId] : visibleArchiveIds;
@@ -5998,12 +6015,14 @@
           const openResources = (targetId) => {
             document.body.classList.add("show-resources");
             toggle.textContent = "Ressourcen ausblenden";
+            renderDashboardCompactness();
             if (!targetId) return;
             requestAnimationFrame(() => document.getElementById(targetId)?.scrollIntoView({ behavior: "smooth", block: "start" }));
           };
           toggle.addEventListener("click", () => {
             document.body.classList.toggle("show-resources");
             toggle.textContent = document.body.classList.contains("show-resources") ? "Ressourcen ausblenden" : closedLabel;
+            renderDashboardCompactness();
           });
           list.addEventListener("click", (event) => {
             const link = event.target.closest("[data-resource-target]");
