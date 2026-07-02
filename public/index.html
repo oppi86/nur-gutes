@@ -5324,6 +5324,7 @@
           toggle.textContent = closedLabel;
           archiveSearch.value = savedArchiveSearch;
           const openArchive = (targetId) => {
+            setFocusMode(false);
             document.body.classList.add("show-legacy");
             toggle.textContent = "Archiv ausblenden";
             if (!targetId) return;
@@ -5351,6 +5352,16 @@
             visibleArchiveCount = archivePageSize;
             localStorage.setItem(archiveSearchKey, savedArchiveSearch);
             renderArchive();
+          });
+          archiveSearch.addEventListener("keydown", (event) => {
+            if (event.key !== "Enter") return;
+            event.preventDefault();
+            const firstResult = archiveList.querySelector("[data-archive-target]");
+            if (!firstResult) {
+              archiveCount.textContent = "Kein Archivtreffer startbar.";
+              return;
+            }
+            openArchive(firstResult.dataset.archiveTarget);
           });
           clearArchiveSearch.addEventListener("click", () => {
             savedArchiveSearch = "";
