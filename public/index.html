@@ -1141,7 +1141,8 @@
       .tool-router { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: end; border: 1px solid #e7e1d7; border-radius: 8px; background: #f7f4ef; padding: 14px; margin-bottom: 14px; }
       .tool-router label { display: grid; gap: 6px; color: #575952; font-size: 12px; font-weight: 900; text-transform: uppercase; }
       .tool-router select { width: 100%; border: 1px solid #d9d1c4; border-radius: 8px; background: #fff; color: #20211d; font: inherit; padding: 12px; min-width: 0; }
-      .tool-router p { margin: 0; font-size: 13px; color: #575952; }
+      .tool-router button { border: 0; border-radius: 8px; background: #17332f; color: white; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 13px 15px; }
+      .tool-router p { grid-column: 1 / -1; margin: 0; font-size: 13px; color: #575952; }
       .top-tools { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; margin-bottom: 14px; }
       .top-tool { border: 1px solid #d9d1c4; border-radius: 8px; background: #fff; color: #17332f; cursor: pointer; font: inherit; padding: 13px; text-align: left; }
       .top-tool strong { display: block; font-size: 15px; line-height: 1.2; }
@@ -1326,6 +1327,7 @@
                   <option value="share">Social-Post vorbereiten</option>
                 </select>
               </label>
+              <button type="button" id="toolRouterStart">Starten</button>
               <p id="toolRouterHint">Waehle eine Aufgabe; der passende Workspace oeffnet sich direkt.</p>
             </div>
             <details class="tool-tabs">
@@ -4553,6 +4555,7 @@
         const dailyDetailsKey = "nurGutesDailyDetailsOpen";
         const archiveSearchKey = "nurGutesArchiveSearch";
         const removedItemsKey = "nurGutesRemovedDone";
+        const quickTaskKey = "nurGutesQuickTask";
         const seedItems = [
           {
             id: "seed-proof-1",
@@ -4621,6 +4624,7 @@
         let boardFormCollapsed = localStorage.getItem(boardFormCollapsedKey) !== "false";
         let dailyDetailsOpen = localStorage.getItem(dailyDetailsKey) === "true";
         let savedArchiveSearch = localStorage.getItem(archiveSearchKey) || "";
+        let quickTask = localStorage.getItem(quickTaskKey) || activeTool || "board";
         let currentFilter = "all";
         let currentBoardSearch = "";
         let editingItemId = "";
@@ -5533,6 +5537,34 @@
           second: "Berechne Timing und Betrag fuer die zweite Gabe nach einem Signal.",
           share: "Bereite kurze Posting-Texte fuer externe Kanaele vor."
         };
+        function setQuickTask(name, shouldPersist = true) {
+          const selectedName = qsa("[data-app-panel]").some((panel) => panel.dataset.appPanel === name) ? name : "board";
+          quickTask = selectedName;
+          const router = qs("#toolRouter");
+          const hint = qs("#toolRouterHint");
+          if (router) router.value = selectedName;
+          if (hint) hint.textContent = `${toolHints[selectedName] || toolHints.board} Mit Starten oeffnest du den passenden Workspace.`;
+          if (shouldPersist) localStorage.setItem(quickTaskKey, selectedName);
+        }
+        function startQuickTask() {
+          setQuickTask(qs("#toolRouter")?.value || quickTask);
+          setFocusMode(true);
+          const action = recommendNextAction();
+          if (quickTask === "board") {
+            setActiveTool("board");
+            setBoardFormCollapsed(false);
+            renderAll();
+            requestAnimationFrame(() => qs("#impactTitle")?.focus());
+          } else if (action?.item && qs(`#${quickTask}Item`)) {
+            openItemTool(action.item.id, quickTask);
+          } else {
+            setActiveTool(quickTask);
+            renderAll();
+            requestAnimationFrame(() => qs(`[data-app-panel="${quickTask}"]`)?.scrollIntoView({ behavior: "smooth", block: "start" }));
+          }
+          const hint = qs("#toolRouterHint");
+          if (hint) hint.textContent = `${toolHints[quickTask] || toolHints.board} Schnellstart gespeichert.`;
+        }
         function setActiveTool(name, shouldPersist = true) {
           const selectedName = qsa("[data-app-panel]").some((panel) => panel.dataset.appPanel === name) ? name : "board";
           activeTool = selectedName;
@@ -5579,16 +5611,22 @@
         qs("#toggleDailyDetails")?.addEventListener("click", () => setDailyDetailsOpen(!dailyDetailsOpen));
         qs("#exportBoardButton")?.addEventListener("click", exportBoardCsv);
         setActiveTool(activeTool, false);
+        setQuickTask(quickTask, false);
         qsa("[data-top-tool]").forEach((button) => {
           button.addEventListener("click", () => {
             setActiveTool(button.dataset.topTool);
+            setQuickTask(button.dataset.topTool);
             setFocusMode(true, true);
           });
         });
         qsa("[data-app-tab]").forEach((tab) => {
-          tab.addEventListener("click", () => setActiveTool(tab.dataset.appTab));
+          tab.addEventListener("click", () => {
+            setActiveTool(tab.dataset.appTab);
+            setQuickTask(tab.dataset.appTab);
+          });
         });
-        qs("#toolRouter")?.addEventListener("change", (event) => setActiveTool(event.target.value));
+        qs("#toolRouter")?.addEventListener("change", (event) => setQuickTask(event.target.value));
+        qs("#toolRouterStart")?.addEventListener("click", startQuickTask);
         qs("#toggleImpactForm")?.addEventListener("click", () => {
           setBoardFormCollapsed(!boardFormCollapsed);
           if (!boardFormCollapsed) requestAnimationFrame(() => qs("#impactTitle")?.focus());
