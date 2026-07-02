@@ -1117,6 +1117,16 @@
       .app-export { display: grid; gap: 8px; margin-top: 18px; }
       .app-export button { width: 100%; border: 1px solid rgba(255,255,255,.3); border-radius: 8px; background: rgba(255,255,255,.1); color: white; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 12px 14px; }
       .app-export p { margin: 0; font-size: 13px; color: rgba(255,255,255,.8); }
+      .app-daily { border: 1px solid rgba(255,255,255,.2); border-radius: 8px; background: rgba(255,255,255,.1); margin-top: 18px; padding: 16px; }
+      .app-daily h3 { color: white; font-size: 20px; margin: 4px 0 8px; }
+      .app-daily p { color: rgba(255,255,255,.82); font-size: 13px; margin: 0; }
+      .app-daily-metrics { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; margin: 12px 0; }
+      .app-daily-metrics span { border: 1px solid rgba(255,255,255,.18); border-radius: 8px; color: rgba(255,255,255,.86); font-size: 12px; font-weight: 900; padding: 9px; }
+      .app-daily-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+      .app-daily-actions button, .app-daily-actions a { border: 0; border-radius: 8px; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 11px 13px; text-decoration: none; }
+      .app-daily-actions button { background: #f9d65c; color: #20211d; }
+      .app-daily-actions a { background: rgba(255,255,255,.13); color: white; }
+      .app-daily-status { margin-top: 10px !important; }
       .app-note { border: 1px solid rgba(255,255,255,.18); border-radius: 8px; padding: 14px; margin-top: 18px; font-size: 14px; color: rgba(255,255,255,.86); }
       .app-mode-control { display: grid; gap: 8px; margin-top: 18px; }
       .app-mode-toggle { width: 100%; border: 0; border-radius: 8px; background: #f9d65c; color: #20211d; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 12px 14px; }
@@ -1257,6 +1267,23 @@
               <button type="button" id="exportBoardButton">Board als CSV exportieren</button>
               <p id="exportBoardStatus">Export fuer Sheets, CRM oder Partner-Reporting.</p>
             </div>
+            <article class="app-daily" aria-labelledby="dailyIdeaTitle">
+              <p class="tag" id="dailyIdeaDate">Daily Product Cycle</p>
+              <h3 id="dailyIdeaTitle">Daily-Idee wird geladen</h3>
+              <p id="dailyIdeaSummary">Die aktuelle Idee wird kompakt gehalten und kann als Board-Arbeit gestartet werden.</p>
+              <div class="app-daily-metrics" aria-label="Daily Produktmetriken">
+                <span id="dailyRevenueStream">Revenue-Stream</span>
+                <span id="dailyRevenueMetric">Daily Revenue</span>
+                <span id="dailyGrowthMetric">User-Growth</span>
+                <span id="dailySocialStatus">Social-Status</span>
+              </div>
+              <p id="dailyReinvestment">Reinvestition wird geladen.</p>
+              <div class="app-daily-actions">
+                <button type="button" id="addDailyIdeaButton">Daily-Idee ins Board uebernehmen</button>
+                <a href="#daily-archive">Archiv oeffnen</a>
+              </div>
+              <p class="app-daily-status" id="dailyIdeaStatus">Bereit als kompakter Board-Eintrag statt neuer Scroll-Sektion.</p>
+            </article>
             <p class="app-note">Revenue-Reinvestition: 40% gute Taten, 25% bessere Algorithmen und Automatisierung, 20% Growth/Marketing, 15% Betrieb und Qualitaet.</p>
             <div class="app-mode-control">
               <button class="app-mode-toggle" type="button" id="focusModeToggle" aria-pressed="false">Arbeitsmodus aktivieren</button>
@@ -4520,6 +4547,21 @@
             createdAt: "2026-06-20"
           }
         ];
+        const dailyProductIdea = {
+          id: "daily-2026-07-02-action-brief",
+          date: "2. Juli 2026",
+          title: "Action Brief Promoter",
+          category: "Business Idee",
+          amount: 79,
+          next: "Einen positiven Artikel in ein Sponsor-faehiges Action Briefing verwandeln",
+          text: "Die Website macht aus einer guten Nachricht einen kompakten Action Brief mit naechster Tat, Sponsor-Ask, Share-Text und Proof-Pfad.",
+          revenueStream: "79-Euro Action Brief Sprint",
+          dailyRevenue: "Ziel: erster 79-Euro Briefing-Kauf",
+          userGrowth: "+1 teilbarer Action Brief aus bestehendem Artikel",
+          socialStatus: "Postingtexte im Social-Tool vorbereitet; keine externen Connectoren autorisiert",
+          implementedFunction: "Ein Klick speichert die Daily-Idee als Board-Eintrag.",
+          reinvestment: "40% gute Taten, 25% bessere Briefing-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
+        };
         const paymentLabels = {
           quick: "Quick Sponsor",
           audit: "Impact Audit",
@@ -4745,6 +4787,60 @@
           qs("#metricDone").textContent = items.filter((item) => item.status === "done").length;
           const connected = Object.values(stripeLinks).some(Boolean);
           qs("#stripeStatus").textContent = connected ? "Stripe Payment Links verbunden" : "Stripe Payment Links nicht verbunden";
+        }
+
+        function renderDailyIdea() {
+          const alreadyAdded = items.some((item) => item.id === dailyProductIdea.id);
+          const fields = {
+            "#dailyIdeaDate": `Daily Product Cycle / ${dailyProductIdea.date}`,
+            "#dailyIdeaTitle": dailyProductIdea.title,
+            "#dailyIdeaSummary": dailyProductIdea.text,
+            "#dailyRevenueStream": `Revenue: ${dailyProductIdea.revenueStream}`,
+            "#dailyRevenueMetric": dailyProductIdea.dailyRevenue,
+            "#dailyGrowthMetric": dailyProductIdea.userGrowth,
+            "#dailySocialStatus": dailyProductIdea.socialStatus,
+            "#dailyReinvestment": `Reinvestition: ${dailyProductIdea.reinvestment}`
+          };
+          Object.entries(fields).forEach(([selector, value]) => {
+            const element = qs(selector);
+            if (element) element.textContent = value;
+          });
+          const button = qs("#addDailyIdeaButton");
+          const status = qs("#dailyIdeaStatus");
+          if (button) button.textContent = alreadyAdded ? "Daily-Idee im Board anzeigen" : "Daily-Idee ins Board uebernehmen";
+          if (status && !status.dataset.locked) {
+            status.textContent = alreadyAdded
+              ? "Daily-Idee liegt als Board-Eintrag vor."
+              : "Bereit als kompakter Board-Eintrag statt neuer Scroll-Sektion.";
+          }
+        }
+
+        function addDailyIdeaToBoard() {
+          const existing = items.some((item) => item.id === dailyProductIdea.id);
+          if (!existing) {
+            items.unshift({
+              id: dailyProductIdea.id,
+              title: dailyProductIdea.title,
+              category: dailyProductIdea.category,
+              amount: dailyProductIdea.amount,
+              next: dailyProductIdea.next,
+              text: `${dailyProductIdea.text} Funktion: ${dailyProductIdea.implementedFunction}`,
+              status: "planned",
+              createdAt: "2026-07-02"
+            });
+            saveItems();
+          }
+          revealSavedBoardItem();
+          setActiveTool("board");
+          setFocusMode(true);
+          setBoardFormCollapsed(true);
+          renderAll();
+          const status = qs("#dailyIdeaStatus");
+          if (status) {
+            status.dataset.locked = "true";
+            status.textContent = existing ? "Daily-Idee war schon im Board und ist jetzt sichtbar." : "Daily-Idee wurde als Board-Eintrag gespeichert.";
+          }
+          requestAnimationFrame(() => qs(`[data-id="${dailyProductIdea.id}"]`)?.scrollIntoView({ behavior: "smooth", block: "center" }));
         }
 
         function getVisibleBoardItems() {
@@ -5295,6 +5391,7 @@
 
         function renderAll() {
           renderStats();
+          renderDailyIdea();
           renderNextAction();
           renderBoard();
           renderPayments();
@@ -5345,6 +5442,7 @@
         setBoardFormCollapsed(boardFormCollapsed, false);
         qs("#focusModeToggle")?.addEventListener("click", () => setFocusMode(!focusMode, true));
         qs("#nextActionButton")?.addEventListener("click", startRecommendedAction);
+        qs("#addDailyIdeaButton")?.addEventListener("click", addDailyIdeaToBoard);
         qs("#exportBoardButton")?.addEventListener("click", exportBoardCsv);
         setActiveTool(activeTool, false);
         qsa("[data-app-tab]").forEach((tab) => {
