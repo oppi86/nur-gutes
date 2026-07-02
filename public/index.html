@@ -1122,6 +1122,13 @@
       .app-next-action { display: grid; gap: 8px; margin-top: 18px; }
       .app-next-action button { width: 100%; border: 0; border-radius: 8px; background: #fff; color: #17332f; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 12px 14px; }
       .app-next-action p { margin: 0; font-size: 13px; color: rgba(255,255,255,.8); }
+      .app-focus-card { border: 1px solid rgba(255,255,255,.2); border-radius: 8px; background: rgba(255,255,255,.1); display: grid; gap: 10px; margin-top: 18px; padding: 14px; }
+      .app-focus-card strong { color: #f9d65c; display: block; font-size: 17px; line-height: 1.2; }
+      .app-focus-card p { color: rgba(255,255,255,.82); font-size: 13px; margin: 0; }
+      .app-focus-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+      .app-focus-actions button { border: 1px solid rgba(255,255,255,.28); border-radius: 8px; background: rgba(255,255,255,.12); color: white; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 10px 12px; }
+      .app-focus-actions button:first-child { background: #f9d65c; border-color: #f9d65c; color: #20211d; }
+      .app-focus-actions button:disabled { cursor: not-allowed; opacity: .55; }
       .app-export { display: grid; gap: 8px; margin-top: 18px; }
       .app-export button { width: 100%; border: 1px solid rgba(255,255,255,.3); border-radius: 8px; background: rgba(255,255,255,.1); color: white; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 12px 14px; }
       .app-export button:disabled { cursor: not-allowed; opacity: .5; }
@@ -1320,6 +1327,15 @@
             <div class="app-next-action">
               <button type="button" id="nextActionButton">Naechste Aktion starten</button>
               <p id="nextActionStatus" aria-live="polite">Der Launcher waehlt den sinnvollsten naechsten Tool-Schritt.</p>
+            </div>
+            <div class="app-focus-card" aria-label="Tagesfokus">
+              <p class="tag">Tagesfokus</p>
+              <strong id="dailyFocusTitle">Kein Fokus gesetzt</strong>
+              <p id="dailyFocusStatus">Waehle einen Board-Eintrag als Fokus, damit der naechste Besuch direkt klar startet.</p>
+              <div class="app-focus-actions">
+                <button type="button" id="startDailyFocusButton" disabled>Fokus starten</button>
+                <button type="button" id="clearDailyFocusButton" disabled>Fokus loesen</button>
+              </div>
             </div>
             <div class="app-export">
               <button type="button" id="exportBoardButton">Board als CSV exportieren</button>
@@ -4637,6 +4653,7 @@
         const archiveOpenKey = "nurGutesArchiveOpen";
         const removedItemsKey = "nurGutesRemovedDone";
         const dashboardFirstKey = "nurGutesDashboardFirst";
+        const dailyFocusKey = "nurGutesDailyFocusItem";
         const quickTaskKey = "nurGutesQuickTask";
         const boardFilterKey = "nurGutesBoardFilter";
         const boardStatKey = "nurGutesBoardStat";
@@ -4677,19 +4694,19 @@
           }
         ];
         const dailyProductIdea = {
-          id: "daily-2026-07-03-dashboard-first",
+          id: "daily-2026-07-03-daily-focus-pin",
           date: "3. Juli 2026",
-          title: "Dashboard First Switch",
+          title: "Daily Focus Pin",
           category: "Business Idee",
-          amount: 59,
-          next: "Die Startansicht als echtes Dashboard statt Hero-Seite speichern",
-          text: "Die Website kann im Arbeitsmodus direkt mit dem Impact Workspace starten und die Hero-Flaeche nur bei Bedarf anzeigen.",
-          revenueStream: "59-Euro Dashboard Setup",
-          dailyRevenue: "Ziel: erster 59-Euro Setup-Kauf fuer eine klare Dashboard-Startseite",
-          userGrowth: "+1 wiederkehrender Nutzer durch weniger Einstiegshuerde",
+          amount: 39,
+          next: "Einen Board-Eintrag als Tagesfokus speichern und direkt starten",
+          text: "Die Website macht aus dem Board eine klare Tagesansicht: ein Eintrag wird als Fokus gespeichert, oben angezeigt und kann sofort gestartet werden.",
+          revenueStream: "39-Euro Focus Setup",
+          dailyRevenue: "Ziel: erster 39-Euro Setup-Kauf fuer einen klaren Tagesfokus",
+          userGrowth: "+1 Rueckkehrsignal durch weniger Entscheidungslast",
           socialStatus: "Postingtexte im Social-Tool vorbereitet; keine externen Connectoren autorisiert",
-          implementedFunction: "Dashboard-zuerst-Modus speichern und Hero im Arbeitsmodus optional ausblenden.",
-          reinvestment: "40% gute Taten, 25% bessere Navigations- und Workspace-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
+          implementedFunction: "Board-Eintrag als Tagesfokus speichern, anzeigen, starten und loesen.",
+          reinvestment: "40% gute Taten, 25% bessere Fokus- und Workspace-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
         };
         const paymentLabels = {
           quick: "Quick Sponsor",
@@ -4729,6 +4746,7 @@
         let archiveSearchMode = false;
         let selectedArchivePreviewTitle = "";
         let dashboardFirst = localStorage.getItem(dashboardFirstKey) !== "false";
+        let dailyFocusItemId = localStorage.getItem(dailyFocusKey) || "";
         if (localStorage.getItem(archiveOpenKey) === "true") localStorage.setItem(archiveOpenKey, "false");
         let quickTask = localStorage.getItem(quickTaskKey) || "auto";
         let currentFilter = ["all", "planned", "active", "done"].includes(localStorage.getItem(boardFilterKey)) ? localStorage.getItem(boardFilterKey) : "all";
@@ -4912,6 +4930,7 @@
             || Boolean(savedToolDetails.tabs);
           const hasBoardDrift = activeTool !== "board"
             || quickTask !== "auto"
+            || Boolean(dailyFocusItemId)
             || currentFilter !== "all"
             || currentStatKey !== "revenue"
             || currentBoardSearch.trim().length > 0
@@ -5133,7 +5152,9 @@
           currentBoardSort = "manual";
           boardFocusLimitEnabled = true;
           boardCompact = true;
+          dailyFocusItemId = "";
           localStorage.setItem(boardFocusLimitKey, String(boardFocusLimitEnabled));
+          localStorage.removeItem(dailyFocusKey);
           dailyDetailsOpen = false;
           localStorage.setItem(compactBoardKey, String(boardCompact));
           localStorage.setItem(dailyDetailsKey, String(dailyDetailsOpen));
@@ -5346,6 +5367,54 @@
           localStorage.setItem(dailyDetailsKey, String(dailyDetailsOpen));
           renderDailyIdea();
           renderDashboardCompactness();
+        }
+
+        function dailyFocusItem() {
+          const item = items.find((entry) => entry.id === dailyFocusItemId);
+          if (item) return item;
+          if (dailyFocusItemId) {
+            dailyFocusItemId = "";
+            localStorage.removeItem(dailyFocusKey);
+          }
+          return null;
+        }
+
+        function setDailyFocus(itemId = "") {
+          const item = items.find((entry) => entry.id === itemId);
+          dailyFocusItemId = item ? item.id : "";
+          if (dailyFocusItemId) localStorage.setItem(dailyFocusKey, dailyFocusItemId);
+          else localStorage.removeItem(dailyFocusKey);
+          renderDailyFocus();
+          renderDashboardCompactness();
+        }
+
+        function renderDailyFocus() {
+          const item = dailyFocusItem();
+          const title = qs("#dailyFocusTitle");
+          const status = qs("#dailyFocusStatus");
+          const startButton = qs("#startDailyFocusButton");
+          const clearButton = qs("#clearDailyFocusButton");
+          const hasFocus = Boolean(item);
+          if (title) title.textContent = item?.title || "Kein Fokus gesetzt";
+          if (status) {
+            status.textContent = item
+              ? `${item.category || "Board"} / ${item.status || "planned"} - ${item.next || "Naechsten Schritt klaeren"}`
+              : "Waehle einen Board-Eintrag als Fokus, damit der naechste Besuch direkt klar startet.";
+          }
+          if (startButton) {
+            startButton.disabled = !hasFocus || item.status === "done";
+            startButton.title = !hasFocus ? "Noch kein Tagesfokus gesetzt" : item.status === "done" ? "Fertige Eintraege koennen nicht gestartet werden" : "Tagesfokus mit passendem Tool starten";
+          }
+          if (clearButton) {
+            clearButton.disabled = !hasFocus;
+            clearButton.title = hasFocus ? "Tagesfokus loesen" : "Noch kein Tagesfokus gesetzt";
+          }
+        }
+
+        function startDailyFocus() {
+          const item = dailyFocusItem();
+          if (!item || item.status === "done") return;
+          startBoardItem(item.id);
         }
 
         function addDailyIdeaToBoard() {
@@ -5630,6 +5699,7 @@
                   </select>
                 </label>
                 <button type="button" data-start-item="true" aria-label="${item.status === "done" ? `Fertigen Eintrag ${escapeHtml(item.title)} nicht starten` : `Naechste Aktion fuer ${escapeHtml(item.title)} starten`}" title="${item.status === "done" ? "Fertige Eintraege koennen nicht gestartet werden" : `Naechste Aktion fuer ${escapeHtml(item.title)} starten`}" ${item.status === "done" ? "disabled" : ""}>Starten</button>
+                <button type="button" data-focus-item="true" aria-label="Board-Eintrag ${escapeHtml(item.title)} als Tagesfokus setzen" title="Als Tagesfokus oben im Dashboard anzeigen">${item.id === dailyFocusItemId ? "Fokus aktiv" : "Als Fokus"}</button>
               </div>
               <details class="app-card-actions">
                 <summary>Weitere Aktionen</summary>
@@ -6309,6 +6379,7 @@
           renderStats();
           if (!renderLastExportStatus()) renderLastCopyStatus();
           renderDailyIdea();
+          renderDailyFocus();
           renderNextAction();
           renderBoard();
           renderPayments();
@@ -6470,6 +6541,8 @@
           focusArchiveSearch();
         }));
         qs("#nextActionButton")?.addEventListener("click", startRecommendedAction);
+        qs("#startDailyFocusButton")?.addEventListener("click", startDailyFocus);
+        qs("#clearDailyFocusButton")?.addEventListener("click", () => setDailyFocus(""));
         qs("#addDailyIdeaButton")?.addEventListener("click", addDailyIdeaToBoard);
         qs("#toggleDailyDetails")?.addEventListener("click", () => setDailyDetailsOpen(!dailyDetailsOpen));
         qs("#exportBoardButton")?.addEventListener("click", exportBoardCsv);
@@ -6617,6 +6690,15 @@
             setTimeout(() => {
               button.textContent = "Kopieren";
             }, 1600);
+            return;
+          }
+          if (button.dataset.focusItem) {
+            setDailyFocus(card.dataset.id);
+            renderBoard();
+            const item = dailyFocusItem();
+            const status = qs("#dailyFocusStatus");
+            if (status && item) status.textContent = `${item.title} ist als Tagesfokus gespeichert.`;
+            requestAnimationFrame(() => qs("#dailyFocusTitle")?.scrollIntoView({ behavior: "smooth", block: "center" }));
             return;
           }
           if (button.dataset.move) {
