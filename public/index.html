@@ -4797,22 +4797,22 @@
           button.setAttribute("aria-label", `${activeToolLabel()} im Arbeitsmodus fortsetzen`);
         }
 
+        function collapseWorkspaceChrome() {
+          archiveOpen = false;
+          savedToolDetails = { router: false, tabs: false };
+          document.body.classList.remove("show-legacy");
+          localStorage.setItem(archiveOpenKey, String(archiveOpen));
+          localStorage.setItem(toolDetailsKey, JSON.stringify(savedToolDetails));
+          qs(".tool-router-details")?.removeAttribute("open");
+          qs(".tool-tabs")?.removeAttribute("open");
+          const archiveToggle = qs("#toggleArchive");
+          if (archiveToggle) archiveToggle.textContent = "Archiv anzeigen";
+        }
+
         function setFocusMode(enabled, shouldScroll = false, shouldPersist = true) {
           focusMode = Boolean(enabled);
           document.body.classList.toggle("focus-mode", focusMode);
-          if (focusMode && archiveOpen) {
-            archiveOpen = false;
-            document.body.classList.remove("show-legacy");
-            localStorage.setItem(archiveOpenKey, String(archiveOpen));
-            const archiveToggle = qs("#toggleArchive");
-            if (archiveToggle) archiveToggle.textContent = "Archiv anzeigen";
-          }
-          if (focusMode) {
-            savedToolDetails = { router: false, tabs: false };
-            localStorage.setItem(toolDetailsKey, JSON.stringify(savedToolDetails));
-            qs(".tool-router-details")?.removeAttribute("open");
-            qs(".tool-tabs")?.removeAttribute("open");
-          }
+          if (focusMode) collapseWorkspaceChrome();
           if (shouldPersist) localStorage.setItem(focusKey, String(focusMode));
           const button = qs("#focusModeToggle");
           if (button) {
@@ -4896,15 +4896,9 @@
           currentFilter = "all";
           currentBoardSearch = "";
           boardCompact = true;
-          archiveOpen = false;
-          savedToolDetails = { router: false, tabs: false };
           localStorage.setItem(compactBoardKey, String(boardCompact));
-          localStorage.setItem(archiveOpenKey, String(archiveOpen));
-          localStorage.setItem(toolDetailsKey, JSON.stringify(savedToolDetails));
+          collapseWorkspaceChrome();
           saveBoardView();
-          document.body.classList.remove("show-legacy");
-          qs(".tool-router-details")?.removeAttribute("open");
-          qs(".tool-tabs")?.removeAttribute("open");
           const boardSearch = qs("#boardSearch");
           if (boardSearch) boardSearch.value = "";
           setBoardFormCollapsed(true);
@@ -4935,21 +4929,15 @@
           currentBoardSearch = "";
           boardCompact = true;
           dailyDetailsOpen = false;
-          archiveOpen = false;
-          savedToolDetails = { router: false, tabs: false };
           localStorage.setItem(compactBoardKey, String(boardCompact));
           localStorage.setItem(dailyDetailsKey, String(dailyDetailsOpen));
-          localStorage.setItem(archiveOpenKey, String(archiveOpen));
-          localStorage.setItem(toolDetailsKey, JSON.stringify(savedToolDetails));
+          collapseWorkspaceChrome();
           saveBoardView();
           setEditMode("");
           setBoardFormCollapsed(true);
           setQuickTask("auto");
           setActiveTool("board");
           setFocusMode(true, false);
-          document.body.classList.remove("show-legacy");
-          qs(".tool-router-details")?.removeAttribute("open");
-          qs(".tool-tabs")?.removeAttribute("open");
           const boardSearch = qs("#boardSearch");
           if (boardSearch) boardSearch.value = "";
           renderAll();
@@ -5909,13 +5897,7 @@
         }
         function startQuickTask() {
           setQuickTask(qs("#toolRouter")?.value || quickTask);
-          archiveOpen = false;
-          savedToolDetails = { router: false, tabs: false };
-          localStorage.setItem(archiveOpenKey, String(archiveOpen));
-          localStorage.setItem(toolDetailsKey, JSON.stringify(savedToolDetails));
-          document.body.classList.remove("show-legacy");
-          qs(".tool-router-details")?.removeAttribute("open");
-          qs(".tool-tabs")?.removeAttribute("open");
+          collapseWorkspaceChrome();
           setFocusMode(true);
           const action = recommendNextAction();
           let startedAction = null;
@@ -5976,13 +5958,7 @@
           renderResumeWorkspaceButton();
         }
         function resumeLastWorkspace() {
-          archiveOpen = false;
-          savedToolDetails = { router: false, tabs: false };
-          localStorage.setItem(archiveOpenKey, String(archiveOpen));
-          localStorage.setItem(toolDetailsKey, JSON.stringify(savedToolDetails));
-          document.body.classList.remove("show-legacy");
-          qs(".tool-router-details")?.removeAttribute("open");
-          qs(".tool-tabs")?.removeAttribute("open");
+          collapseWorkspaceChrome();
           setFocusMode(true, false, true);
           setBoardFormCollapsed(true);
           setActiveTool(activeTool || "board");
