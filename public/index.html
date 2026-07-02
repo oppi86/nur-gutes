@@ -5937,6 +5937,7 @@
             archiveList.innerHTML = visibleMatches.length ? visibleMatches.map((item) => (
               `<article class="archive-item"><a href="#${escapeHtml(item.id)}" data-archive-target="${escapeHtml(item.id)}">${escapeHtml(item.title)}</a><p class="muted">${escapeHtml(item.label)}</p></article>`
             )).join("") : `<article class="archive-empty"><p class="muted">Keine Archivtreffer. Suche kuerzer formulieren oder Archiv anzeigen.</p></article>`;
+            renderDashboardCompactness();
           };
           archiveSearch.addEventListener("input", () => {
             savedArchiveSearch = archiveSearch.value;
