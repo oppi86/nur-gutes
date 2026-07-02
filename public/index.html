@@ -5710,6 +5710,11 @@
           });
         });
         qs("#toolRouter")?.addEventListener("change", (event) => setQuickTask(event.target.value));
+        qs("#toolRouter")?.addEventListener("keydown", (event) => {
+          if (event.isComposing || event.key !== "Enter") return;
+          event.preventDefault();
+          startQuickTask();
+        });
         qs("#toolRouterStart")?.addEventListener("click", startQuickTask);
         qs("#toggleImpactForm")?.addEventListener("click", () => {
           setBoardFormCollapsed(!boardFormCollapsed);
