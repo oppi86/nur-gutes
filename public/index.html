@@ -1120,6 +1120,10 @@
       .app-stats button[aria-pressed="true"] { background: rgba(249,214,92,.22); border-color: #f9d65c; }
       .app-stats button:disabled { cursor: not-allowed; opacity: .5; }
       .app-stats strong { display: block; color: #f9d65c; font-size: 28px; line-height: 1; margin-bottom: 6px; }
+      .app-stats-more { border: 1px solid rgba(255,255,255,.18); border-radius: 8px; margin-top: 8px; overflow: hidden; }
+      .app-stats-more summary { cursor: pointer; color: rgba(255,255,255,.88); font-size: 13px; font-weight: 900; list-style-position: inside; padding: 10px 12px; }
+      .app-stats-more[open] summary { border-bottom: 1px solid rgba(255,255,255,.14); }
+      .app-stats-secondary { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; padding: 10px; }
       .app-next-action { display: grid; gap: 8px; margin-top: 18px; }
       .app-next-action button { width: 100%; border: 0; border-radius: 8px; background: #fff; color: #17332f; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 12px 14px; }
       .app-next-action p { margin: 0; font-size: 13px; color: rgba(255,255,255,.8); }
@@ -1313,7 +1317,7 @@
       .focus-mode .app-nav { display: flex; }
       footer { background: #20211d; color: white; padding: 40px 48px; }
       @media (max-width: 860px) {
-        .app-shell, .tool-router, .top-tools, .resource-list, .app-form, .stripe-grid, .pay-grid, .pitch-grid, .pitch-preview, .trust-grid, .trust-plan, .proof-grid, .proof-ledger, .monthly-grid, .monthly-tiers, .second-grid, .second-score { grid-template-columns: 1fr; }
+        .app-shell, .tool-router, .top-tools, .app-stats-secondary, .resource-list, .app-form, .stripe-grid, .pay-grid, .pitch-grid, .pitch-preview, .trust-grid, .trust-plan, .proof-grid, .proof-ledger, .monthly-grid, .monthly-tiers, .second-grid, .second-score { grid-template-columns: 1fr; }
         .app-nav { align-items: flex-start; flex-direction: column; }
         .app-intro { margin-bottom: 20px; }
         .app-card-head { display: block; }
@@ -1361,10 +1365,15 @@
             <p class="muted">Plane gute Taten, mache daraus bezahlbare Angebote, speichere den Fortschritt im Browser und teile sofort klare naechste Schritte.</p>
             <div class="app-stats">
               <button type="button" data-stat-filter="active" data-stat-key="active"><strong id="metricActions">0</strong><span>aktive Eintraege</span></button>
-              <button type="button" data-stat-filter="all" data-stat-key="revenue"><strong id="metricRevenue">0 EUR</strong><span>Revenue-Ziel</span></button>
-              <button type="button" data-stat-filter="all" data-stat-key="impact"><strong id="metricImpact">0 EUR</strong><span>Impact-Anteil 40%</span></button>
-              <button type="button" data-stat-filter="done" data-stat-key="done"><strong id="metricDone">0</strong><span>abgeschlossen</span></button>
             </div>
+            <details class="app-stats-more" id="statsMore">
+              <summary>Weitere Kennzahlen</summary>
+              <div class="app-stats app-stats-secondary">
+                <button type="button" data-stat-filter="all" data-stat-key="revenue"><strong id="metricRevenue">0 EUR</strong><span>Revenue-Ziel</span></button>
+                <button type="button" data-stat-filter="all" data-stat-key="impact"><strong id="metricImpact">0 EUR</strong><span>Impact-Anteil 40%</span></button>
+                <button type="button" data-stat-filter="done" data-stat-key="done"><strong id="metricDone">0</strong><span>abgeschlossen</span></button>
+              </div>
+            </details>
             <div class="app-next-action">
               <button type="button" id="nextActionButton">Naechste Aktion starten</button>
               <p id="nextActionStatus" aria-live="polite">Der Launcher waehlt den sinnvollsten naechsten Tool-Schritt.</p>
@@ -4755,6 +4764,7 @@
         const boardPresetMoreKey = "nurGutesBoardPresetMoreOpen";
         const boardOutputMoreKey = "nurGutesBoardOutputMoreOpen";
         const dashboardActionsMoreKey = "nurGutesDashboardActionsMoreOpen";
+        const statsMoreKey = "nurGutesStatsMoreOpen";
         const toolAccessMoreKey = "nurGutesToolAccessMoreOpen";
         const reinvestmentMoreKey = "nurGutesReinvestmentMoreOpen";
         const toolDetailsKey = "nurGutesToolDetails";
@@ -4790,18 +4800,18 @@
           }
         ];
         const dailyProductIdea = {
-          id: "daily-2026-07-03-stripe-status-shortcut",
+          id: "daily-2026-07-03-stats-drawer",
           date: "3. Juli 2026",
-          title: "Stripe Status Shortcut",
+          title: "Dashboard Stats Drawer",
           category: "Business Idee",
           amount: 29,
-          next: "Stripe-Status als direkten Payment-Link-Shortcut nutzen",
-          text: "Die Website verwandelt den Stripe-Status im Dashboard von statischem Hinweis in einen klickbaren Shortcut zum Payment-Link-Tool.",
-          revenueStream: "29-Euro Payment Setup Shortcut",
-          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf durch schnelleren Payment-Link-Start",
-          userGrowth: "+1 Monetarisierungs-Signal durch weniger Suchweg zum Zahlungssetup",
+          next: "Dashboard-Kennzahlen auf eine Primaerkachel reduzieren",
+          text: "Die Website zeigt im Dashboard nur die aktive Arbeitslast direkt und legt Revenue, Impact und abgeschlossene Eintraege in ein gespeichertes Kennzahlenmenue.",
+          revenueStream: "29-Euro Dashboard Metrics Setup",
+          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer klarere Kennzahlenfuehrung",
+          userGrowth: "+1 Fokus-Signal durch weniger Kennzahlenflaeche im ersten Screen",
           socialStatus: "Postingtexte im Social-Tool vorbereitet; keine externen Connectoren autorisiert",
-          implementedFunction: "Stripe-Status klickbar machen und direkt das Payment-Link-Tool starten.",
+          implementedFunction: "Kennzahlenmenue einklappen, oeffnen, speichern und Filterklicks weiter unterstuetzen.",
           reinvestment: "40% gute Taten, 25% bessere Fokus- und Workspace-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
         };
         const paymentLabels = {
@@ -4861,6 +4871,7 @@
         let boardPresetMoreOpen = localStorage.getItem(boardPresetMoreKey) === "true";
         let boardOutputMoreOpen = localStorage.getItem(boardOutputMoreKey) === "true";
         let dashboardActionsMoreOpen = localStorage.getItem(dashboardActionsMoreKey) === "true";
+        let statsMoreOpen = localStorage.getItem(statsMoreKey) === "true";
         let toolAccessMoreOpen = localStorage.getItem(toolAccessMoreKey) === "true";
         let reinvestmentMoreOpen = localStorage.getItem(reinvestmentMoreKey) === "true";
         let savedBoardPreset = loadJson(boardPresetKey, null);
@@ -5677,6 +5688,11 @@
         function setDashboardActionsMoreOpen(open) {
           dashboardActionsMoreOpen = Boolean(open);
           localStorage.setItem(dashboardActionsMoreKey, String(dashboardActionsMoreOpen));
+        }
+
+        function setStatsMoreOpen(open) {
+          statsMoreOpen = Boolean(open);
+          localStorage.setItem(statsMoreKey, String(statsMoreOpen));
         }
 
         function setToolAccessMoreOpen(open) {
@@ -6849,6 +6865,8 @@
         if (toolAccessMore) toolAccessMore.open = toolAccessMoreOpen;
         const reinvestmentMore = qs("#reinvestmentMore");
         if (reinvestmentMore) reinvestmentMore.open = reinvestmentMoreOpen;
+        const statsMore = qs("#statsMore");
+        if (statsMore) statsMore.open = statsMoreOpen;
         Object.entries(toolDetailSelectors).forEach(([key, selector]) => {
           const detail = qs(selector);
           if (detail && savedToolDetails[key] === true) detail.open = true;
@@ -6899,6 +6917,7 @@
           });
         });
         qs("#reinvestmentMore")?.addEventListener("toggle", (event) => setReinvestmentMoreOpen(event.target.open));
+        qs("#statsMore")?.addEventListener("toggle", (event) => setStatsMoreOpen(event.target.open));
         qs("#toolAccessMore")?.addEventListener("toggle", (event) => setToolAccessMoreOpen(event.target.open));
         Object.entries(toolDetailSelectors).forEach(([key, selector]) => {
           const detail = qs(selector);
