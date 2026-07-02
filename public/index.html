@@ -4855,8 +4855,8 @@
             return;
           }
           if (action.empty) {
-            button.disabled = true;
-            button.textContent = "Kein sichtbarer Start";
+            button.disabled = false;
+            button.textContent = "Ansicht zuruecksetzen";
             status.textContent = "Aktuelle Board-Suche oder Filter zeigt keinen startbaren Eintrag.";
             syncAutoRouterHint(action);
             return;
@@ -4869,6 +4869,12 @@
 
         function startRecommendedAction() {
           const action = recommendNextAction();
+          if (action?.empty) {
+            resetBoardView();
+            const status = qs("#nextActionStatus");
+            if (status) status.textContent = "Board-Ansicht zurueckgesetzt. Die naechste Aktion ist wieder startbar.";
+            return;
+          }
           startAction(action);
         }
 
