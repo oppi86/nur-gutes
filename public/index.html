@@ -4792,6 +4792,13 @@
         function setFocusMode(enabled, shouldScroll = false, shouldPersist = true) {
           focusMode = Boolean(enabled);
           document.body.classList.toggle("focus-mode", focusMode);
+          if (focusMode && archiveOpen) {
+            archiveOpen = false;
+            document.body.classList.remove("show-legacy");
+            localStorage.setItem(archiveOpenKey, String(archiveOpen));
+            const archiveToggle = qs("#toggleArchive");
+            if (archiveToggle) archiveToggle.textContent = "Archiv anzeigen";
+          }
           if (shouldPersist) localStorage.setItem(focusKey, String(focusMode));
           const button = qs("#focusModeToggle");
           if (button) {
