@@ -5253,6 +5253,14 @@
           }).join("");
         }
 
+        function syncStripeLinksFromForm() {
+          const form = qs("#stripeForm");
+          stripeLinks = Object.fromEntries(Object.keys(paymentLabels).map((key) => [key, form.elements[key].value.trim()]));
+          saveStripe();
+          renderPayments();
+          renderNextAction();
+        }
+
         function renderShare() {
           const topItems = items.slice(0, 3);
           const revenue = items.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
@@ -6053,10 +6061,11 @@
 
         qs("#stripeForm").addEventListener("submit", (event) => {
           event.preventDefault();
-          const form = event.currentTarget;
-          stripeLinks = Object.fromEntries(Object.keys(paymentLabels).map((key) => [key, form.elements[key].value.trim()]));
-          saveStripe();
-          renderAll();
+          syncStripeLinksFromForm();
+        });
+        Object.keys(paymentLabels).forEach((key) => {
+          qs("#stripeForm").elements[key]?.addEventListener("input", syncStripeLinksFromForm);
+          qs("#stripeForm").elements[key]?.addEventListener("change", syncStripeLinksFromForm);
         });
 
         qs("#payGrid").addEventListener("click", (event) => {
