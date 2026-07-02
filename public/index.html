@@ -4865,6 +4865,7 @@
           dailyDetailsOpen = false;
           savedToolDetails = { router: false, tabs: false };
           document.body.classList.remove("show-legacy");
+          document.body.classList.remove("show-resources");
           qsa(".legacy-daily-section.archive-visible").forEach((section) => section.classList.remove("archive-visible"));
           localStorage.setItem(archiveOpenKey, String(archiveOpen));
           localStorage.setItem(dailyDetailsKey, String(dailyDetailsOpen));
@@ -4875,6 +4876,8 @@
           qs("#toggleDailyDetails")?.setAttribute("aria-expanded", "false");
           const archiveToggle = qs("#toggleArchive");
           if (archiveToggle) archiveToggle.textContent = archiveToggle.dataset.closedLabel || "Archiv anzeigen";
+          const resourceToggle = qs("#toggleResources");
+          if (resourceToggle) resourceToggle.textContent = resourceToggle.dataset.closedLabel || "Ressourcen anzeigen";
           const dailyDetailsToggle = qs("#toggleDailyDetails");
           if (dailyDetailsToggle) dailyDetailsToggle.textContent = "Metriken anzeigen";
         }
@@ -6006,8 +6009,9 @@
               if (!section.id) section.id = `ressource-${index + 1}`;
               const title = section.querySelector("h2")?.textContent?.trim() || `Ressource ${index + 1}`;
               return { id: section.id, title };
-            });
+          });
           const closedLabel = `Ressourcen anzeigen (${resources.length})`;
+          toggle.dataset.closedLabel = closedLabel;
           toggle.textContent = closedLabel;
           list.innerHTML = resources.map((item) => (
             `<a href="#${escapeHtml(item.id)}" data-resource-target="${escapeHtml(item.id)}">${escapeHtml(item.title)}</a>`
