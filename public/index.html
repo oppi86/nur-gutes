@@ -1134,6 +1134,8 @@
       .app-next-secondary button { background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.28); color: white; }
       .app-next-secondary button:disabled { cursor: not-allowed; opacity: .55; }
       .app-focus-card { border: 1px solid rgba(255,255,255,.2); border-radius: 8px; background: rgba(255,255,255,.1); display: grid; gap: 10px; margin-top: 18px; padding: 14px; }
+      .app-focus-card.no-focus .app-focus-note,
+      .app-focus-card.no-focus .app-focus-more { display: none; }
       .app-focus-card strong { color: #f9d65c; display: block; font-size: 17px; line-height: 1.2; }
       .app-focus-card p { color: rgba(255,255,255,.82); font-size: 13px; margin: 0; }
       .app-focus-note { display: grid; gap: 6px; }
@@ -4820,18 +4822,18 @@
           }
         ];
         const dailyProductIdea = {
-          id: "daily-2026-07-03-auto-focus",
+          id: "daily-2026-07-03-focus-minimal",
           date: "3. Juli 2026",
-          title: "Auto Tagesfokus",
+          title: "Minimaler Tagesfokus",
           category: "Business Idee",
           amount: 29,
-          next: "Empfohlene Board-Aktion direkt als Tagesfokus speichern",
-          text: "Der Tagesfokus ist kein leerer Zustand mehr: Wenn noch kein Fokus gesetzt ist, speichert der Primaerbutton automatisch die empfohlene Board-Aktion als Fokus.",
+          next: "Leere Fokus-Nebenaktionen ausblenden, bis ein Fokus gesetzt ist",
+          text: "Die Tagesfokus-Karte zeigt ohne gesetzten Fokus nur Titel, Status und Primaeraktion. Notizfeld und Nebenaktionen erscheinen erst, wenn ein Fokus wirklich gespeichert ist.",
           revenueStream: "29-Euro Focus Setup",
-          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer klarere Tagesstarts",
-          userGrowth: "+1 Aktivierungs-Signal durch weniger leere Fokus-Zustaende",
+          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer schlankere Tagesstarts",
+          userGrowth: "+1 Klarheits-Signal durch weniger deaktivierte Kontrollelemente",
           socialStatus: "Postingtexte im Social-Tool vorbereitet; keine externen Connectoren autorisiert",
-          implementedFunction: "Empfohlene naechste Aktion berechnen, als Tagesfokus in localStorage speichern und danach wie gewohnt starten.",
+          implementedFunction: "Fokus-Zustand aus localStorage lesen, leere Nebenaktionen ausblenden und nach Fokus-Setzung automatisch wieder freigeben.",
           reinvestment: "40% gute Taten, 25% bessere Fokus- und Workspace-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
         };
         const paymentLabels = {
@@ -5627,6 +5629,7 @@
           const item = dailyFocusItem();
           const title = qs("#dailyFocusTitle");
           const status = qs("#dailyFocusStatus");
+          const card = qs(".app-focus-card");
           const note = qs("#dailyFocusNote");
           const actionsMore = qs("#dailyFocusActionsMore");
           const startButton = qs("#startDailyFocusButton");
@@ -5635,6 +5638,7 @@
           const undoButton = qs("#undoDailyFocusButton");
           const clearButton = qs("#clearDailyFocusButton");
           const hasFocus = Boolean(item);
+          if (card) card.classList.toggle("no-focus", !hasFocus);
           if (title) title.textContent = item?.title || "Kein Fokus gesetzt";
           if (status) {
             status.textContent = item
