@@ -5666,14 +5666,16 @@
         }
 
         function focusArchiveSearch() {
-          archiveOpen = true;
+          archiveOpen = false;
           localStorage.setItem(archiveOpenKey, String(archiveOpen));
-          document.body.classList.add("show-legacy");
+          document.body.classList.remove("show-legacy");
           const toggle = qs("#toggleArchive");
-          if (toggle) toggle.textContent = "Archiv ausblenden";
+          if (toggle && toggle.textContent === "Archiv ausblenden") toggle.textContent = "Archiv anzeigen";
           setFocusMode(false);
           const section = qs("#daily-archive");
           const search = qs("#archiveSearch");
+          const count = qs("#archiveCount");
+          if (count) count.textContent = "Archiv-Suche bereit. Alte Iterationen bleiben geschlossen, bis du einen Treffer oeffnest.";
           if (!section || !search) return;
           requestAnimationFrame(() => {
             section.scrollIntoView({ behavior: "smooth", block: "start" });
