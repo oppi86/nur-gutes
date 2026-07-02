@@ -1317,6 +1317,7 @@
             <p class="app-note">Revenue-Reinvestition: 40% gute Taten, 25% bessere Algorithmen und Automatisierung, 20% Growth/Marketing, 15% Betrieb und Qualitaet.</p>
             <div class="app-mode-control">
               <button class="app-mode-toggle" type="button" id="focusModeToggle" aria-pressed="false">Arbeitsmodus aktivieren</button>
+              <button class="app-mode-toggle" type="button" id="resumeWorkspaceButton">Zuletztes Tool oeffnen</button>
               <button class="app-mode-reset" type="button" id="resetDashboardButton">Dashboard aufraeumen</button>
               <p class="app-mode-status" id="focusModeStatus">Magazinbereiche bleiben sichtbar.</p>
             </div>
@@ -4789,6 +4790,13 @@
           status.textContent = `${mode}: ${activeToolLabel()} aktiv, ${visibility}.`;
         }
 
+        function renderResumeWorkspaceButton() {
+          const button = qs("#resumeWorkspaceButton");
+          if (!button) return;
+          button.textContent = `${activeToolLabel()} fortsetzen`;
+          button.setAttribute("aria-label", `${activeToolLabel()} im Arbeitsmodus fortsetzen`);
+        }
+
         function setFocusMode(enabled, shouldScroll = false, shouldPersist = true) {
           focusMode = Boolean(enabled);
           document.body.classList.toggle("focus-mode", focusMode);
@@ -4926,6 +4934,7 @@
           renderAll();
           const status = qs("#focusModeStatus");
           if (status) status.textContent = "Dashboard aufgeraeumt: Board kompakt, Suche und Filter zurueckgesetzt, nur Workspace sichtbar.";
+          renderResumeWorkspaceButton();
           requestAnimationFrame(() => qs("#app")?.scrollIntoView({ behavior: "smooth", block: "start" }));
         }
 
@@ -5904,6 +5913,17 @@
           if (hint) hint.textContent = toolHints[selectedName] || toolHints.board;
           if (shouldPersist) localStorage.setItem(activeToolKey, selectedName);
           renderWorkspaceStatus();
+          renderResumeWorkspaceButton();
+        }
+        function resumeLastWorkspace() {
+          setFocusMode(true, false, true);
+          setBoardFormCollapsed(true);
+          setActiveTool(activeTool || "board");
+          renderAll();
+          const panel = qs(`[data-app-panel="${activeTool}"]`);
+          const status = qs("#focusModeStatus");
+          if (status) status.textContent = `${activeToolLabel()} fortgesetzt. Arbeitsmodus bleibt kompakt.`;
+          requestAnimationFrame(() => panel?.scrollIntoView({ behavior: "smooth", block: "start" }));
         }
         function activateToolShortcut(toolName) {
           setActiveTool(toolName);
@@ -5930,6 +5950,7 @@
         setFocusMode(focusMode);
         setBoardFormCollapsed(boardFormCollapsed, false);
         qs("#focusModeToggle")?.addEventListener("click", () => setFocusMode(!focusMode, true));
+        qs("#resumeWorkspaceButton")?.addEventListener("click", resumeLastWorkspace);
         qs("#resetDashboardButton")?.addEventListener("click", resetDashboardMode);
         qsa("[data-dashboard-start]").forEach((button) => button.addEventListener("click", (event) => {
           event.preventDefault();
