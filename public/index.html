@@ -4665,8 +4665,8 @@
         let boardFormCollapsed = localStorage.getItem(boardFormCollapsedKey) !== "false";
         let dailyDetailsOpen = localStorage.getItem(dailyDetailsKey) === "true";
         let savedArchiveSearch = localStorage.getItem(archiveSearchKey) || "";
-        let archiveOpen = localStorage.getItem(archiveOpenKey) === "true";
-        if (archiveOpen) focusMode = false;
+        let archiveOpen = false;
+        if (localStorage.getItem(archiveOpenKey) === "true") localStorage.setItem(archiveOpenKey, "false");
         let quickTask = localStorage.getItem(quickTaskKey) || "auto";
         let currentFilter = ["all", "planned", "active", "done"].includes(localStorage.getItem(boardFilterKey)) ? localStorage.getItem(boardFilterKey) : "all";
         let currentBoardSearch = localStorage.getItem(boardSearchKey) || "";
@@ -5679,8 +5679,10 @@
           if (!section || !search) return;
           requestAnimationFrame(() => {
             section.scrollIntoView({ behavior: "smooth", block: "start" });
-            search.focus({ preventScroll: true });
-            search.select();
+            setTimeout(() => {
+              search.focus({ preventScroll: true });
+              search.select();
+            }, 80);
           });
         }
 
