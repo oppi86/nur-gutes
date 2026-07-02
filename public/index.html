@@ -6453,7 +6453,7 @@
           if (event.key === "Enter") {
             event.preventDefault();
             startFirstVisibleBoardItem();
-          } else if (event.key === "Escape" && (currentBoardSearch.trim() || currentFilter !== "all")) {
+          } else if (event.key === "Escape" && (currentBoardSearch.trim() || currentFilter !== "all" || currentBoardSort !== "manual" || !boardFocusLimitEnabled)) {
             event.preventDefault();
             resetBoardView();
           }
