@@ -4898,7 +4898,15 @@
           setQuickTask("auto");
           const action = recommendNextAction();
           if (action?.item) {
-            startAction(action);
+            setFocusMode(true, true);
+            if (action.tool && qs(`#${action.tool}Item`)) {
+              openItemTool(action.item.id, action.tool, false);
+            } else {
+              setActiveTool(action.tool || "board");
+              renderAll();
+            }
+            const status = qs("#nextActionStatus");
+            if (status) status.textContent = `Dashboard bereit: ${action.label} fuer "${action.item.title}" ist empfohlen, aber noch nicht gestartet.`;
           } else {
             setActiveTool("board");
             setFocusMode(true, true);
