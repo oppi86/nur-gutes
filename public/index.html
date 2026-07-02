@@ -4822,18 +4822,18 @@
           }
         ];
         const dailyProductIdea = {
-          id: "daily-2026-07-03-smart-reset",
+          id: "daily-2026-07-03-smart-maintenance",
           date: "3. Juli 2026",
-          title: "Smart Board Reset",
+          title: "Smart Board Pflege",
           category: "Business Idee",
           amount: 29,
-          next: "Board-Reset nur anzeigen, wenn die Ansicht angepasst ist",
-          text: "Der Reset-Button neben der Board-Suche ist im Standardzustand verborgen und erscheint erst, wenn Suche, Filter, Sortierung oder Listenmodus angepasst wurden.",
-          revenueStream: "29-Euro Board Reset Setup",
-          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer klarere Board-Suchflows",
-          userGrowth: "+1 Klarheits-Signal durch weniger deaktivierte Standard-Buttons",
+          next: "Board-Pflege nur anzeigen, wenn fertige oder entfernte Eintraege existieren",
+          text: "Die Board-Pflege bleibt im normalen Board verborgen und erscheint erst, wenn es fertige Eintraege zum Entfernen oder entfernte Eintraege zum Wiederherstellen gibt.",
+          revenueStream: "29-Euro Board Hygiene Setup",
+          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer sauberere Board-Pflege",
+          userGrowth: "+1 Klarheits-Signal durch weniger leere Wartungsbedienelemente",
           socialStatus: "Postingtexte im Social-Tool vorbereitet; keine externen Connectoren autorisiert",
-          implementedFunction: "Aktuelle Board-Ansicht auswerten, Reset-Button zustandsbasiert einblenden und die bestehende Reset-Aktion weiter ausloesen.",
+          implementedFunction: "Board-Zustand auswerten, Pflege-Drawer zustandsbasiert einblenden, fertige Eintraege entfernen und entfernte Eintraege wiederherstellen.",
           reinvestment: "40% gute Taten, 25% bessere Fokus- und Workspace-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
         };
         const paymentLabels = {
@@ -6092,7 +6092,17 @@
           if (sort && sort.value !== currentBoardSort) sort.value = currentBoardSort;
           const doneCount = items.filter((item) => item.status === "done").length;
           const boardMaintenanceMore = qs("#boardMaintenanceMore");
-          if (boardMaintenanceMore && boardMaintenanceMore.open !== boardMaintenanceMoreOpen) boardMaintenanceMore.open = boardMaintenanceMoreOpen;
+          const shouldShowMaintenance = doneCount > 0 || lastRemovedItems.length > 0;
+          if (boardMaintenanceMore) {
+            boardMaintenanceMore.hidden = !shouldShowMaintenance;
+            if (!shouldShowMaintenance && boardMaintenanceMore.open) {
+              boardMaintenanceMore.open = false;
+              boardMaintenanceMoreOpen = false;
+              localStorage.setItem(boardMaintenanceMoreKey, String(boardMaintenanceMoreOpen));
+            } else if (shouldShowMaintenance && boardMaintenanceMore.open !== boardMaintenanceMoreOpen) {
+              boardMaintenanceMore.open = boardMaintenanceMoreOpen;
+            }
+          }
           const clearDoneButton = qs("#clearDoneButton");
           if (clearDoneButton) {
             clearDoneButton.disabled = doneCount === 0;
