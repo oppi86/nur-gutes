@@ -1166,6 +1166,10 @@
       .app-mode-reset { width: 100%; border: 1px solid rgba(255,255,255,.28); border-radius: 8px; background: rgba(255,255,255,.1); color: white; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 12px 14px; }
       .app-mode-reset:disabled { cursor: not-allowed; opacity: .55; }
       .app-mode-status { margin: 0; font-size: 13px; color: rgba(255,255,255,.8); }
+      .app-mode-more { border: 1px solid rgba(255,255,255,.18); border-radius: 8px; overflow: hidden; }
+      .app-mode-more summary { cursor: pointer; color: rgba(255,255,255,.88); font-size: 13px; font-weight: 900; list-style-position: inside; padding: 10px 12px; }
+      .app-mode-more[open] summary { border-bottom: 1px solid rgba(255,255,255,.14); }
+      .app-mode-secondary { display: grid; gap: 8px; padding: 10px; }
       .app-workbench { border: 1px solid #e7e1d7; box-shadow: none; padding: 20px; }
       .tool-router { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: end; border: 1px solid #e7e1d7; border-radius: 8px; background: #f7f4ef; padding: 14px; margin-bottom: 14px; }
       .tool-router label { display: grid; gap: 6px; color: #575952; font-size: 12px; font-weight: 900; text-transform: uppercase; }
@@ -1398,9 +1402,14 @@
             <p class="app-note">Revenue-Reinvestition: 40% gute Taten, 25% bessere Algorithmen und Automatisierung, 20% Growth/Marketing, 15% Betrieb und Qualitaet.</p>
             <div class="app-mode-control">
               <button class="app-mode-toggle" type="button" id="focusModeToggle" aria-pressed="false">Arbeitsmodus aktivieren</button>
-              <button class="app-mode-toggle" type="button" id="resumeWorkspaceButton">Zuletztes Tool oeffnen</button>
-              <button class="app-mode-reset" type="button" id="resetDashboardButton">Dashboard aufraeumen</button>
-              <button class="app-mode-reset" type="button" id="copyCompactnessButton">Kompakt-Check kopieren</button>
+              <details class="app-mode-more" id="dashboardActionsMore">
+                <summary>Weitere Dashboard-Aktionen</summary>
+                <div class="app-mode-secondary">
+                  <button class="app-mode-toggle" type="button" id="resumeWorkspaceButton">Zuletztes Tool oeffnen</button>
+                  <button class="app-mode-reset" type="button" id="resetDashboardButton">Dashboard aufraeumen</button>
+                  <button class="app-mode-reset" type="button" id="copyCompactnessButton">Kompakt-Check kopieren</button>
+                </div>
+              </details>
               <p class="app-mode-status" id="focusModeStatus">Magazinbereiche bleiben sichtbar.</p>
               <p class="app-mode-status" id="dashboardCompactnessStatus" aria-live="polite">Dashboard-Kompaktheit wird berechnet.</p>
             </div>
@@ -4698,6 +4707,7 @@
         const boardFocusLimitKey = "nurGutesBoardFocusLimit";
         const boardPresetKey = "nurGutesBoardPreset";
         const boardOutputMoreKey = "nurGutesBoardOutputMoreOpen";
+        const dashboardActionsMoreKey = "nurGutesDashboardActionsMoreOpen";
         const toolDetailsKey = "nurGutesToolDetails";
         const lastCopyKey = "nurGutesLastCopy";
         const lastExportKey = "nurGutesLastExport";
@@ -4731,18 +4741,18 @@
           }
         ];
         const dailyProductIdea = {
-          id: "daily-2026-07-03-output-action-drawer",
+          id: "daily-2026-07-03-dashboard-action-drawer",
           date: "3. Juli 2026",
-          title: "Board Output Action Drawer",
+          title: "Dashboard Action Drawer",
           category: "Business Idee",
           amount: 29,
-          next: "Board-Ausgaben in Primaerexport und gespeichertes Zusatzmenue aufteilen",
-          text: "Die Website zeigt im Dashboard nur noch den wichtigsten Board-Export direkt und legt den Board-Report in ein gespeichertes Ausgabemenue.",
-          revenueStream: "29-Euro Board Output Setup",
-          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer klarere Reporting-Ausgaben",
-          userGrowth: "+1 Export- oder Reporting-Signal durch weniger sichtbare Komplexitaet",
+          next: "Seltene Dashboard-Aktionen einklappen und den Zustand speichern",
+          text: "Die Website zeigt im linken Dashboard nur noch den wichtigsten Arbeitsmodus-Schalter direkt und legt Fortsetzen, Aufraeumen und Kompakt-Check in ein gespeichertes Aktionsmenue.",
+          revenueStream: "29-Euro Dashboard Cleanup Setup",
+          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer klarere Dashboard-Nutzung",
+          userGrowth: "+1 Rueckkehrsignal durch weniger sichtbare Steuerungs-Komplexitaet",
           socialStatus: "Postingtexte im Social-Tool vorbereitet; keine externen Connectoren autorisiert",
-          implementedFunction: "Board-Ausgabemenue einklappen, oeffnen, speichern und nach Reload wiederherstellen.",
+          implementedFunction: "Dashboard-Aktionsmenue einklappen, oeffnen, speichern und nach Reload wiederherstellen.",
           reinvestment: "40% gute Taten, 25% bessere Fokus- und Workspace-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
         };
         const paymentLabels = {
@@ -4798,6 +4808,7 @@
         let currentBoardSort = boardSortOptions.includes(localStorage.getItem(boardSortKey)) ? localStorage.getItem(boardSortKey) : "manual";
         let boardFocusLimitEnabled = localStorage.getItem(boardFocusLimitKey) !== "false";
         let boardOutputMoreOpen = localStorage.getItem(boardOutputMoreKey) === "true";
+        let dashboardActionsMoreOpen = localStorage.getItem(dashboardActionsMoreKey) === "true";
         let savedBoardPreset = loadJson(boardPresetKey, null);
         let savedToolDetails = loadJson(toolDetailsKey, {});
         let savedPitchChannel = localStorage.getItem(pitchChannelKey) || "daily-growth";
@@ -4987,7 +4998,9 @@
         function renderDashboardCompactness() {
           const status = qs("#dashboardCompactnessStatus");
           const resetButton = qs("#resetDashboardButton");
+          const dashboardActionsMore = qs("#dashboardActionsMore");
           const { visibleSections, archivedDailySections, openDailySections, resourceSections, openResourceSections, archiveSearchActive, archivePreviewActive, hasBoardDrift, isClean } = getDashboardCompactness();
+          if (dashboardActionsMore && dashboardActionsMore.open !== dashboardActionsMoreOpen) dashboardActionsMore.open = dashboardActionsMoreOpen;
           if (status) {
             status.textContent = focusMode
               ? `Kompakt: ${visibleSections} sichtbare Bereiche, ${archivedDailySections} Daily-Iterationen im Archiv, ${resourceSections} Ressourcen eingeklappt${hasBoardDrift ? ", Board-Ansicht angepasst" : ""}.`
@@ -5581,6 +5594,11 @@
         function setBoardOutputMoreOpen(open) {
           boardOutputMoreOpen = Boolean(open);
           localStorage.setItem(boardOutputMoreKey, String(boardOutputMoreOpen));
+        }
+
+        function setDashboardActionsMoreOpen(open) {
+          dashboardActionsMoreOpen = Boolean(open);
+          localStorage.setItem(dashboardActionsMoreKey, String(dashboardActionsMoreOpen));
         }
 
         function addDailyIdeaToBoard() {
@@ -6693,6 +6711,7 @@
         setBoardFormCollapsed(boardFormCollapsed, false);
         qs("#focusModeToggle")?.addEventListener("click", () => setFocusMode(!focusMode, true));
         qs("#dashboardFirstToggle")?.addEventListener("click", () => setDashboardFirst(!dashboardFirst));
+        qs("#dashboardActionsMore")?.addEventListener("toggle", (event) => setDashboardActionsMoreOpen(event.target.open));
         qs("#resumeWorkspaceButton")?.addEventListener("click", resumeLastWorkspace);
         qs("#resetDashboardButton")?.addEventListener("click", resetDashboardMode);
         qs("#copyCompactnessButton")?.addEventListener("click", copyDashboardCompactness);
