@@ -4563,6 +4563,7 @@
         const quickTaskKey = "nurGutesQuickTask";
         const boardFilterKey = "nurGutesBoardFilter";
         const boardSearchKey = "nurGutesBoardSearch";
+        const lastCopyKey = "nurGutesLastCopy";
         const seedItems = [
           {
             id: "seed-proof-1",
@@ -4667,12 +4668,26 @@
           }
         }
 
+        function rememberCopy(label, succeeded) {
+          const now = new Date();
+          const time = now.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
+          const copyState = { label, succeeded: Boolean(succeeded), time, createdAt: now.toISOString() };
+          localStorage.setItem(lastCopyKey, JSON.stringify(copyState));
+          const status = qs("#exportBoardStatus");
+          if (status) {
+            status.textContent = succeeded
+              ? `Zuletzt kopiert: ${label} um ${time}.`
+              : `${label} konnte nicht automatisch kopiert werden; Text ist markiert.`;
+          }
+        }
+
         function setupCopyButton(buttonSelector, outputSelector, copiedLabel, fallbackLabel, resetLabel) {
           const button = qs(buttonSelector);
           const output = qs(outputSelector);
           if (!button || !output) return;
           button.addEventListener("click", async () => {
             const didCopy = await copyText(output.value);
+            rememberCopy(resetLabel, didCopy);
             if (!didCopy) output.select();
             button.textContent = didCopy ? copiedLabel : fallbackLabel;
             setTimeout(() => {
@@ -4897,6 +4912,7 @@
             return;
           }
           const copied = await copyText(visibleBoardReport());
+          rememberCopy("Board-Report", copied);
           if (status) status.textContent = copied ? `${visibleItems.length} sichtbare Eintraege als Board-Report kopiert.` : "Board-Report markiert; manuelles Kopieren pruefen.";
         }
 
@@ -5829,6 +5845,7 @@
             const item = items.find((entry) => entry.id === card.dataset.id);
             if (!item) return;
             const didCopy = await copyText(itemShareText(item));
+            rememberCopy(`Board-Eintrag: ${item.title || "Ohne Titel"}`, didCopy);
             button.textContent = didCopy ? "Kopiert" : "Text bereit";
             setTimeout(() => {
               button.textContent = "Kopieren";
