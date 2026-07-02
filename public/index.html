@@ -5159,7 +5159,7 @@
           const count = qs("#boardCount");
           if (count) count.textContent = query ? `${visibleItems.length} Treffer in ${filteredItems.length} gefilterten Eintraegen` : `${visibleItems.length} von ${items.length} Eintraegen sichtbar`;
           const clearBoardSearch = qs("#clearBoardSearch");
-          if (clearBoardSearch) clearBoardSearch.disabled = query.length === 0;
+          if (clearBoardSearch) clearBoardSearch.disabled = query.length === 0 && currentFilter === "all";
           const search = qs("#boardSearch");
           if (search && search.value !== currentBoardSearch) search.value = currentBoardSearch;
           const doneCount = items.filter((item) => item.status === "done").length;
