@@ -4801,7 +4801,7 @@
           setTimeout(() => hub.classList.remove("tool-hub-active"), 1600);
         }
 
-        function startAction(action) {
+        function startAction(action, syncQuickTask = true) {
           if (!action) return;
           const wasPlanned = action.item.status === "planned";
           if (wasPlanned) {
@@ -4810,7 +4810,7 @@
             saveItems();
           }
           setFocusMode(true);
-          openItemTool(action.item.id, action.tool);
+          openItemTool(action.item.id, action.tool, syncQuickTask);
           const status = qs("#nextActionStatus");
           if (status) {
             status.textContent = wasPlanned
@@ -5661,14 +5661,14 @@
           if (quickTask === "auto") {
             if (action?.item) {
               startedAction = action;
-              startAction(action);
+              startAction(action, false);
             }
             else if (action?.empty) {
               revealSavedBoardItem();
               const fallbackAction = recommendNextAction();
               if (fallbackAction?.item) {
                 startedAction = fallbackAction;
-                startAction(fallbackAction);
+                startAction(fallbackAction, false);
               }
               else {
                 setActiveTool("board");
@@ -5712,10 +5712,11 @@
           if (hint) hint.textContent = toolHints[selectedName] || toolHints.board;
           if (shouldPersist) localStorage.setItem(activeToolKey, selectedName);
         }
-        function openItemTool(itemId, toolName) {
+        function openItemTool(itemId, toolName, syncQuickTask = true) {
           const select = qs(`#${toolName}Item`);
           if (select && items.some((item) => item.id === itemId)) select.value = itemId;
           setFocusMode(true);
+          if (syncQuickTask) setQuickTask(toolName);
           setActiveTool(toolName);
           renderAll();
           const panel = qs(`[data-app-panel="${toolName}"]`);
