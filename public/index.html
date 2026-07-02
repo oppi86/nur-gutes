@@ -4673,7 +4673,15 @@
           const time = now.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
           const copyState = { label, succeeded: Boolean(succeeded), time, createdAt: now.toISOString() };
           localStorage.setItem(lastCopyKey, JSON.stringify(copyState));
+          renderLastCopyStatus(copyState);
+        }
+
+        function renderLastCopyStatus(copyState = loadJson(lastCopyKey, null)) {
           const status = qs("#exportBoardStatus");
+          if (!status || !copyState?.label || !copyState?.time) return;
+          const label = copyState.label;
+          const time = copyState.time;
+          const succeeded = Boolean(copyState.succeeded);
           if (status) {
             status.textContent = succeeded
               ? `Zuletzt kopiert: ${label} um ${time}.`
@@ -5626,6 +5634,7 @@
 
         function renderAll() {
           renderStats();
+          renderLastCopyStatus();
           renderDailyIdea();
           renderNextAction();
           renderBoard();
