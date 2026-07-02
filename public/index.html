@@ -4575,6 +4575,7 @@
         const lastExportKey = "nurGutesLastExport";
         const pitchChannelKey = "nurGutesPitchChannel";
         const trustSettingsKey = "nurGutesTrustSettings";
+        const monthlySettingsKey = "nurGutesMonthlySettings";
         const seedItems = [
           {
             id: "seed-proof-1",
@@ -4648,6 +4649,7 @@
         let currentBoardSearch = localStorage.getItem(boardSearchKey) || "";
         let savedPitchChannel = localStorage.getItem(pitchChannelKey) || "daily-growth";
         let savedTrustSettings = loadJson(trustSettingsKey, {});
+        let savedMonthlySettings = loadJson(monthlySettingsKey, {});
         let editingItemId = "";
         let lastRemovedItems = loadJson(removedItemsKey, []);
 
@@ -5835,6 +5837,14 @@
           const field = qs(selector);
           if (field && savedTrustSettings[key]) field.value = savedTrustSettings[key];
         });
+        const monthlySettingSelectors = {
+          base: "#monthlyBase",
+          rhythm: "#monthlyRhythm"
+        };
+        Object.entries(monthlySettingSelectors).forEach(([key, selector]) => {
+          const field = qs(selector);
+          if (field && savedMonthlySettings[key]) field.value = savedMonthlySettings[key];
+        });
         qsa("[data-top-tool]").forEach((button) => {
           button.addEventListener("click", () => {
             activateToolShortcut(button.dataset.topTool);
@@ -6045,8 +6055,16 @@
         });
 
         ["#monthlyItem", "#monthlyBase", "#monthlyRhythm"].forEach((selector) => {
-          qs(selector).addEventListener("input", renderMonthly);
-          qs(selector).addEventListener("change", renderMonthly);
+          const updateMonthly = () => {
+            savedMonthlySettings = {
+              base: qs("#monthlyBase").value,
+              rhythm: qs("#monthlyRhythm").value
+            };
+            localStorage.setItem(monthlySettingsKey, JSON.stringify(savedMonthlySettings));
+            renderMonthly();
+          };
+          qs(selector).addEventListener("input", updateMonthly);
+          qs(selector).addEventListener("change", updateMonthly);
         });
 
         ["#secondItem", "#secondFirstGift", "#secondSignal", "#secondChannel"].forEach((selector) => {
