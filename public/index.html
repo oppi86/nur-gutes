@@ -1117,6 +1117,7 @@
       .app-stats button { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); border-radius: 8px; color: white; cursor: pointer; font: inherit; padding: 16px; text-align: left; }
       .app-stats button:hover, .app-stats button:focus-visible { background: rgba(255,255,255,.16); outline: 2px solid rgba(249,214,92,.8); outline-offset: 2px; }
       .app-stats button[aria-pressed="true"] { background: rgba(249,214,92,.22); border-color: #f9d65c; }
+      .app-stats button:disabled { cursor: not-allowed; opacity: .5; }
       .app-stats strong { display: block; color: #f9d65c; font-size: 28px; line-height: 1; margin-bottom: 6px; }
       .app-next-action { display: grid; gap: 8px; margin-top: 18px; }
       .app-next-action button { width: 100%; border: 0; border-radius: 8px; background: #fff; color: #17332f; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 12px 14px; }
@@ -5080,12 +5081,15 @@
 
         function renderStats() {
           const activeItems = items.filter((item) => item.status === "active");
+          const doneItems = items.filter((item) => item.status === "done");
           const revenue = items.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
           qs("#metricActions").textContent = activeItems.length;
           qs("#metricRevenue").textContent = money(revenue);
           qs("#metricImpact").textContent = money(revenue * 0.4);
-          qs("#metricDone").textContent = items.filter((item) => item.status === "done").length;
+          qs("#metricDone").textContent = doneItems.length;
           qsa("[data-stat-filter]").forEach((button) => {
+            const count = button.dataset.statKey === "active" ? activeItems.length : button.dataset.statKey === "done" ? doneItems.length : items.length;
+            button.disabled = ["active", "done"].includes(button.dataset.statKey) && count === 0 && button.dataset.statKey !== currentStatKey;
             button.setAttribute("aria-pressed", String(button.dataset.statKey === currentStatKey));
           });
           const connected = Object.values(stripeLinks).some(Boolean);
