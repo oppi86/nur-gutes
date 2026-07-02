@@ -4890,8 +4890,15 @@
           currentFilter = "all";
           currentBoardSearch = "";
           boardCompact = true;
+          archiveOpen = false;
+          savedToolDetails = { router: false, tabs: false };
           localStorage.setItem(compactBoardKey, String(boardCompact));
+          localStorage.setItem(archiveOpenKey, String(archiveOpen));
+          localStorage.setItem(toolDetailsKey, JSON.stringify(savedToolDetails));
           saveBoardView();
+          document.body.classList.remove("show-legacy");
+          qs(".tool-router-details")?.removeAttribute("open");
+          qs(".tool-tabs")?.removeAttribute("open");
           const boardSearch = qs("#boardSearch");
           if (boardSearch) boardSearch.value = "";
           setBoardFormCollapsed(true);
