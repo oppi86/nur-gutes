@@ -4886,12 +4886,13 @@
         }
 
         function recommendNextAction() {
-          const boardViewIsScoped = currentFilter !== "all" || currentBoardSearch.trim().length > 0;
-          const scopedItem = boardViewIsScoped ? getVisibleBoardItems().visibleItems.find((entry) => entry.status !== "done") : null;
+          const { outputItems, hiddenFocusCount } = getBoardOutputItems();
+          const boardViewIsScoped = currentFilter !== "all" || currentBoardSearch.trim().length > 0 || boardFocusLimitEnabled;
+          const scopedItem = outputItems.find((entry) => entry.status !== "done");
           if (boardViewIsScoped && !scopedItem) return { scoped: true, empty: true };
           const fallbackItem = items.find((entry) => entry.status !== "done") || items[0];
           const action = recommendActionForItem(scopedItem || fallbackItem);
-          return action ? { ...action, scoped: Boolean(scopedItem) } : null;
+          return action ? { ...action, scoped: Boolean(scopedItem), focused: hiddenFocusCount > 0 } : null;
         }
 
         function renderNextAction() {
@@ -4914,7 +4915,7 @@
           }
           button.disabled = false;
           button.textContent = `${action.label} starten`;
-          status.textContent = `${action.scoped ? "Aus aktueller Ansicht: " : ""}${action.item.title}: ${action.reason}`;
+          status.textContent = `${action.focused ? "Aus Fokusliste: " : action.scoped ? "Aus aktueller Ansicht: " : ""}${action.item.title}: ${action.reason}`;
           syncAutoRouterHint(action);
         }
 
@@ -5031,12 +5032,12 @@
         }
 
         function startFirstVisibleBoardItem() {
-          const { visibleItems } = getVisibleBoardItems();
-          const item = visibleItems.find((entry) => entry.status !== "done");
+          const { outputItems } = getBoardOutputItems();
+          const item = outputItems.find((entry) => entry.status !== "done");
           if (!item) {
             resetBoardView();
             const status = qs("#nextActionStatus");
-            if (status) status.textContent = "Kein startbarer Treffer sichtbar. Board-Ansicht wurde zurueckgesetzt.";
+            if (status) status.textContent = "Kein startbarer Eintrag im aktuellen Fokus. Board-Ansicht wurde zurueckgesetzt.";
             return;
           }
           startBoardItem(item.id);
