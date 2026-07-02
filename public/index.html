@@ -1125,6 +1125,11 @@
       .app-focus-card { border: 1px solid rgba(255,255,255,.2); border-radius: 8px; background: rgba(255,255,255,.1); display: grid; gap: 10px; margin-top: 18px; padding: 14px; }
       .app-focus-card strong { color: #f9d65c; display: block; font-size: 17px; line-height: 1.2; }
       .app-focus-card p { color: rgba(255,255,255,.82); font-size: 13px; margin: 0; }
+      .app-focus-note { display: grid; gap: 6px; }
+      .app-focus-note label { color: rgba(255,255,255,.76); font-size: 11px; font-weight: 900; text-transform: uppercase; }
+      .app-focus-note textarea { width: 100%; border: 1px solid rgba(255,255,255,.24); border-radius: 8px; background: rgba(255,255,255,.1); color: white; font: inherit; font-size: 13px; min-height: 58px; padding: 10px 12px; resize: vertical; }
+      .app-focus-note textarea::placeholder { color: rgba(255,255,255,.54); }
+      .app-focus-note textarea:disabled { cursor: not-allowed; opacity: .55; }
       .app-focus-actions { display: flex; flex-wrap: wrap; gap: 8px; }
       .app-focus-actions button { border: 1px solid rgba(255,255,255,.28); border-radius: 8px; background: rgba(255,255,255,.12); color: white; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 10px 12px; }
       .app-focus-actions button:first-child { background: #f9d65c; border-color: #f9d65c; color: #20211d; }
@@ -1332,6 +1337,10 @@
               <p class="tag">Tagesfokus</p>
               <strong id="dailyFocusTitle">Kein Fokus gesetzt</strong>
               <p id="dailyFocusStatus">Waehle einen Board-Eintrag als Fokus, damit der naechste Besuch direkt klar startet.</p>
+              <div class="app-focus-note">
+                <label for="dailyFocusNote">Fokus-Notiz</label>
+                <textarea id="dailyFocusNote" maxlength="180" placeholder="Blocker, Kontakt oder Proof fuer heute festhalten" disabled></textarea>
+              </div>
               <div class="app-focus-actions">
                 <button type="button" id="startDailyFocusButton" disabled>Fokus starten</button>
                 <button type="button" id="copyDailyFocusButton" disabled>Brief kopieren</button>
@@ -4658,6 +4667,7 @@
         const dashboardFirstKey = "nurGutesDashboardFirst";
         const dailyFocusKey = "nurGutesDailyFocusItem";
         const dailyFocusUndoKey = "nurGutesDailyFocusUndo";
+        const dailyFocusNoteKey = "nurGutesDailyFocusNote";
         const quickTaskKey = "nurGutesQuickTask";
         const boardFilterKey = "nurGutesBoardFilter";
         const boardStatKey = "nurGutesBoardStat";
@@ -4698,18 +4708,18 @@
           }
         ];
         const dailyProductIdea = {
-          id: "daily-2026-07-03-focus-undo",
+          id: "daily-2026-07-03-focus-note",
           date: "3. Juli 2026",
-          title: "Daily Focus Undo",
+          title: "Daily Focus Note",
           category: "Business Idee",
           amount: 29,
-          next: "Einen versehentlich erledigten Tagesfokus direkt wiederherstellen",
-          text: "Die Website macht den Fokusabschluss fehlertolerant: Nach Fertig markieren kann der letzte Fokus direkt im Dashboard zurueckgeholt werden.",
-          revenueStream: "29-Euro Focus Recovery Setup",
-          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer sichere Tagesfokus-Workflows",
-          userGrowth: "+1 Rueckkehrsignal durch weniger Angst vor Fehlklicks",
+          next: "Eine kurze Kontextnotiz zum Tagesfokus speichern",
+          text: "Die Website speichert eine kurze Tagesfokus-Notiz im Dashboard und uebernimmt sie in den kopierbaren Fokusbrief.",
+          revenueStream: "29-Euro Focus Context Setup",
+          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer bessere Fokusuebergabe",
+          userGrowth: "+1 Team- oder Rueckkehrsignal durch gespeicherten Kontext",
           socialStatus: "Postingtexte im Social-Tool vorbereitet; keine externen Connectoren autorisiert",
-          implementedFunction: "Letzten abgeschlossenen Tagesfokus rueckgaengig machen und wieder als Fokus setzen.",
+          implementedFunction: "Tagesfokus-Notiz speichern, laden und in den Fokusbrief uebernehmen.",
           reinvestment: "40% gute Taten, 25% bessere Fokus- und Workspace-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
         };
         const paymentLabels = {
@@ -4752,6 +4762,7 @@
         let dashboardFirst = localStorage.getItem(dashboardFirstKey) !== "false";
         let dailyFocusItemId = localStorage.getItem(dailyFocusKey) || "";
         let lastCompletedFocus = loadJson(dailyFocusUndoKey, null);
+        let dailyFocusNote = localStorage.getItem(dailyFocusNoteKey) || "";
         if (localStorage.getItem(archiveOpenKey) === "true") localStorage.setItem(archiveOpenKey, "false");
         let quickTask = localStorage.getItem(quickTaskKey) || "auto";
         let currentFilter = ["all", "planned", "active", "done"].includes(localStorage.getItem(boardFilterKey)) ? localStorage.getItem(boardFilterKey) : "all";
@@ -5158,9 +5169,11 @@
           boardFocusLimitEnabled = true;
           boardCompact = true;
           dailyFocusItemId = "";
+          dailyFocusNote = "";
           lastCompletedFocus = null;
           localStorage.setItem(boardFocusLimitKey, String(boardFocusLimitEnabled));
           localStorage.removeItem(dailyFocusKey);
+          localStorage.removeItem(dailyFocusNoteKey);
           localStorage.removeItem(dailyFocusUndoKey);
           dailyDetailsOpen = false;
           localStorage.setItem(compactBoardKey, String(boardCompact));
@@ -5391,6 +5404,10 @@
           dailyFocusItemId = item ? item.id : "";
           if (dailyFocusItemId) localStorage.setItem(dailyFocusKey, dailyFocusItemId);
           else localStorage.removeItem(dailyFocusKey);
+          if (!dailyFocusItemId) {
+            dailyFocusNote = "";
+            localStorage.removeItem(dailyFocusNoteKey);
+          }
           renderDailyFocus();
           renderDashboardCompactness();
         }
@@ -5399,6 +5416,7 @@
           const item = dailyFocusItem();
           const title = qs("#dailyFocusTitle");
           const status = qs("#dailyFocusStatus");
+          const note = qs("#dailyFocusNote");
           const startButton = qs("#startDailyFocusButton");
           const copyButton = qs("#copyDailyFocusButton");
           const completeButton = qs("#completeDailyFocusButton");
@@ -5410,6 +5428,10 @@
             status.textContent = item
               ? `${item.category || "Board"} / ${item.status || "planned"} - ${item.next || "Naechsten Schritt klaeren"}`
               : "Waehle einen Board-Eintrag als Fokus, damit der naechste Besuch direkt klar startet.";
+          }
+          if (note) {
+            note.disabled = !hasFocus;
+            if (note.value !== dailyFocusNote) note.value = dailyFocusNote;
           }
           if (startButton) {
             startButton.disabled = !hasFocus || item.status === "done";
@@ -5446,6 +5468,7 @@
             "",
             `Naechster Schritt: ${item?.next || "Naechsten Schritt klaeren"}`,
             `Warum es wichtig ist: ${item?.text || "Ein konkreter Schritt mit sichtbarem Nutzen."}`,
+            dailyFocusNote ? `Fokus-Notiz: ${dailyFocusNote}` : "",
             "",
             "Heute erledigen:",
             "1. Fokus kurz pruefen",
@@ -5483,7 +5506,9 @@
           lastCompletedFocus = { id: item.id, status: item.status || "planned", title: item.title || "Tagesfokus" };
           items = items.map((entry) => entry.id === item.id ? { ...entry, status: "done" } : entry);
           dailyFocusItemId = "";
+          dailyFocusNote = "";
           localStorage.removeItem(dailyFocusKey);
+          localStorage.removeItem(dailyFocusNoteKey);
           localStorage.setItem(dailyFocusUndoKey, JSON.stringify(lastCompletedFocus));
           resetEmptyCurrentFilter();
           saveItems();
@@ -5500,8 +5525,10 @@
           const restoredStatus = ["planned", "active"].includes(undo.status) ? undo.status : "active";
           items = items.map((entry) => entry.id === undo.id ? { ...entry, status: restoredStatus } : entry);
           dailyFocusItemId = undo.id;
+          dailyFocusNote = "";
           lastCompletedFocus = null;
           localStorage.setItem(dailyFocusKey, dailyFocusItemId);
+          localStorage.removeItem(dailyFocusNoteKey);
           localStorage.removeItem(dailyFocusUndoKey);
           currentFilter = "all";
           currentStatKey = "revenue";
@@ -5509,6 +5536,14 @@
           saveItems();
           renderAll();
           if (status) status.textContent = `${item.title} wurde wieder als Tagesfokus hergestellt.`;
+        }
+
+        function updateDailyFocusNote(value = "") {
+          dailyFocusNote = String(value || "").trim().slice(0, 180);
+          if (dailyFocusNote) localStorage.setItem(dailyFocusNoteKey, dailyFocusNote);
+          else localStorage.removeItem(dailyFocusNoteKey);
+          const status = qs("#dailyFocusStatus");
+          if (status && dailyFocusItem()) status.textContent = dailyFocusNote ? "Fokus-Notiz gespeichert." : "Fokus-Notiz geloescht.";
         }
 
         function addDailyIdeaToBoard() {
@@ -6640,6 +6675,7 @@
         qs("#completeDailyFocusButton")?.addEventListener("click", completeDailyFocus);
         qs("#undoDailyFocusButton")?.addEventListener("click", undoDailyFocusComplete);
         qs("#clearDailyFocusButton")?.addEventListener("click", () => setDailyFocus(""));
+        qs("#dailyFocusNote")?.addEventListener("input", (event) => updateDailyFocusNote(event.target.value));
         qs("#addDailyIdeaButton")?.addEventListener("click", addDailyIdeaToBoard);
         qs("#toggleDailyDetails")?.addEventListener("click", () => setDailyDetailsOpen(!dailyDetailsOpen));
         qs("#exportBoardButton")?.addEventListener("click", exportBoardCsv);
