@@ -5052,24 +5052,17 @@
           setBoardFormCollapsed(true);
           setQuickTask("auto");
           const action = recommendNextAction();
+          setActiveTool("board");
+          setFocusMode(true, true);
+          renderAll();
+          const status = qs("#nextActionStatus");
           if (action?.item) {
-            setFocusMode(true, true);
-            if (action.tool && qs(`#${action.tool}Item`)) {
-              openItemTool(action.item.id, action.tool, false);
-            } else {
-              setActiveTool(action.tool || "board");
-              renderAll();
-            }
-            const status = qs("#nextActionStatus");
             if (status) status.textContent = `Dashboard bereit: ${action.label} fuer "${action.item.title}" ist empfohlen, aber noch nicht gestartet.`;
           } else {
-            setActiveTool("board");
-            setFocusMode(true, true);
             setBoardFormCollapsed(false);
             renderAll();
+            if (status) status.textContent = "Dashboard-Modus gespeichert: Board kompakt, Formular offen, Arbeitsmodus aktiv.";
           }
-          const status = qs("#nextActionStatus");
-          if (status && !action?.item) status.textContent = "Dashboard-Modus gespeichert: Board kompakt, Formular offen, Arbeitsmodus aktiv.";
         }
 
         function resetDashboardMode() {
