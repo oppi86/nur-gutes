@@ -4920,17 +4920,17 @@
             });
             saveItems();
           }
+          const dailyItem = items.find((item) => item.id === dailyProductIdea.id);
           revealSavedBoardItem();
-          setActiveTool("board");
-          setFocusMode(true);
-          setBoardFormCollapsed(true);
           renderAll();
+          if (dailyItem) startAction(recommendActionForItem(dailyItem));
           const status = qs("#dailyIdeaStatus");
           if (status) {
             status.dataset.locked = "true";
-            status.textContent = existing ? "Daily-Idee war schon im Board und ist jetzt sichtbar." : "Daily-Idee wurde als Board-Eintrag gespeichert.";
+            status.textContent = existing
+              ? "Daily-Idee war schon im Board. Das passende Tool ist geoeffnet."
+              : "Daily-Idee wurde gespeichert und direkt als naechste Aktion gestartet.";
           }
-          requestAnimationFrame(() => qs(`[data-id="${dailyProductIdea.id}"]`)?.scrollIntoView({ behavior: "smooth", block: "center" }));
         }
 
         function getVisibleBoardItems() {
