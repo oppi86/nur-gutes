@@ -1181,6 +1181,10 @@
       .tool-router select { width: 100%; border: 1px solid #d9d1c4; border-radius: 8px; background: #fff; color: #20211d; font: inherit; padding: 12px; min-width: 0; }
       .tool-router button { border: 0; border-radius: 8px; background: #17332f; color: white; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 13px 15px; }
       .tool-router p { grid-column: 1 / -1; margin: 0; font-size: 13px; color: #575952; }
+      .tool-access-more { border: 1px solid #e7e1d7; border-radius: 8px; background: #fff; margin-bottom: 14px; overflow: hidden; }
+      .tool-access-more summary { cursor: pointer; color: #17332f; font-size: 13px; font-weight: 900; list-style-position: inside; padding: 12px 14px; }
+      .tool-access-more[open] > summary { border-bottom: 1px solid #e7e1d7; }
+      .tool-access-body { display: grid; gap: 10px; padding: 10px; }
       .tool-router-details { border: 1px solid #e7e1d7; border-radius: 8px; background: #fff; margin-bottom: 14px; }
       .tool-router-details summary { cursor: pointer; color: #17332f; font-size: 13px; font-weight: 900; list-style-position: inside; padding: 12px 14px; }
       .tool-router-details[open] summary { border-bottom: 1px solid #e7e1d7; }
@@ -1438,37 +1442,42 @@
               <button class="top-tool" type="button" data-top-tool="pitch" aria-pressed="false"><strong>Pitch</strong><span>Partner-Ask erzeugen</span></button>
               <button class="top-tool" type="button" data-top-tool="proof" aria-pressed="false"><strong>Proof</strong><span>Wirkungsbeleg bauen</span></button>
             </div>
-            <details class="tool-router-details">
-              <summary>Weitere Aufgabe starten</summary>
-              <div class="tool-router">
-                <label>Was willst du jetzt tun?
-                  <select id="toolRouter">
-                    <option value="auto">Empfohlene naechste Aktion</option>
-                    <option value="board">Gute Tat oder Idee erfassen</option>
-                    <option value="payments">Payment Links verbinden</option>
-                    <option value="pitch">Pitch und Landing-Text bauen</option>
-                    <option value="trust">Vertrauensargumente klaeren</option>
-                    <option value="proof">Proof-Update erstellen</option>
-                    <option value="monthly">Monatsbeitrag planen</option>
-                    <option value="second">Zweite Gabe timen</option>
-                    <option value="share">Social-Post vorbereiten</option>
-                  </select>
-                </label>
-                <button type="button" id="toolRouterStart">Starten</button>
-                <p id="toolRouterHint">Waehle eine Aufgabe; der passende Workspace oeffnet sich direkt.</p>
-              </div>
-            </details>
-            <details class="tool-tabs">
-              <summary>Direktzugriff auf alle Tools</summary>
-              <div class="app-tabs" role="tablist" aria-label="Impact Workspace">
-                <button class="app-tab" type="button" aria-selected="true" data-app-tab="board">Board</button>
-                <button class="app-tab" type="button" aria-selected="false" data-app-tab="payments">Stripe</button>
-                <button class="app-tab" type="button" aria-selected="false" data-app-tab="pitch">Pitch</button>
-                <button class="app-tab" type="button" aria-selected="false" data-app-tab="trust">Trust</button>
-                <button class="app-tab" type="button" aria-selected="false" data-app-tab="proof">Proof</button>
-                <button class="app-tab" type="button" aria-selected="false" data-app-tab="monthly">Monthly</button>
-                <button class="app-tab" type="button" aria-selected="false" data-app-tab="second">Second</button>
-                <button class="app-tab" type="button" aria-selected="false" data-app-tab="share">Social</button>
+            <details class="tool-access-more" id="toolAccessMore">
+              <summary>Weitere Tools</summary>
+              <div class="tool-access-body">
+                <details class="tool-router-details">
+                  <summary>Weitere Aufgabe starten</summary>
+                  <div class="tool-router">
+                    <label>Was willst du jetzt tun?
+                      <select id="toolRouter">
+                        <option value="auto">Empfohlene naechste Aktion</option>
+                        <option value="board">Gute Tat oder Idee erfassen</option>
+                        <option value="payments">Payment Links verbinden</option>
+                        <option value="pitch">Pitch und Landing-Text bauen</option>
+                        <option value="trust">Vertrauensargumente klaeren</option>
+                        <option value="proof">Proof-Update erstellen</option>
+                        <option value="monthly">Monatsbeitrag planen</option>
+                        <option value="second">Zweite Gabe timen</option>
+                        <option value="share">Social-Post vorbereiten</option>
+                      </select>
+                    </label>
+                    <button type="button" id="toolRouterStart">Starten</button>
+                    <p id="toolRouterHint">Waehle eine Aufgabe; der passende Workspace oeffnet sich direkt.</p>
+                  </div>
+                </details>
+                <details class="tool-tabs">
+                  <summary>Direktzugriff auf alle Tools</summary>
+                  <div class="app-tabs" role="tablist" aria-label="Impact Workspace">
+                    <button class="app-tab" type="button" aria-selected="true" data-app-tab="board">Board</button>
+                    <button class="app-tab" type="button" aria-selected="false" data-app-tab="payments">Stripe</button>
+                    <button class="app-tab" type="button" aria-selected="false" data-app-tab="pitch">Pitch</button>
+                    <button class="app-tab" type="button" aria-selected="false" data-app-tab="trust">Trust</button>
+                    <button class="app-tab" type="button" aria-selected="false" data-app-tab="proof">Proof</button>
+                    <button class="app-tab" type="button" aria-selected="false" data-app-tab="monthly">Monthly</button>
+                    <button class="app-tab" type="button" aria-selected="false" data-app-tab="second">Second</button>
+                    <button class="app-tab" type="button" aria-selected="false" data-app-tab="share">Social</button>
+                  </div>
+                </details>
               </div>
             </details>
 
@@ -4739,6 +4748,7 @@
         const boardPresetMoreKey = "nurGutesBoardPresetMoreOpen";
         const boardOutputMoreKey = "nurGutesBoardOutputMoreOpen";
         const dashboardActionsMoreKey = "nurGutesDashboardActionsMoreOpen";
+        const toolAccessMoreKey = "nurGutesToolAccessMoreOpen";
         const toolDetailsKey = "nurGutesToolDetails";
         const lastCopyKey = "nurGutesLastCopy";
         const lastExportKey = "nurGutesLastExport";
@@ -4772,18 +4782,18 @@
           }
         ];
         const dailyProductIdea = {
-          id: "daily-2026-07-03-board-maintenance-drawer",
+          id: "daily-2026-07-03-tool-access-drawer",
           date: "3. Juli 2026",
-          title: "Board Maintenance Drawer",
+          title: "Tool Access Drawer",
           category: "Business Idee",
           amount: 29,
-          next: "Board-Pflegeaktionen aus der Filterleiste in ein gespeichertes Menue verlegen",
-          text: "Die Website haelt Statusfilter, Kompaktmodus und Fokusliste direkt sichtbar, legt aber Fertige entfernen und Wiederherstellen in ein gespeichertes Board-Pflege-Menue.",
-          revenueStream: "29-Euro Board Cleanup Setup",
-          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer sauberere Board-Pflege",
-          userGrowth: "+1 Arbeitsfluss-Signal durch weniger Filterleisten-Komplexitaet",
+          next: "Zusatz-Toolzugang in ein gespeichertes Menue buendeln",
+          text: "Die Website zeigt nur die drei wichtigsten Tools direkt und legt Router sowie kompletten Tool-Direktzugriff in ein gespeichertes Weitere-Tools-Menue.",
+          revenueStream: "29-Euro Tool Navigation Setup",
+          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer klarere Tool-Navigation",
+          userGrowth: "+1 Tool-Startsignal durch weniger Navigations-Komplexitaet",
           socialStatus: "Postingtexte im Social-Tool vorbereitet; keine externen Connectoren autorisiert",
-          implementedFunction: "Board-Pflege-Menue einklappen, oeffnen, speichern und nach Reload wiederherstellen.",
+          implementedFunction: "Weitere-Tools-Menue einklappen, oeffnen, speichern und nach Reload wiederherstellen.",
           reinvestment: "40% gute Taten, 25% bessere Fokus- und Workspace-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
         };
         const paymentLabels = {
@@ -4843,6 +4853,7 @@
         let boardPresetMoreOpen = localStorage.getItem(boardPresetMoreKey) === "true";
         let boardOutputMoreOpen = localStorage.getItem(boardOutputMoreKey) === "true";
         let dashboardActionsMoreOpen = localStorage.getItem(dashboardActionsMoreKey) === "true";
+        let toolAccessMoreOpen = localStorage.getItem(toolAccessMoreKey) === "true";
         let savedBoardPreset = loadJson(boardPresetKey, null);
         let savedToolDetails = loadJson(toolDetailsKey, {});
         let savedPitchChannel = localStorage.getItem(pitchChannelKey) || "daily-growth";
@@ -5012,6 +5023,7 @@
           const hasOpenChrome = document.body.classList.contains("show-legacy")
             || document.body.classList.contains("show-resources")
             || dailyDetailsOpen
+            || toolAccessMoreOpen
             || Boolean(savedToolDetails.router)
             || Boolean(savedToolDetails.tabs);
           const hasBoardDrift = activeTool !== "board"
@@ -5211,8 +5223,11 @@
           currentBoardSort = "manual";
           boardFocusLimitEnabled = true;
           boardCompact = true;
+          toolAccessMoreOpen = false;
           localStorage.setItem(boardFocusLimitKey, String(boardFocusLimitEnabled));
           localStorage.setItem(compactBoardKey, String(boardCompact));
+          localStorage.setItem(toolAccessMoreKey, String(toolAccessMoreOpen));
+          qs("#toolAccessMore")?.removeAttribute("open");
           collapseWorkspaceChrome();
           saveBoardView();
           const boardSearch = qs("#boardSearch");
@@ -5242,14 +5257,17 @@
           boardCompact = true;
           dailyFocusItemId = "";
           dailyFocusNote = "";
+          toolAccessMoreOpen = false;
           lastCompletedFocus = null;
           localStorage.setItem(boardFocusLimitKey, String(boardFocusLimitEnabled));
+          localStorage.setItem(toolAccessMoreKey, String(toolAccessMoreOpen));
           localStorage.removeItem(dailyFocusKey);
           localStorage.removeItem(dailyFocusNoteKey);
           localStorage.removeItem(dailyFocusUndoKey);
           dailyDetailsOpen = false;
           localStorage.setItem(compactBoardKey, String(boardCompact));
           localStorage.setItem(dailyDetailsKey, String(dailyDetailsOpen));
+          qs("#toolAccessMore")?.removeAttribute("open");
           collapseWorkspaceChrome();
           saveBoardView();
           setEditMode("");
@@ -5650,6 +5668,12 @@
         function setDashboardActionsMoreOpen(open) {
           dashboardActionsMoreOpen = Boolean(open);
           localStorage.setItem(dashboardActionsMoreKey, String(dashboardActionsMoreOpen));
+        }
+
+        function setToolAccessMoreOpen(open) {
+          toolAccessMoreOpen = Boolean(open);
+          localStorage.setItem(toolAccessMoreKey, String(toolAccessMoreOpen));
+          renderDashboardCompactness();
         }
 
         function addDailyIdeaToBoard() {
@@ -6806,6 +6830,8 @@
           router: ".tool-router-details",
           tabs: ".tool-tabs"
         };
+        const toolAccessMore = qs("#toolAccessMore");
+        if (toolAccessMore) toolAccessMore.open = toolAccessMoreOpen;
         Object.entries(toolDetailSelectors).forEach(([key, selector]) => {
           const detail = qs(selector);
           if (detail && savedToolDetails[key] === true) detail.open = true;
@@ -6855,6 +6881,7 @@
             activateToolShortcut(tab.dataset.appTab);
           });
         });
+        qs("#toolAccessMore")?.addEventListener("toggle", (event) => setToolAccessMoreOpen(event.target.open));
         Object.entries(toolDetailSelectors).forEach(([key, selector]) => {
           const detail = qs(selector);
           if (!detail) return;
