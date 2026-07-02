@@ -4969,8 +4969,9 @@
           const { visibleItems } = getVisibleBoardItems();
           const item = visibleItems.find((entry) => entry.status !== "done");
           if (!item) {
-            const count = qs("#boardCount");
-            if (count) count.textContent = "Kein startbarer Treffer sichtbar.";
+            resetBoardView();
+            const status = qs("#nextActionStatus");
+            if (status) status.textContent = "Kein startbarer Treffer sichtbar. Board-Ansicht wurde zurueckgesetzt.";
             return;
           }
           startBoardItem(item.id);
