@@ -5257,10 +5257,12 @@
             if (form.elements[key]) form.elements[key].value = stripeLinks[key] || "";
           });
           qs("#payGrid").innerHTML = Object.entries(paymentLabels).map(([key, label]) => {
-            const href = stripeLinks[key];
-            const className = href ? "app-pay" : "app-pay missing";
+            const savedLink = stripeLinks[key] || "";
+            const isReadyLink = /^https?:\/\//i.test(savedLink);
+            const href = isReadyLink ? savedLink : "";
+            const className = isReadyLink ? "app-pay" : "app-pay missing";
             const target = href || "#payments";
-            const text = href ? label : `${label} fehlt`;
+            const text = href ? label : savedLink ? `${label} pruefen` : `${label} fehlt`;
             return `<a class="${className}" href="${escapeHtml(target)}" ${href ? 'target="_blank" rel="noopener"' : ""} data-pay-link="${key}">${escapeHtml(text)}</a>`;
           }).join("");
         }
