@@ -111,7 +111,10 @@
       .archive-panel { border: 1px solid #e7e1d7; box-shadow: none; padding: 24px; }
       .archive-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
       .archive-search { display: grid; gap: 8px; margin: 12px 0 14px; }
+      .archive-search-controls { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 8px; }
       .archive-search input { width: 100%; border: 1px solid #d9d1c4; border-radius: 8px; background: #fff; color: #20211d; font: inherit; padding: 12px; min-width: 0; }
+      .archive-search button { border: 1px solid #d9d1c4; border-radius: 8px; background: #f7f4ef; color: #20211d; cursor: pointer; font: inherit; font-size: 13px; font-weight: 900; padding: 0 13px; }
+      .archive-search button:disabled { cursor: not-allowed; opacity: .5; }
       .archive-list { display: grid; gap: 10px; max-height: 420px; overflow: auto; padding-right: 4px; }
       .archive-item { border: 1px solid #e7e1d7; border-radius: 8px; background: #f7f4ef; padding: 12px; }
       .archive-item a { color: #17332f; font-weight: 900; text-decoration: none; }
@@ -1651,7 +1654,10 @@
           <article class="archive-panel">
             <p class="tag">Komprimierte Historie</p>
             <label class="archive-search">Archiv durchsuchen
-              <input id="archiveSearch" type="search" placeholder="z.B. Monthly, Trust, Volunteer" autocomplete="off" />
+              <span class="archive-search-controls">
+                <input id="archiveSearch" type="search" placeholder="z.B. Monthly, Trust, Volunteer" autocomplete="off" />
+                <button type="button" id="clearArchiveSearch" disabled>Loeschen</button>
+              </span>
             </label>
             <p class="muted" id="archiveCount">Archiv wird geladen.</p>
             <div class="archive-list" id="archiveList"></div>
@@ -5291,10 +5297,11 @@
           const archiveList = qs("#archiveList");
           const archiveSearch = qs("#archiveSearch");
           const archiveCount = qs("#archiveCount");
+          const clearArchiveSearch = qs("#clearArchiveSearch");
           const toggle = qs("#toggleArchive");
           const growthLoop = qs(".growth-loop");
           const commons = qs("#taten");
-          if (!archiveList || !archiveSearch || !archiveCount || !toggle || !growthLoop || !commons) return;
+          if (!archiveList || !archiveSearch || !archiveCount || !clearArchiveSearch || !toggle || !growthLoop || !commons) return;
           const legacyItems = qsa("main > section").filter((section) => {
             const afterGrowth = Boolean(growthLoop.compareDocumentPosition(section) & Node.DOCUMENT_POSITION_FOLLOWING);
             const beforeCommons = Boolean(section.compareDocumentPosition(commons) & Node.DOCUMENT_POSITION_FOLLOWING);
@@ -5322,6 +5329,7 @@
             const query = archiveSearch.value.trim().toLowerCase();
             const matches = query ? legacyItems.filter((item) => item.searchText.includes(query)) : legacyItems;
             archiveCount.textContent = query ? `${matches.length} Treffer fuer "${archiveSearch.value.trim()}"` : `${legacyItems.length} archivierte Iterationen`;
+            clearArchiveSearch.disabled = query.length === 0;
             archiveList.innerHTML = matches.length ? matches.map((item) => (
               `<article class="archive-item"><a href="#${escapeHtml(item.id)}" data-archive-target="${escapeHtml(item.id)}">${escapeHtml(item.title)}</a><p class="muted">${escapeHtml(item.label)}</p></article>`
             )).join("") : `<article class="archive-empty"><p class="muted">Keine Archivtreffer. Suche kuerzer formulieren oder Archiv anzeigen.</p></article>`;
@@ -5330,6 +5338,13 @@
             savedArchiveSearch = archiveSearch.value;
             localStorage.setItem(archiveSearchKey, savedArchiveSearch);
             renderArchive();
+          });
+          clearArchiveSearch.addEventListener("click", () => {
+            savedArchiveSearch = "";
+            archiveSearch.value = "";
+            localStorage.removeItem(archiveSearchKey);
+            renderArchive();
+            archiveSearch.focus();
           });
           archiveList.addEventListener("click", (event) => {
             const link = event.target.closest("[data-archive-target]");
