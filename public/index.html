@@ -4587,6 +4587,7 @@
         const removedItemsKey = "nurGutesRemovedDone";
         const quickTaskKey = "nurGutesQuickTask";
         const boardFilterKey = "nurGutesBoardFilter";
+        const boardStatKey = "nurGutesBoardStat";
         const boardSearchKey = "nurGutesBoardSearch";
         const toolDetailsKey = "nurGutesToolDetails";
         const lastCopyKey = "nurGutesLastCopy";
@@ -4670,7 +4671,10 @@
         if (localStorage.getItem(archiveOpenKey) === "true") localStorage.setItem(archiveOpenKey, "false");
         let quickTask = localStorage.getItem(quickTaskKey) || "auto";
         let currentFilter = ["all", "planned", "active", "done"].includes(localStorage.getItem(boardFilterKey)) ? localStorage.getItem(boardFilterKey) : "all";
-        let currentStatKey = currentFilter === "active" ? "active" : currentFilter === "done" ? "done" : "revenue";
+        const savedBoardStat = localStorage.getItem(boardStatKey);
+        let currentStatKey = ["active", "revenue", "impact", "done"].includes(savedBoardStat)
+          ? savedBoardStat
+          : currentFilter === "active" ? "active" : currentFilter === "done" ? "done" : "revenue";
         let currentBoardSearch = localStorage.getItem(boardSearchKey) || "";
         let savedToolDetails = loadJson(toolDetailsKey, {});
         let savedPitchChannel = localStorage.getItem(pitchChannelKey) || "daily-growth";
@@ -4690,6 +4694,7 @@
         const saveRemovedItems = () => localStorage.setItem(removedItemsKey, JSON.stringify(lastRemovedItems));
         const saveBoardView = () => {
           localStorage.setItem(boardFilterKey, currentFilter);
+          localStorage.setItem(boardStatKey, currentStatKey);
           if (currentBoardSearch.trim()) localStorage.setItem(boardSearchKey, currentBoardSearch);
           else localStorage.removeItem(boardSearchKey);
         };
