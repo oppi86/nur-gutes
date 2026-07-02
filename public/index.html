@@ -4886,9 +4886,13 @@
         }
 
         function recommendNextAction() {
-          const { outputItems, hiddenFocusCount } = getBoardOutputItems();
+          const { visibleItems, outputItems, hiddenFocusCount } = getBoardOutputItems();
           const boardViewIsScoped = currentFilter !== "all" || currentBoardSearch.trim().length > 0 || boardFocusLimitEnabled;
           const scopedItem = outputItems.find((entry) => entry.status !== "done");
+          const hiddenStartableItem = hiddenFocusCount ? visibleItems.slice(outputItems.length).find((entry) => entry.status !== "done") : null;
+          if (boardFocusLimitEnabled && !scopedItem && hiddenStartableItem) {
+            return { scoped: true, empty: true, revealFocus: true, item: hiddenStartableItem };
+          }
           if (boardViewIsScoped && !scopedItem) return { scoped: true, empty: true };
           const fallbackItem = items.find((entry) => entry.status !== "done") || items[0];
           const action = recommendActionForItem(scopedItem || fallbackItem);
@@ -4908,8 +4912,10 @@
           }
           if (action.empty) {
             button.disabled = false;
-            button.textContent = "Ansicht zuruecksetzen";
-            status.textContent = "Aktuelle Board-Suche oder Filter zeigt keinen startbaren Eintrag.";
+            button.textContent = action.revealFocus ? "Alle anzeigen" : "Ansicht zuruecksetzen";
+            status.textContent = action.revealFocus
+              ? `${action.item.title} ist startbar, liegt aber ausserhalb der Fokusliste.`
+              : "Aktuelle Board-Suche oder Filter zeigt keinen startbaren Eintrag.";
             syncAutoRouterHint(action);
             return;
           }
@@ -4922,6 +4928,15 @@
         function startRecommendedAction() {
           const action = recommendNextAction();
           if (action?.empty) {
+            if (action.revealFocus) {
+              boardFocusLimitEnabled = false;
+              localStorage.setItem(boardFocusLimitKey, String(boardFocusLimitEnabled));
+              renderBoard();
+              renderNextAction();
+              const status = qs("#nextActionStatus");
+              if (status) status.textContent = "Alle passenden Eintraege sichtbar. Die naechste Aktion ist jetzt startbar.";
+              return;
+            }
             resetBoardView();
             const status = qs("#nextActionStatus");
             if (status) status.textContent = "Board-Ansicht zurueckgesetzt. Die naechste Aktion ist wieder startbar.";
@@ -5032,9 +5047,19 @@
         }
 
         function startFirstVisibleBoardItem() {
-          const { outputItems } = getBoardOutputItems();
+          const { visibleItems, outputItems, hiddenFocusCount } = getBoardOutputItems();
           const item = outputItems.find((entry) => entry.status !== "done");
           if (!item) {
+            const hiddenStartableItem = hiddenFocusCount ? visibleItems.slice(outputItems.length).find((entry) => entry.status !== "done") : null;
+            if (hiddenStartableItem) {
+              boardFocusLimitEnabled = false;
+              localStorage.setItem(boardFocusLimitKey, String(boardFocusLimitEnabled));
+              renderBoard();
+              renderNextAction();
+              const status = qs("#nextActionStatus");
+              if (status) status.textContent = "Alle passenden Eintraege sichtbar. Enter kann den naechsten Eintrag starten.";
+              return;
+            }
             resetBoardView();
             const status = qs("#nextActionStatus");
             if (status) status.textContent = "Kein startbarer Eintrag im aktuellen Fokus. Board-Ansicht wurde zurueckgesetzt.";
