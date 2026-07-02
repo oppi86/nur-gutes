@@ -5637,7 +5637,9 @@
           if (quickTask !== "auto") return;
           const hint = qs("#toolRouterHint");
           if (!hint) return;
-          hint.textContent = action?.item
+          hint.textContent = action?.empty
+            ? "Keine startbare Aktion in der aktuellen Ansicht. Mit Starten setzt du Suche und Filter zurueck."
+            : action?.item
             ? `Empfohlen: ${action.label} fuer "${action.item.title}". Mit Starten oeffnest du den passenden Workspace.`
             : `${toolHints.auto} Mit Starten oeffnest du den passenden Workspace.`;
         }
@@ -5655,8 +5657,26 @@
           setQuickTask(qs("#toolRouter")?.value || quickTask);
           setFocusMode(true);
           const action = recommendNextAction();
+          let startedAction = null;
           if (quickTask === "auto") {
-            if (action?.item) startAction(action);
+            if (action?.item) {
+              startedAction = action;
+              startAction(action);
+            }
+            else if (action?.empty) {
+              revealSavedBoardItem();
+              const fallbackAction = recommendNextAction();
+              if (fallbackAction?.item) {
+                startedAction = fallbackAction;
+                startAction(fallbackAction);
+              }
+              else {
+                setActiveTool("board");
+                setBoardFormCollapsed(false);
+                renderAll();
+                requestAnimationFrame(() => qs("#impactTitle")?.focus());
+              }
+            }
             else {
               setActiveTool("board");
               setBoardFormCollapsed(false);
@@ -5676,8 +5696,8 @@
             requestAnimationFrame(() => qs(`[data-app-panel="${quickTask}"]`)?.scrollIntoView({ behavior: "smooth", block: "start" }));
           }
           const hint = qs("#toolRouterHint");
-          if (hint) hint.textContent = quickTask === "auto" && action?.item
-            ? `Empfohlen gestartet: ${action.label} fuer "${action.item.title}".`
+          if (hint) hint.textContent = quickTask === "auto" && startedAction?.item
+            ? `Empfohlen gestartet: ${startedAction.label} fuer "${startedAction.item.title}".`
             : `${toolHints[quickTask] || toolHints.auto} Schnellstart gespeichert.`;
         }
         function setActiveTool(name, shouldPersist = true) {
