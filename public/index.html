@@ -4822,18 +4822,18 @@
           }
         ];
         const dailyProductIdea = {
-          id: "daily-2026-07-03-smart-maintenance",
+          id: "daily-2026-07-03-smart-focus-toggle",
           date: "3. Juli 2026",
-          title: "Smart Board Pflege",
+          title: "Smart Fokusliste",
           category: "Business Idee",
           amount: 29,
-          next: "Board-Pflege nur anzeigen, wenn fertige oder entfernte Eintraege existieren",
-          text: "Die Board-Pflege bleibt im normalen Board verborgen und erscheint erst, wenn es fertige Eintraege zum Entfernen oder entfernte Eintraege zum Wiederherstellen gibt.",
-          revenueStream: "29-Euro Board Hygiene Setup",
-          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer sauberere Board-Pflege",
-          userGrowth: "+1 Klarheits-Signal durch weniger leere Wartungsbedienelemente",
+          next: "Fokuslisten-Schalter nur anzeigen, wenn es mehr Treffer als Fokusplaetze gibt",
+          text: "Der Fokuslisten-Schalter bleibt im kleinen Standard-Board verborgen und erscheint erst, wenn mehr passende Eintraege als Fokusplaetze vorhanden sind oder die Vollansicht aktiv ist.",
+          revenueStream: "29-Euro Board Focus Setup",
+          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer klarere Board-Fokusansichten",
+          userGrowth: "+1 Klarheits-Signal durch weniger deaktivierte Board-Schalter",
           socialStatus: "Postingtexte im Social-Tool vorbereitet; keine externen Connectoren autorisiert",
-          implementedFunction: "Board-Zustand auswerten, Pflege-Drawer zustandsbasiert einblenden, fertige Eintraege entfernen und entfernte Eintraege wiederherstellen.",
+          implementedFunction: "Sichtbare Board-Treffer zaehlen, Fokuslisten-Schalter zustandsbasiert einblenden und die bestehende Vollansicht/Fokusansicht weiter toggeln.",
           reinvestment: "40% gute Taten, 25% bessere Fokus- und Workspace-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
         };
         const paymentLabels = {
@@ -6032,10 +6032,12 @@
           }
           const focusListButton = qs("#focusListButton");
           if (focusListButton) {
+            const canToggleFocusList = visibleItems.length > boardFocusLimit || !boardFocusLimitEnabled;
+            focusListButton.hidden = !canToggleFocusList;
             focusListButton.classList.toggle("active", boardFocusLimitEnabled);
             focusListButton.setAttribute("aria-pressed", String(boardFocusLimitEnabled));
             focusListButton.textContent = boardFocusLimitEnabled ? `Alle anzeigen (${visibleItems.length})` : `Fokusliste (${Math.min(boardFocusLimit, visibleItems.length)})`;
-            focusListButton.disabled = visibleItems.length <= boardFocusLimit && boardFocusLimitEnabled;
+            focusListButton.disabled = !canToggleFocusList;
             focusListButton.title = boardFocusLimitEnabled
               ? `Alle ${visibleItems.length} passenden Board-Eintraege anzeigen`
               : `Nur die ersten ${Math.min(boardFocusLimit, visibleItems.length)} passenden Board-Eintraege anzeigen`;
