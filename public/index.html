@@ -4822,18 +4822,18 @@
           }
         ];
         const dailyProductIdea = {
-          id: "daily-2026-07-03-smart-focus-toggle",
-          date: "3. Juli 2026",
-          title: "Smart Fokusliste",
+          id: "daily-2026-07-04-smart-output",
+          date: "4. Juli 2026",
+          title: "Smart Board Ausgabe",
           category: "Business Idee",
           amount: 29,
-          next: "Fokuslisten-Schalter nur anzeigen, wenn es mehr Treffer als Fokusplaetze gibt",
-          text: "Der Fokuslisten-Schalter bleibt im kleinen Standard-Board verborgen und erscheint erst, wenn mehr passende Eintraege als Fokusplaetze vorhanden sind oder die Vollansicht aktiv ist.",
-          revenueStream: "29-Euro Board Focus Setup",
-          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer klarere Board-Fokusansichten",
-          userGrowth: "+1 Klarheits-Signal durch weniger deaktivierte Board-Schalter",
+          next: "Board-Ausgabe nur zeigen, wenn Export oder Report gerade relevant ist",
+          text: "Der Board-Ausgabe-Block bleibt im Standard-Board verborgen und erscheint erst bei angepasster Ansicht, geoeffnetem Ausgabe-Menue oder vorhandener Export-/Copy-Aktivitaet.",
+          revenueStream: "29-Euro Board Output Setup",
+          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer klarere Reporting-Flows",
+          userGrowth: "+1 Klarheits-Signal durch weniger Standard-Ausgabeflaeche im Board",
           socialStatus: "Postingtexte im Social-Tool vorbereitet; keine externen Connectoren autorisiert",
-          implementedFunction: "Sichtbare Board-Treffer zaehlen, Fokuslisten-Schalter zustandsbasiert einblenden und die bestehende Vollansicht/Fokusansicht weiter toggeln.",
+          implementedFunction: "Board-Ansicht, Export-/Copy-Aktivitaet und Ausgabe-Drawer auswerten, Ausgabe-Block zustandsbasiert einblenden und CSV/Report-Funktionen weiter ausloesen.",
           reinvestment: "40% gute Taten, 25% bessere Fokus- und Workspace-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
         };
         const paymentLabels = {
@@ -6066,7 +6066,11 @@
           const exportBoardButton = qs("#exportBoardButton");
           const copyBoardReportButton = qs("#copyBoardReportButton");
           const boardOutputMore = qs("#boardOutputMore");
+          const boardOutput = qs(".app-panel.active .app-export");
           const outputCount = boardFocusLimitEnabled ? displayedItems.length : visibleItems.length;
+          const hasOutputActivity = Boolean(loadJson(lastExportKey, null)?.label || loadJson(lastCopyKey, null)?.label);
+          const shouldShowBoardOutput = !boardViewMatchesDefault() || boardOutputMoreOpen || hasOutputActivity;
+          if (boardOutput) boardOutput.hidden = !shouldShowBoardOutput;
           if (boardOutputMore && boardOutputMore.open !== boardOutputMoreOpen) boardOutputMore.open = boardOutputMoreOpen;
           [exportBoardButton, copyBoardReportButton].filter(Boolean).forEach((button) => {
             button.disabled = outputCount === 0;
