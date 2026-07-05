@@ -4822,18 +4822,18 @@
           }
         ];
         const dailyProductIdea = {
-          id: "daily-2026-07-04-smart-output",
-          date: "4. Juli 2026",
-          title: "Smart Board Ausgabe",
+          id: "daily-2026-07-05-smart-sort",
+          date: "5. Juli 2026",
+          title: "Smart Board Sortierung",
           category: "Business Idee",
           amount: 29,
-          next: "Board-Ausgabe nur zeigen, wenn Export oder Report gerade relevant ist",
-          text: "Der Board-Ausgabe-Block bleibt im Standard-Board verborgen und erscheint erst bei angepasster Ansicht, geoeffnetem Ausgabe-Menue oder vorhandener Export-/Copy-Aktivitaet.",
-          revenueStream: "29-Euro Board Output Setup",
-          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer klarere Reporting-Flows",
-          userGrowth: "+1 Klarheits-Signal durch weniger Standard-Ausgabeflaeche im Board",
+          next: "Board-Sortierung nur anzeigen, wenn genug Eintraege oder aktive Sortierung vorhanden sind",
+          text: "Die Sortiersteuerung bleibt im kleinen Standard-Board verborgen und erscheint erst bei mehreren Eintraegen oder wenn eine gespeicherte Sortierung aktiv ist.",
+          revenueStream: "29-Euro Board Sort Setup",
+          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer klarere Board-Priorisierung",
+          userGrowth: "+1 Klarheits-Signal durch weniger Standard-Kontrollen im Board",
           socialStatus: "Postingtexte im Social-Tool vorbereitet; keine externen Connectoren autorisiert",
-          implementedFunction: "Board-Ansicht, Export-/Copy-Aktivitaet und Ausgabe-Drawer auswerten, Ausgabe-Block zustandsbasiert einblenden und CSV/Report-Funktionen weiter ausloesen.",
+          implementedFunction: "Board-Eintraege und gespeicherte Sortierung auswerten, Sortierfeld zustandsbasiert einblenden und bestehende Sortierlogik weiter ausloesen.",
           reinvestment: "40% gute Taten, 25% bessere Fokus- und Workspace-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
         };
         const paymentLabels = {
@@ -6095,7 +6095,12 @@
           const search = qs("#boardSearch");
           if (search && search.value !== currentBoardSearch) search.value = currentBoardSearch;
           const sort = qs("#boardSort");
-          if (sort && sort.value !== currentBoardSort) sort.value = currentBoardSort;
+          if (sort) {
+            const sortControl = sort.closest(".board-sort");
+            const shouldShowSort = visibleItems.length > 2 || currentBoardSort !== "manual";
+            if (sortControl) sortControl.hidden = !shouldShowSort;
+            if (sort.value !== currentBoardSort) sort.value = currentBoardSort;
+          }
           const doneCount = items.filter((item) => item.status === "done").length;
           const boardMaintenanceMore = qs("#boardMaintenanceMore");
           const shouldShowMaintenance = doneCount > 0 || lastRemovedItems.length > 0;
