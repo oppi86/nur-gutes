@@ -4822,18 +4822,18 @@
           }
         ];
         const dailyProductIdea = {
-          id: "daily-2026-07-05-smart-sort",
-          date: "5. Juli 2026",
-          title: "Smart Board Sortierung",
+          id: "daily-2026-07-06-smart-search",
+          date: "6. Juli 2026",
+          title: "Smart Board Suche",
           category: "Business Idee",
           amount: 29,
-          next: "Board-Sortierung nur anzeigen, wenn genug Eintraege oder aktive Sortierung vorhanden sind",
-          text: "Die Sortiersteuerung bleibt im kleinen Standard-Board verborgen und erscheint erst bei mehreren Eintraegen oder wenn eine gespeicherte Sortierung aktiv ist.",
-          revenueStream: "29-Euro Board Sort Setup",
-          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer klarere Board-Priorisierung",
-          userGrowth: "+1 Klarheits-Signal durch weniger Standard-Kontrollen im Board",
+          next: "Board-Suche nur anzeigen, wenn sie bei Board-Groesse oder aktiver Suche hilfreich ist",
+          text: "Die Board-Suche bleibt im kleinen Standard-Board verborgen und erscheint erst bei mehr Eintraegen oder wenn eine gespeicherte Suche aktiv ist.",
+          revenueStream: "29-Euro Board Search Setup",
+          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer klarere Board-Findbarkeit",
+          userGrowth: "+1 Klarheits-Signal durch weniger Standard-Suchflaeche im kleinen Board",
           socialStatus: "Postingtexte im Social-Tool vorbereitet; keine externen Connectoren autorisiert",
-          implementedFunction: "Board-Eintraege und gespeicherte Sortierung auswerten, Sortierfeld zustandsbasiert einblenden und bestehende Sortierlogik weiter ausloesen.",
+          implementedFunction: "Board-Groesse und gespeicherte Suche auswerten, Suchfeld zustandsbasiert einblenden und bestehende Filterlogik weiter ausloesen.",
           reinvestment: "40% gute Taten, 25% bessere Fokus- und Workspace-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
         };
         const paymentLabels = {
@@ -6093,7 +6093,12 @@
             clearBoardSearch.setAttribute("aria-label", clearBoardSearch.title);
           }
           const search = qs("#boardSearch");
-          if (search && search.value !== currentBoardSearch) search.value = currentBoardSearch;
+          if (search) {
+            const searchControl = search.closest(".board-search");
+            const shouldShowSearch = items.length > 3 || currentBoardSearch.trim().length > 0;
+            if (searchControl) searchControl.hidden = !shouldShowSearch;
+            if (search.value !== currentBoardSearch) search.value = currentBoardSearch;
+          }
           const sort = qs("#boardSort");
           if (sort) {
             const sortControl = sort.closest(".board-sort");
