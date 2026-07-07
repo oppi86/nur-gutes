@@ -4822,18 +4822,18 @@
           }
         ];
         const dailyProductIdea = {
-          id: "daily-2026-07-06-smart-search",
-          date: "6. Juli 2026",
-          title: "Smart Board Suche",
+          id: "daily-2026-07-07-smart-compact",
+          date: "7. Juli 2026",
+          title: "Smart Board Ansicht",
           category: "Business Idee",
           amount: 29,
-          next: "Board-Suche nur anzeigen, wenn sie bei Board-Groesse oder aktiver Suche hilfreich ist",
-          text: "Die Board-Suche bleibt im kleinen Standard-Board verborgen und erscheint erst bei mehr Eintraegen oder wenn eine gespeicherte Suche aktiv ist.",
-          revenueStream: "29-Euro Board Search Setup",
-          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer klarere Board-Findbarkeit",
-          userGrowth: "+1 Klarheits-Signal durch weniger Standard-Suchflaeche im kleinen Board",
+          next: "Board-Ansichtsschalter nur anzeigen, wenn Normalansicht oder groesseres Board relevant ist",
+          text: "Der Kompakt/Normal-Schalter bleibt im kleinen Standard-Board verborgen und erscheint erst bei groesseren Boards oder wenn die Normalansicht aktiv ist.",
+          revenueStream: "29-Euro Board View Setup",
+          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer ruhigere Board-Arbeitsansichten",
+          userGrowth: "+1 Klarheits-Signal durch weniger Standard-Ansichtsschalter",
           socialStatus: "Postingtexte im Social-Tool vorbereitet; keine externen Connectoren autorisiert",
-          implementedFunction: "Board-Groesse und gespeicherte Suche auswerten, Suchfeld zustandsbasiert einblenden und bestehende Filterlogik weiter ausloesen.",
+          implementedFunction: "Board-Groesse und Ansichtsmodus auswerten, Ansichtsschalter zustandsbasiert einblenden und bestehende Kompakt/Normal-Logik weiter toggeln.",
           reinvestment: "40% gute Taten, 25% bessere Fokus- und Workspace-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
         };
         const paymentLabels = {
@@ -6026,9 +6026,12 @@
           list?.classList.toggle("compact", boardCompact);
           const compactBoardButton = qs("#compactBoardButton");
           if (compactBoardButton) {
+            const canToggleCompact = visibleItems.length > 2 || !boardCompact;
+            compactBoardButton.hidden = !canToggleCompact;
             compactBoardButton.classList.toggle("active", boardCompact);
             compactBoardButton.setAttribute("aria-pressed", String(boardCompact));
             compactBoardButton.textContent = boardCompact ? "Normalansicht" : "Kompakt";
+            compactBoardButton.disabled = !canToggleCompact;
           }
           const focusListButton = qs("#focusListButton");
           if (focusListButton) {
