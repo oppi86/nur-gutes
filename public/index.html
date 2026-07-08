@@ -4773,6 +4773,7 @@
         const dailyFocusKey = "nurGutesDailyFocusItem";
         const dailyFocusUndoKey = "nurGutesDailyFocusUndo";
         const dailyFocusNoteKey = "nurGutesDailyFocusNote";
+        const dailyFocusAutoDismissedKey = "nurGutesDailyFocusAutoDismissed";
         const dailyFocusActionsOpenKey = "nurGutesDailyFocusActionsOpen";
         const quickTaskKey = "nurGutesQuickTask";
         const boardFilterKey = "nurGutesBoardFilter";
@@ -4822,18 +4823,18 @@
           }
         ];
         const dailyProductIdea = {
-          id: "daily-2026-07-07-smart-compact",
-          date: "7. Juli 2026",
-          title: "Smart Board Ansicht",
+          id: "daily-2026-07-08-auto-focus-recall",
+          date: "8. Juli 2026",
+          title: "Auto Fokus Recall",
           category: "Business Idee",
           amount: 29,
-          next: "Board-Ansichtsschalter nur anzeigen, wenn Normalansicht oder groesseres Board relevant ist",
-          text: "Der Kompakt/Normal-Schalter bleibt im kleinen Standard-Board verborgen und erscheint erst bei groesseren Boards oder wenn die Normalansicht aktiv ist.",
-          revenueStream: "29-Euro Board View Setup",
-          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer ruhigere Board-Arbeitsansichten",
-          userGrowth: "+1 Klarheits-Signal durch weniger Standard-Ansichtsschalter",
+          next: "Empfohlenen Tagesfokus automatisch speichern, solange der Nutzer ihn nicht geloest hat",
+          text: "Das Dashboard setzt bei leerem Tagesfokus automatisch die empfohlene Board-Aktion als Fokus und merkt, wenn der Nutzer den Fokus bewusst loest.",
+          revenueStream: "29-Euro Focus Recall Setup",
+          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer schnellere Tagesstarts",
+          userGrowth: "+1 Aktivierungs-Signal durch sofort handlungsfaehigen Dashboard-Start",
           socialStatus: "Postingtexte im Social-Tool vorbereitet; keine externen Connectoren autorisiert",
-          implementedFunction: "Board-Groesse und Ansichtsmodus auswerten, Ansichtsschalter zustandsbasiert einblenden und bestehende Kompakt/Normal-Logik weiter toggeln.",
+          implementedFunction: "Empfohlene Board-Aktion berechnen, als Tagesfokus in localStorage speichern und manuelles Loesen per Dismiss-Flag respektieren.",
           reinvestment: "40% gute Taten, 25% bessere Fokus- und Workspace-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
         };
         const paymentLabels = {
@@ -4878,6 +4879,7 @@
         let dailyFocusItemId = localStorage.getItem(dailyFocusKey) || "";
         let lastCompletedFocus = loadJson(dailyFocusUndoKey, null);
         let dailyFocusNote = localStorage.getItem(dailyFocusNoteKey) || "";
+        let dailyFocusAutoDismissed = localStorage.getItem(dailyFocusAutoDismissedKey) === "true";
         let dailyFocusActionsOpen = localStorage.getItem(dailyFocusActionsOpenKey) === "true";
         if (localStorage.getItem(archiveOpenKey) === "true") localStorage.setItem(archiveOpenKey, "false");
         let quickTask = localStorage.getItem(quickTaskKey) || "auto";
@@ -5373,6 +5375,7 @@
           boardCompact = true;
           dailyFocusItemId = "";
           dailyFocusNote = "";
+          dailyFocusAutoDismissed = false;
           toolAccessMoreOpen = false;
           lastCompletedFocus = null;
           localStorage.setItem(boardFocusLimitKey, String(boardFocusLimitEnabled));
@@ -5380,6 +5383,7 @@
           localStorage.removeItem(dailyFocusKey);
           localStorage.removeItem(dailyFocusNoteKey);
           localStorage.removeItem(dailyFocusUndoKey);
+          localStorage.removeItem(dailyFocusAutoDismissedKey);
           dailyDetailsOpen = false;
           localStorage.setItem(compactBoardKey, String(boardCompact));
           localStorage.setItem(dailyDetailsKey, String(dailyDetailsOpen));
@@ -5612,17 +5616,34 @@
           return null;
         }
 
-        function setDailyFocus(itemId = "") {
+        function setDailyFocus(itemId = "", options = {}) {
           const item = items.find((entry) => entry.id === itemId);
           dailyFocusItemId = item ? item.id : "";
-          if (dailyFocusItemId) localStorage.setItem(dailyFocusKey, dailyFocusItemId);
-          else localStorage.removeItem(dailyFocusKey);
+          if (dailyFocusItemId) {
+            dailyFocusAutoDismissed = false;
+            localStorage.setItem(dailyFocusKey, dailyFocusItemId);
+            localStorage.removeItem(dailyFocusAutoDismissedKey);
+          } else {
+            localStorage.removeItem(dailyFocusKey);
+            dailyFocusAutoDismissed = Boolean(options.dismiss);
+            if (dailyFocusAutoDismissed) localStorage.setItem(dailyFocusAutoDismissedKey, "true");
+            else localStorage.removeItem(dailyFocusAutoDismissedKey);
+          }
           if (!dailyFocusItemId) {
             dailyFocusNote = "";
             localStorage.removeItem(dailyFocusNoteKey);
           }
           renderDailyFocus();
           renderDashboardCompactness();
+        }
+
+        function ensureRecommendedDailyFocus() {
+          if (dailyFocusItemId || dailyFocusAutoDismissed) return false;
+          const action = recommendNextAction();
+          if (!action?.item || action.empty || action.item.status === "done") return false;
+          dailyFocusItemId = action.item.id;
+          localStorage.setItem(dailyFocusKey, dailyFocusItemId);
+          return true;
         }
 
         function renderDailyFocus() {
@@ -5743,6 +5764,7 @@
           localStorage.removeItem(dailyFocusKey);
           localStorage.removeItem(dailyFocusNoteKey);
           localStorage.setItem(dailyFocusUndoKey, JSON.stringify(lastCompletedFocus));
+          localStorage.removeItem(dailyFocusAutoDismissedKey);
           resetEmptyCurrentFilter();
           saveItems();
           renderAll();
@@ -5759,10 +5781,12 @@
           items = items.map((entry) => entry.id === undo.id ? { ...entry, status: restoredStatus } : entry);
           dailyFocusItemId = undo.id;
           dailyFocusNote = "";
+          dailyFocusAutoDismissed = false;
           lastCompletedFocus = null;
           localStorage.setItem(dailyFocusKey, dailyFocusItemId);
           localStorage.removeItem(dailyFocusNoteKey);
           localStorage.removeItem(dailyFocusUndoKey);
+          localStorage.removeItem(dailyFocusAutoDismissedKey);
           currentFilter = "all";
           currentStatKey = "revenue";
           saveBoardView();
@@ -6847,6 +6871,7 @@
           renderStats();
           if (!renderLastExportStatus()) renderLastCopyStatus();
           renderDailyIdea();
+          ensureRecommendedDailyFocus();
           renderDailyFocus();
           renderNextAction();
           renderBoard();
@@ -7017,7 +7042,7 @@
         qs("#copyDailyFocusButton")?.addEventListener("click", copyDailyFocusBrief);
         qs("#completeDailyFocusButton")?.addEventListener("click", completeDailyFocus);
         qs("#undoDailyFocusButton")?.addEventListener("click", undoDailyFocusComplete);
-        qs("#clearDailyFocusButton")?.addEventListener("click", () => setDailyFocus(""));
+        qs("#clearDailyFocusButton")?.addEventListener("click", () => setDailyFocus("", { dismiss: true }));
         qs("#dailyFocusNote")?.addEventListener("input", (event) => updateDailyFocusNote(event.target.value));
         qs("#dailyFocusActionsMore")?.addEventListener("toggle", (event) => setDailyFocusActionsOpen(event.target.open));
         qs("#addDailyIdeaButton")?.addEventListener("click", addDailyIdeaToBoard);
