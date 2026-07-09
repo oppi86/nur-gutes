@@ -4823,18 +4823,18 @@
           }
         ];
         const dailyProductIdea = {
-          id: "daily-2026-07-08-auto-focus-recall",
-          date: "8. Juli 2026",
-          title: "Auto Fokus Recall",
+          id: "daily-2026-07-09-smart-status-filter",
+          date: "9. Juli 2026",
+          title: "Smart Statusfilter",
           category: "Business Idee",
-          amount: 29,
-          next: "Empfohlenen Tagesfokus automatisch speichern, solange der Nutzer ihn nicht geloest hat",
-          text: "Das Dashboard setzt bei leerem Tagesfokus automatisch die empfohlene Board-Aktion als Fokus und merkt, wenn der Nutzer den Fokus bewusst loest.",
-          revenueStream: "29-Euro Focus Recall Setup",
-          dailyRevenue: "Ziel: erster 29-Euro Setup-Kauf fuer schnellere Tagesstarts",
-          userGrowth: "+1 Aktivierungs-Signal durch sofort handlungsfaehigen Dashboard-Start",
+          amount: 39,
+          next: "Board-Filter nur zeigen, wenn der Status wirklich Eintraege hat",
+          text: "Das Board blendet leere Statusfilter automatisch aus und macht neue Filter sichtbar, sobald ein Eintrag diesen Status bekommt.",
+          revenueStream: "39-Euro Board Status Setup",
+          dailyRevenue: "Ziel: erster 39-Euro Setup-Kauf fuer klarere Mini-Workflows",
+          userGrowth: "+1 Nutzungs-Signal durch weniger sichtbare, aber sofort verstaendliche Board-Optionen",
           socialStatus: "Postingtexte im Social-Tool vorbereitet; keine externen Connectoren autorisiert",
-          implementedFunction: "Empfohlene Board-Aktion berechnen, als Tagesfokus in localStorage speichern und manuelles Loesen per Dismiss-Flag respektieren.",
+          implementedFunction: "Statusfilter zaehlen Board-Eintraege live, verstecken leere Optionen und erscheinen automatisch nach Statuswechseln.",
           reinvestment: "40% gute Taten, 25% bessere Fokus- und Workspace-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
         };
         const paymentLabels = {
@@ -6043,9 +6043,11 @@
           qsa("[data-filter]").forEach((button) => {
             const filter = button.dataset.filter;
             const filterCount = filterCounts[filter] || 0;
+            const isEmptyOptionalFilter = filter !== "all" && filterCount === 0 && currentFilter !== filter;
             button.textContent = `${filterLabels[filter] || filter} (${filterCount})`;
+            button.hidden = isEmptyOptionalFilter;
             button.classList.toggle("active", currentFilter === filter);
-            button.disabled = filter !== "all" && filterCount === 0 && currentFilter !== filter;
+            button.disabled = isEmptyOptionalFilter;
           });
           list?.classList.toggle("compact", boardCompact);
           const compactBoardButton = qs("#compactBoardButton");
