@@ -4823,18 +4823,19 @@
           }
         ];
         const dailyProductIdea = {
-          id: "daily-2026-07-09-smart-status-filter",
-          date: "9. Juli 2026",
-          title: "Smart Statusfilter",
+          id: "daily-2026-07-10-daily-date-sync",
+          date: "10. Juli 2026",
+          createdAt: "2026-07-10",
+          title: "Daily Date Sync",
           category: "Business Idee",
-          amount: 39,
-          next: "Board-Filter nur zeigen, wenn der Status wirklich Eintraege hat",
-          text: "Das Board blendet leere Statusfilter automatisch aus und macht neue Filter sichtbar, sobald ein Eintrag diesen Status bekommt.",
-          revenueStream: "39-Euro Board Status Setup",
-          dailyRevenue: "Ziel: erster 39-Euro Setup-Kauf fuer klarere Mini-Workflows",
-          userGrowth: "+1 Nutzungs-Signal durch weniger sichtbare, aber sofort verstaendliche Board-Optionen",
+          amount: 49,
+          next: "Daily-Board-Eintrag mit dem echten Tagesdatum speichern",
+          text: "Das Board uebernimmt Daily-Ideen mit eigenem ISO-Datum, damit Sortierung, Export und spaetere Auswertung nicht mehr durch alte Standarddaten verfaelscht werden.",
+          revenueStream: "49-Euro Board Hygiene Setup",
+          dailyRevenue: "Ziel: erster 49-Euro Setup-Kauf fuer sauberere Daily-Workflows",
+          userGrowth: "+1 Qualitaets-Signal durch verlaessliche Sortierung und bessere Wiederkehr-Orientierung",
           socialStatus: "Postingtexte im Social-Tool vorbereitet; keine externen Connectoren autorisiert",
-          implementedFunction: "Statusfilter zaehlen Board-Eintraege live, verstecken leere Optionen und erscheinen automatisch nach Statuswechseln.",
+          implementedFunction: "Daily-Idee traegt ein eigenes createdAt-Datum und speichert dieses beim Uebernehmen ins Board.",
           reinvestment: "40% gute Taten, 25% bessere Fokus- und Workspace-Algorithmen, 20% Growth/Distribution, 15% Betrieb und Qualitaet."
         };
         const paymentLabels = {
@@ -5861,7 +5862,7 @@
               next: dailyProductIdea.next,
               text: `${dailyProductIdea.text} Funktion: ${dailyProductIdea.implementedFunction}`,
               status: "planned",
-              createdAt: "2026-07-02"
+              createdAt: dailyProductIdea.createdAt
             });
             saveItems();
           }
